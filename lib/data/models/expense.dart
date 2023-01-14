@@ -9,19 +9,17 @@ class Expense {
   final num price;
   final String createdDate;
   final String updatedDate;
-  final bool deleted;
+  final int deleted;
   Expense({
-    required this.id,
+    this.id = "",
     required this.person,
     required this.description,
     this.picture = "",
     required this.price,
     required this.createdDate,
     required this.updatedDate,
-    this.deleted = false,
+    this.deleted = 0,
   });
-
-  
 
   Expense copyWith({
     String? id,
@@ -31,7 +29,7 @@ class Expense {
     num? price,
     String? createdDate,
     String? updatedDate,
-    bool? deleted,
+    int? deleted,
   }) {
     return Expense(
       id: id ?? this.id,
@@ -67,7 +65,7 @@ class Expense {
       price: map['price'] as num,
       createdDate: map['createdDate'] as String,
       updatedDate: map['updatedDate'] as String,
-      deleted: map['deleted'] as bool,
+      deleted: map['deleted'] as int,
     );
   }
 

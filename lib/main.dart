@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/presentation/widgets/custom_dialogs.dart';
-
+import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferencesHelper.instance;
   await SqliteManager.instance.open();
   await Firebase.initializeApp();
+  FirestoreManager.instance;
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  showExpenseDialog(BuildContext context) {
+    showDialog(context: context, builder: (ctx) => ExpenseDialog());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,17 +28,15 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Builder(
-          builder: (appContext) {
-            return Scaffold(
-              floatingActionButton: FloatingActionButton(
-                onPressed: ()=> addExpenseDialog(context: appContext),
-                child: const Icon(Icons.add_rounded),
-              ),
-              body: SafeArea(child: MainPage()),
-            );
-          }
-        ));
+        home: Builder(builder: (appContext) {
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => showExpenseDialog(appContext),
+              child: const Icon(Icons.add_rounded),
+            ),
+            body: SafeArea(child: MainPage()),
+          );
+        }));
   }
 }
 
