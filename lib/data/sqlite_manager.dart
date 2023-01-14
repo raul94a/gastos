@@ -19,21 +19,23 @@ class SqliteManager {
   String get expensesTable => _expensesTable;
 
   Future<void> open() async {
-    _database = await openDatabase(dbName, version: 1, onCreate: _onCreate, onOpen: (db) async{
-      
-      // final res  =await db.rawQuery('delete from expenses');
-      // print(res);
-      
-    },);
+    _database = await openDatabase(
+      dbName,
+      version: 2,
+      onCreate: _onCreate,
+      onOpen: (db) async {
+        // final res  =await db.rawQuery('delete from expenses');
+        // print(res);
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+       
+      },
+    );
   }
 
   FutureOr<void> _onCreate(Database db, int descriptor) async {
-    await db.execute(
-        'CREATE TABLE expenses (id varchar(255) primary key,' 
-        'person varchar(255), description TEXT, picture TEXT, price REAL,' 
-        'createdDate varchar(255), updatedDate varchar(255), deleted BOOLEAN)');
-
-  
+    await db.execute('CREATE TABLE expenses (id varchar(255) primary key,'
+        'person varchar(255), description TEXT, picture TEXT, price REAL,'
+        'createdDate int, updatedDate int, deleted BOOLEAN)');
   }
-
 }

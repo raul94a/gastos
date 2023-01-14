@@ -7,8 +7,8 @@ class Expense {
   final String description;
   final String picture;
   final num price;
-  final String createdDate;
-  final String updatedDate;
+  final DateTime createdDate;
+  final DateTime updatedDate;
   final int deleted;
   Expense({
     this.id = "",
@@ -21,14 +21,15 @@ class Expense {
     this.deleted = 0,
   });
 
+
   Expense copyWith({
     String? id,
     String? person,
     String? description,
     String? picture,
     num? price,
-    String? createdDate,
-    String? updatedDate,
+    DateTime? createdDate,
+    DateTime? updatedDate,
     int? deleted,
   }) {
     return Expense(
@@ -50,21 +51,22 @@ class Expense {
       'description': description,
       'picture': picture,
       'price': price,
-      'createdDate': createdDate,
-      'updatedDate': updatedDate,
+      'createdDate': createdDate.millisecondsSinceEpoch,
+      'updatedDate': updatedDate.millisecondsSinceEpoch,
       'deleted': deleted,
     };
   }
 
   factory Expense.fromMap(Map<String, dynamic> map) {
+    print(map);
     return Expense(
       id: map['id'] as String,
       person: map['person'] as String,
       description: map['description'] as String,
       picture: map['picture'] as String,
       price: map['price'] as num,
-      createdDate: map['createdDate'] as String,
-      updatedDate: map['updatedDate'] as String,
+      createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int),
+      updatedDate: DateTime.fromMillisecondsSinceEpoch(map['updatedDate'] as int),
       deleted: map['deleted'] as int,
     );
   }

@@ -1,4 +1,3 @@
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
@@ -19,15 +18,15 @@ class SharedPreferencesHelper {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<void> saveLastSync(String date) async {
-    preferences.setString(_lastSync, date);
+  Future<void> saveLastSync(int millis) async {
+    preferences.setInt(_lastSync, millis);
   }
 
   Future<void> saveDateType(DateType type) async {
     preferences.setString(_dateType, type.value);
   }
 
-  String getLastSync() => preferences.getString(_lastSync) ?? "";
+  int getLastSync() => preferences.getInt(_lastSync) ?? 0;
   DateType getDateType() {
     final type = preferences.getString(_dateType);
     if (type == null) {
