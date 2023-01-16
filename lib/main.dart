@@ -79,56 +79,84 @@ class ExpenseList extends StatelessWidget {
           width: width * 0.96,
           child: ListView.builder(
               itemCount: state.expenses.keys.toList().length,
-              itemBuilder: (ctx, index) => Wrap(
-                    children: [
-                      Text(state.orderedDate[index]),
-                      SizedBox(
-                        height: size.height * 0.3,
-                        child: ListView.builder(
-                            itemCount: state
-                                .expenses[state.orderedDate[index]]!
-                                .length,
-                            itemBuilder: ((context, i) {
-                              final date = state.orderedDate[index];
-
-                              final List<Expense> expenses =
-                                  state.expenses[date]!;
-
-                              return Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 4.0),
-                                child: ListTile(
-                                  onLongPress: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (ctx) {
-                                          return ExpenseOptionsDialog(
-                                              state: state,
-                                              index: i,
-                                              date: date);
-                                        });
-                                  },
-                                  contentPadding: const EdgeInsets.all(8),
-                                  style: ListTileStyle.list,
-                                  shape: RoundedRectangleBorder(
-                                      side:
-                                          const BorderSide(color: Colors.black),
-                                      borderRadius: BorderRadius.circular(7)),
-                                  leading: Text('${i + 1}'),
-                                  title: Text(expenses[i].description),
-                                  subtitle: Text(expenses[i].person),
-                                  trailing: CircleAvatar(
-                                    radius: 70,
-                                    child: Text('${expenses[i].price} €'),
-                                  ),
-                                ),
-                              );
-                            })),
-                      ),
-                    ],
-                  )),
+              itemBuilder: (ctx, index) =>
+                  ExpensesByDateList(state: state, index: index)),
         ),
       ),
+    );
+  }
+}
+
+class ExpensesByDateList extends StatefulWidget {
+  const ExpensesByDateList({Key? key, required this.state, required this.index})
+      : super(key: key);
+  final ExpenseProvider state;
+  final int index;
+
+  @override
+  State<ExpensesByDateList> createState() => _ExpensesByDateListState();
+}
+
+class _ExpensesByDateListState extends State<ExpensesByDateList> {
+  bool show = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    show = widget.index == 0 ? true : false;
+  }
+
+  void changeShowStatus() => setState(() => show = !show);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Wrap(
+      children: [
+        GestureDetector(
+            onTap: changeShowStatus,
+            child: Text(widget.state.orderedDate[widget.index])),
+        if (show)
+          ListView.builder(
+              shrinkWrap: true,
+              itemCount: widget.state
+                  .expenses[widget.state.orderedDate[widget.index]]!.length,
+              itemBuilder: ((context, i) {
+                final date = widget.state.orderedDate[widget.index];
+                final List<Expense> expenses = widget.state.expenses[date]!;
+
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: ListTile(
+                    onLongPress: () {
+                      showDialog(
+                          context: context,
+                          builder: (ctx) {
+                            return ExpenseOptionsDialog(
+                                state: widget.state, index: i, date: date);
+                          });
+                    },
+                    contentPadding: const EdgeInsets.all(8),
+                    style: ListTileStyle.list,
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(color: Colors.black),
+                        borderRadius: BorderRadius.circular(7)),
+                    leading: Text('${i + 1}'),
+                    title: Text(expenses[i].description),
+                    subtitle: Text(expenses[i].person),
+                    trailing: CircleAvatar(
+                      radius: 70,
+                      child: Text('${expenses[i].price} €'),
+                    ),
+                  ),
+                );
+              })),
+        if (widget.index != 0 && show)
+          ElevatedButton(
+              onPressed: () {},
+              child: Text(
+                  'Añadir gasto a ${widget.state.orderedDate[widget.index]}'))
+      ],
     );
   }
 }
