@@ -26,6 +26,8 @@ class SqliteManager {
       onOpen: (db) async {
         // final res  =await db.rawQuery('delete from expenses');
         // print(res);
+      //  final res = await db.rawQuery('SELECT e.*, date(e.createdDate / 1000 , "unixepoch") as "date" from expenses e order by date desc');
+     
       },
       onUpgrade: (db, oldVersion, newVersion) async {
        

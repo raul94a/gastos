@@ -30,14 +30,14 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
 
     return SingleChildScrollView(
       child: Dialog(
-        insetPadding: EdgeInsets.all(10),
+        insetPadding: const EdgeInsets.all(10),
         child: Padding(
           padding: const EdgeInsets.all(14.5),
           child: Form(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Nombre'),
+                const Text('Nombre'),
                 Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
@@ -48,10 +48,10 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                       controller: nameController,
                       // onFieldSubmitted: (value) => nameNode.nextFocus(),
                     )),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                Text('Descripción del gasto'),
+                const Text('Descripción del gasto'),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
@@ -63,10 +63,10 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                     //   onFieldSubmitted: (value) => descriptionNode.nextFocus(),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                Text('precio (€)'),
+                const Text('precio (€)'),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
@@ -77,7 +77,7 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                     //    onFieldSubmitted: (value) => priceNode.nextFocus(),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Consumer<ExpenseProvider>(
@@ -88,8 +88,6 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                       onPressed: state.loading
                           ? null
                           : () async {
-                              //TODO: create the model
-
                               String name = nameController.text;
                               String description = descriptionController.text;
                               String priceString =
@@ -119,15 +117,21 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                           ? CircularProgressIndicator(
                               color: Colors.white,
                             )
-                          : Text('Añadir gasto')),
+                          : Text(expense != null
+                              ? 'Actualizar gasto'
+                              : 'Añadir gasto')),
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                ElevatedButton(
-                    style: ButtonStyle(fixedSize: getProperty(Size(width, 50))),
-                    onPressed: Navigator.of(context).pop,
-                    child: Text('Cancelar'))
+                Consumer<ExpenseProvider>(
+                  builder: (ctx, state, _) => ElevatedButton(
+                      style:
+                          ButtonStyle(fixedSize: getProperty(Size(width, 50))),
+                      onPressed:
+                          state.loading ? null : Navigator.of(context).pop,
+                      child: Text('Cancelar')),
+                )
               ],
             ),
           ),

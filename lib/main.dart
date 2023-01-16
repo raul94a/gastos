@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:gastos/data/firestore_manager.dart';
-import 'package:gastos/data/services/expenses_service.dart';
+import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/presentation/widgets/custom_dialogs.dart';
@@ -56,6 +56,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final today = DateTime.now();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: const [Expanded(child: ExpenseList())],
@@ -77,31 +78,54 @@ class ExpenseList extends StatelessWidget {
         child: SizedBox(
           width: width * 0.96,
           child: ListView.builder(
-              itemCount: state.expenses.length,
-              itemBuilder: (ctx, index) => Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: ListTile(
-                      onLongPress: () {
-                        showDialog(
-                            context: context,
-                            builder: (ctx) {
-                              return ExpenseOptionsDialog(
-                                  state: state, index: index);
-                            });
-                      },
-                      contentPadding: const EdgeInsets.all(8),
-                      style: ListTileStyle.list,
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(color: Colors.black),
-                          borderRadius: BorderRadius.circular(7)),
-                      leading: Text('${index + 1}'),
-                      title: Text(state.expenses[index].description),
-                      subtitle: Text(state.expenses[index].person),
-                      trailing: CircleAvatar(
-                        radius: 70,
-                        child: Text('${state.expenses[index].price} €'),
+              itemCount: state.expenses.keys.toList().length,
+              itemBuilder: (ctx, index) => Wrap(
+                    children: [
+                      Text(state.orderedDate[index]),
+                      SizedBox(
+                        height: size.height * 0.3,
+                        child: ListView.builder(
+                            itemCount: state
+                                .expenses[state.orderedDate[index]]!
+                                .length,
+                            itemBuilder: ((context, i) {
+                              final date = state.orderedDate[index];
+
+                              final List<Expense> expenses =
+                                  state.expenses[date]!;
+
+                              return Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: ListTile(
+                                  onLongPress: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (ctx) {
+                                          return ExpenseOptionsDialog(
+                                              state: state,
+                                              index: i,
+                                              date: date);
+                                        });
+                                  },
+                                  contentPadding: const EdgeInsets.all(8),
+                                  style: ListTileStyle.list,
+                                  shape: RoundedRectangleBorder(
+                                      side:
+                                          const BorderSide(color: Colors.black),
+                                      borderRadius: BorderRadius.circular(7)),
+                                  leading: Text('${i + 1}'),
+                                  title: Text(expenses[i].description),
+                                  subtitle: Text(expenses[i].person),
+                                  trailing: CircleAvatar(
+                                    radius: 70,
+                                    child: Text('${expenses[i].price} €'),
+                                  ),
+                                ),
+                              );
+                            })),
                       ),
-                    ),
+                    ],
                   )),
         ),
       ),
@@ -111,9 +135,10 @@ class ExpenseList extends StatelessWidget {
 
 class ExpenseOptionsDialog extends StatelessWidget {
   const ExpenseOptionsDialog(
-      {Key? key, required this.state, required this.index})
+      {Key? key, required this.state, required this.index, required this.date})
       : super(key: key);
   final ExpenseProvider state;
+  final String date;
   final int index;
   @override
   Widget build(BuildContext context) {
@@ -127,8 +152,8 @@ class ExpenseOptionsDialog extends StatelessWidget {
                     Navigator.of(context).pop();
                     showDialog(
                         context: context,
-                        builder: (ctx) =>
-                            ExpenseDialog(expense: state.expenses[index]));
+                        builder: (ctx) => ExpenseDialog(
+                            expense: state.expenses[date]![index]));
                   },
             icon: const Icon(Icons.update),
             label: const Text('Actualizar gasto')),
@@ -136,7 +161,7 @@ class ExpenseOptionsDialog extends StatelessWidget {
             onPressed: state.loading
                 ? null
                 : () => state
-                    .remove(state.expenses[index])
+                    .remove(state.expenses[date]![index])
                     .whenComplete(() => Navigator.of(context).pop()),
             icon: Icon(Icons.update),
             label: Text('Eliminar gasto')),
@@ -155,7 +180,6 @@ class InitialLoad extends StatelessWidget {
     Future.microtask(() async => await initialLoad(context));
     return Consumer<ExpenseProvider>(builder: (ctx, state, _) {
       if (state.initialFetchFinished) {
-       
         return const MainPage();
       }
       return Center(

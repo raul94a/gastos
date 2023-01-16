@@ -1,14 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gastos/data/firestore_manager.dart';
-import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/data/queries/expense_queries.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:gastos/utils/date_formatter.dart';
 
 class ExpenseService {
   SqliteManager sqliteManager = SqliteManager.instance;
   FirestoreManager firestoreManager = FirestoreManager.instance;
-
   Future<String> save(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
     try {
@@ -82,9 +80,12 @@ class ExpenseService {
     }
   }
 
-  Future<List<Map<String,dynamic>>> readAll() async {
-      final table = sqliteManager.expensesTable;
+  Future<List<Map<String, dynamic>>> readAll() async {
     final db = sqliteManager.database;
-    return await db.rawQuery('select * from $table');
+    List<Map<String,dynamic>> result = await db.rawQuery(ExpenseQueries.readExpenses());
+
+ 
+
+    return result;
   }
 }

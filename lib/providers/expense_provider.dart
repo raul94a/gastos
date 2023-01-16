@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/repository/expenses_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
+import 'package:gastos/utils/date_formatter.dart';
 
 class ExpenseProvider with ChangeNotifier {
   //firebase
@@ -12,13 +13,16 @@ class ExpenseProvider with ChangeNotifier {
   final repository = ExpensesRepository();
   final preferences = SharedPreferencesHelper.instance;
 
-  final List<Expense> _expenses = [];
+  final Map<String, List<Expense>> _expenses = {};
 
   bool loading = false;
   bool initialFetchFinished = false;
 
   //getters
-  List<Expense> get expenses => _expenses;
+  Map<String, List<Expense>> get expenses => _expenses;
+
+  List<String> get orderedDate =>
+      (_expenses.keys.toList())..sort((a, b) => b.compareTo(a));
 
   //state management
 
@@ -27,7 +31,9 @@ class ExpenseProvider with ChangeNotifier {
     notifyListeners();
     try {
       final newExpense = await repository.save(expense);
-      _expenses.add(newExpense);
+      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      final list = _expenses[date];
+      list?.add(newExpense);
     } catch (err) {
       rethrow;
     } finally {
@@ -41,8 +47,10 @@ class ExpenseProvider with ChangeNotifier {
     notifyListeners();
     try {
       await repository.update(expense);
-      final index = expenses.indexWhere((element) => element.id == expense.id);
-      _expenses[index] = expense;
+      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      final list = _expenses[date];
+      final index = list?.indexWhere((element) => element.id == expense.id);
+      list?[index!] = expense;
     } catch (err) {
       rethrow;
     } finally {
@@ -57,7 +65,9 @@ class ExpenseProvider with ChangeNotifier {
     try {
       final exp = await repository.remove(expense);
       if (exp != null) {
-        _expenses.removeWhere((element) => element.id == expense.id);
+        final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+        final list = _expenses[date];
+        list?.removeWhere((element) => element.id == expense.id);
       }
     } catch (err) {
       rethrow;
@@ -78,7 +88,7 @@ class ExpenseProvider with ChangeNotifier {
       rethrow;
     } finally {
       loading = false;
-     
+
       notifyListeners();
     }
   }
@@ -90,13 +100,12 @@ class ExpenseProvider with ChangeNotifier {
 
     notifyListeners();
     try {
-    
       _expenses.addAll(await repository.readAll());
     } catch (err) {
       rethrow;
     } finally {
       loading = false;
-       initialFetchFinished = true;
+      initialFetchFinished = true;
       notifyListeners();
     }
   }
