@@ -43,19 +43,19 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   Future<void> update(Expense expense) async {
-    loading = true;
-    notifyListeners();
+    //loading = true;
+    //notifyListeners();
     try {
       await repository.update(expense);
-      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
-      final list = _expenses[date];
-      final index = list?.indexWhere((element) => element.id == expense.id);
-      list?[index!] = expense;
+      // final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      // final list = _expenses[date];
+      // final index = list?.indexWhere((element) => element.id == expense.id);
+      // list?[index!] = expense;
     } catch (err) {
       rethrow;
     } finally {
-      loading = false;
-      notifyListeners();
+      //loading = false;
+      //notifyListeners();
     }
   }
 

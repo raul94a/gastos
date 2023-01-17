@@ -1,32 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/data/services/expenses_service.dart';
 import 'package:gastos/presentation/style/form_style.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
-class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
-  const ExpenseDialog({Key? key, this.expense}) : super(key: key);
+class ExpenseDialog extends StatefulWidget with MaterialStatePropertyMixin {
+  const ExpenseDialog({Key? key, this.expense, this.updateHandler})
+      : super(key: key);
   final Expense? expense;
+  final Function(Expense)? updateHandler;
+
+  @override
+  State<ExpenseDialog> createState() => _ExpenseDialogState();
+}
+
+class _ExpenseDialogState extends State<ExpenseDialog> {
+  final TextEditingController nameController = TextEditingController(),
+      descriptionController = TextEditingController(),
+      priceController = TextEditingController();
+
+  final FocusNode nameNode = FocusNode(),
+      descriptionNode = FocusNode(),
+      priceNode = FocusNode(),
+      buttonNode = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.expense != null) {
+      nameController.text = widget.expense!.person;
+      descriptionController.text = widget.expense!.description;
+      priceController.text = widget.expense!.price.toString();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    nameController.dispose();
+    descriptionController.dispose();
+    priceController.dispose();
+    nameNode.dispose();
+    descriptionNode.dispose();
+    priceNode.dispose();
+    buttonNode.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('BUILDING EXPENSE DIALOG');
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final TextEditingController nameController = TextEditingController(),
-        descriptionController = TextEditingController(),
-        priceController = TextEditingController();
-    final FocusNode nameNode = FocusNode(),
-        descriptionNode = FocusNode(),
-        priceNode = FocusNode(),
-        buttonNode = FocusNode();
-
-    if (expense != null) {
-      nameController.text = expense!.person;
-      descriptionController.text = expense!.description;
-      priceController.text = expense!.price.toString();
-    }
 
     return SingleChildScrollView(
       child: Dialog(
@@ -42,8 +67,8 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.none,
-                      // focusNode: nameNode,
+                      textInputAction: TextInputAction.next,
+                      focusNode: nameNode,
                       decoration: basisFormDecoration(),
                       controller: nameController,
                       // onFieldSubmitted: (value) => nameNode.nextFocus(),
@@ -56,11 +81,10 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
                     keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.none,
-                    // focusNode: descriptionNode,
+                    textInputAction: TextInputAction.next,
+                    focusNode: descriptionNode,
                     decoration: basisFormDecoration(),
                     controller: descriptionController,
-                    //   onFieldSubmitted: (value) => descriptionNode.nextFocus(),
                   ),
                 ),
                 const SizedBox(
@@ -70,8 +94,10 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
-                    textInputAction: TextInputAction.none,
-                    // focusNode: priceNode,
+                    keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true, signed: true),
+                    textInputAction: TextInputAction.done,
+                    focusNode: priceNode,
                     decoration: basisFormDecoration(),
                     controller: priceController,
                     //    onFieldSubmitted: (value) => priceNode.nextFocus(),
@@ -82,8 +108,8 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                 ),
                 Consumer<ExpenseProvider>(
                   builder: (ctx, state, _) => ElevatedButton(
-                      style:
-                          ButtonStyle(fixedSize: getProperty(Size(width, 50))),
+                      style: ButtonStyle(
+                          fixedSize: widget.getProperty(Size(width, 50))),
                       focusNode: buttonNode,
                       onPressed: state.loading
                           ? null
@@ -97,7 +123,7 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                                 print('Price is null');
                                 return;
                               }
-                              if (expense == null) {
+                              if (widget.expense == null) {
                                 await createExpense(
                                     context: context,
                                     state: state,
@@ -114,23 +140,23 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                               }
                             },
                       child: state.loading
-                          ? CircularProgressIndicator(
+                          ? const CircularProgressIndicator(
                               color: Colors.white,
                             )
-                          : Text(expense != null
+                          : Text(widget.expense != null
                               ? 'Actualizar gasto'
                               : 'Añadir gasto')),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Consumer<ExpenseProvider>(
                   builder: (ctx, state, _) => ElevatedButton(
-                      style:
-                          ButtonStyle(fixedSize: getProperty(Size(width, 50))),
+                      style: ButtonStyle(
+                          fixedSize: widget.getProperty(Size(width, 50))),
                       onPressed:
                           state.loading ? null : Navigator.of(context).pop,
-                      child: Text('Cancelar')),
+                      child: const Text('Cancelar')),
                 )
               ],
             ),
@@ -170,12 +196,14 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
       required String name,
       required String description,
       required num price}) async {
-    final newExpense = expense!.copyWith(
+    final newExpense = widget.expense!.copyWith(
         person: name,
         description: description,
         price: price,
         updatedDate: DateTime.now());
     try {
+      //We're not going to update the Expense with the provider.
+      widget.updateHandler!(newExpense);
       await state.update(newExpense);
       Navigator.of(context).pop();
     } catch (err) {
