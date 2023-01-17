@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   showExpenseDialog(BuildContext context) {
-    showDialog(context: context, builder: (ctx) => const ExpenseDialog());
+    showDialog(context: context, barrierDismissible: true,builder: (ctx) => const ExpenseDialog());
   }
 
   @override

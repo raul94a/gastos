@@ -46,7 +46,7 @@ class ExpenseProvider with ChangeNotifier {
     //loading = true;
     //notifyListeners();
     try {
-      await repository.update(expense);
+      repository.update(expense);
       // final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
       // final list = _expenses[date];
       // final index = list?.indexWhere((element) => element.id == expense.id);
@@ -67,7 +67,10 @@ class ExpenseProvider with ChangeNotifier {
       if (exp != null) {
         final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
         final list = _expenses[date];
-        list?.removeWhere((element) => element.id == expense.id);
+        list!.removeWhere((element) => element.id == expense.id);
+        if (list.isEmpty) {
+          _expenses.remove(date);
+        }
       }
     } catch (err) {
       rethrow;
