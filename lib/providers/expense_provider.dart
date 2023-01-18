@@ -17,6 +17,8 @@ class ExpenseProvider with ChangeNotifier {
 
   bool loading = false;
   bool initialFetchFinished = false;
+  bool success = false;
+  bool error = false;
 
   //getters
   Map<String, List<Expense>> get expenses => _expenses;
@@ -24,6 +26,8 @@ class ExpenseProvider with ChangeNotifier {
   List<String> get orderedDate =>
       (_expenses.keys.toList())..sort((a, b) => b.compareTo(a));
 
+  //methods
+  bool expensesContainsDate(String date) => _expenses.containsKey(date);
   //state management
 
   Future<void> add(Expense expense) async {
@@ -32,8 +36,18 @@ class ExpenseProvider with ChangeNotifier {
     try {
       final newExpense = await repository.save(expense);
       final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
-      final list = _expenses[date];
-      list?.add(newExpense);
+      if (expensesContainsDate(date)) {
+        final list = _expenses[date];
+        list!.add(newExpense);
+      } else {
+        print('La fecha no existe: $date\nCreando Nueva expense');
+        _expenses.addAll({
+          date: [newExpense]
+        });
+        print(_expenses);
+        
+      }
+      success = true;
     } catch (err) {
       rethrow;
     } finally {
@@ -96,7 +110,13 @@ class ExpenseProvider with ChangeNotifier {
     }
   }
 
-  void clear() {}
+  void clear() {
+    success = false;
+    loading = false;
+    error = false;
+    // notifyListeners();
+  }
+
 
   Future<void> get() async {
     loading = true;

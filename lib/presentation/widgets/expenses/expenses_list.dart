@@ -49,19 +49,21 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final orderedKeys = widget.state.orderedDate;
+    final keyIndex = widget.index;
+    final expenses = widget.state.expenses;
+    final List<Expense> expensesOfDate = expenses[orderedKeys[keyIndex]]!;
     return Wrap(
       children: [
         GestureDetector(
             onTap: changeShowStatus,
-            child: Text(widget.state.orderedDate[widget.index])),
+            child: Text(orderedKeys[keyIndex])),
         if (show)
           ListView.builder(
               shrinkWrap: true,
-              itemCount: widget.state
-                  .expenses[widget.state.orderedDate[widget.index]]!.length,
+              itemCount: expensesOfDate.length,
               itemBuilder: ((context, i) {
-                final date = widget.state.orderedDate[widget.index];
+                final date = orderedKeys[keyIndex];
                 final List<Expense> expenses = widget.state.expenses[date]!;
                 final expense = expenses[i];
 

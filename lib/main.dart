@@ -5,6 +5,7 @@ import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/presentation/pages/inital_load.dart';
 import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
+import 'package:gastos/presentation/widgets/initial_load/should_abandon.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,10 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   showExpenseDialog(BuildContext context) {
-    showDialog(context: context, barrierDismissible: true,builder: (ctx) => const ExpenseDialog());
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (ctx) => const ExpenseDialog());
   }
 
   @override
@@ -39,12 +43,14 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           home: Builder(builder: (appContext) {
-            return Scaffold(
-              floatingActionButton: FloatingActionButton(
-                onPressed: () => showExpenseDialog(appContext),
-                child: const Icon(Icons.add_rounded),
+            return ShouldAbandonApp(
+              child: Scaffold(
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () => showExpenseDialog(appContext),
+                  child: const Icon(Icons.add_rounded),
+                ),
+                body: const SafeArea(child: InitialLoad()),
               ),
-              body: const SafeArea(child: InitialLoad()),
             );
           })),
     );
