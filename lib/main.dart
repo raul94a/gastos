@@ -5,7 +5,7 @@ import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/presentation/pages/inital_load.dart';
 import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
-import 'package:gastos/presentation/widgets/initial_load/should_abandon.dart';
+import 'package:gastos/presentation/widgets/main/should_abandon.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:provider/provider.dart';
 

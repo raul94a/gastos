@@ -45,7 +45,6 @@ class ExpenseProvider with ChangeNotifier {
           date: [newExpense]
         });
         print(_expenses);
-        
       }
       success = true;
     } catch (err) {
@@ -57,39 +56,40 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   Future<void> update(Expense expense) async {
-    //loading = true;
-    //notifyListeners();
     try {
       repository.update(expense);
-      // final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
-      // final list = _expenses[date];
-      // final index = list?.indexWhere((element) => element.id == expense.id);
-      // list?[index!] = expense;
     } catch (err) {
       rethrow;
-    } finally {
-      //loading = false;
-      //notifyListeners();
     }
   }
 
-  Future<void> remove(Expense expense) async {
-    loading = true;
-    notifyListeners();
+  void remove(Expense expense) {
+    //loading = true;
+    //notifyListeners();
     try {
-      final exp = await repository.remove(expense);
-      if (exp != null) {
-        final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
-        final list = _expenses[date];
-        list!.removeWhere((element) => element.id == expense.id);
+      print('Starting removal of expense ${expense.id}');
+      final exp = repository.remove(expense);
+
+      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      final list = _expenses[date];
+      print('Expense was created in dae: $date');
+      print('Expenses list for $date is: $list');
+      if (list != null) {
+        final index = list.indexWhere((element) => element.id == expense.id);
+        print('Expense ${expense.id} is at $index');
+        final removedExpense = list.removeAt(index);
+        print('removedExpense: $removedExpense');
+        _expenses[date] = [...list];
+
         if (list.isEmpty) {
           _expenses.remove(date);
         }
       }
     } catch (err) {
+      print(err);
       rethrow;
     } finally {
-      loading = false;
+      //loading = false;
       notifyListeners();
     }
   }
@@ -114,9 +114,7 @@ class ExpenseProvider with ChangeNotifier {
     success = false;
     loading = false;
     error = false;
-    // notifyListeners();
   }
-
 
   Future<void> get() async {
     loading = true;

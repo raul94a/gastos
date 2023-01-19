@@ -24,15 +24,14 @@ class ExpenseOptionsDialog extends StatelessWidget {
       title: const Text('Selecciona la acción que desees'),
       children: [
         TextButton.icon(
-            onPressed: state.loading
-                ? null
-                : () {
-                    Navigator.of(context).pop();
-                    showDialog(
-                        context: context,
-                        builder: (ctx) => ExpenseDialog(
-                            expense: expense, updateHandler: updateHandler));
-                  },
+            onPressed: () {
+              if (state.loading) return;
+              Navigator.of(context).pop();
+              showDialog(
+                  context: context,
+                  builder: (ctx) => ExpenseDialog(
+                      expense: expense, updateHandler: updateHandler));
+            },
             icon: const Icon(
               Icons.update,
               color: Colors.blue,
@@ -40,11 +39,10 @@ class ExpenseOptionsDialog extends StatelessWidget {
             label: const Text('Actualizar gasto',
                 style: TextStyle(color: Colors.blue))),
         TextButton.icon(
-            onPressed: state.loading
-                ? null
-                : () => state
-                    .remove(state.expenses[date]![index])
-                    .whenComplete(() => Navigator.of(context).pop()),
+            onPressed: () => {
+                  state.remove(state.expenses[date]![index]),
+                  Navigator.of(context).pop()
+                },
             icon: const Icon(Icons.update, color: Colors.blue),
             label: const Text('Eliminar gasto',
                 style: TextStyle(color: Colors.blue))),

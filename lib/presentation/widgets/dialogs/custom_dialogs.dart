@@ -249,7 +249,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String name,
       required String description,
       required num price}) async {
-    final createdDate = DateTime.now();
+    final createdDate = DateTime.now().toLocal();
     final updatedDate = createdDate;
     final expense = Expense(
         person: name,
@@ -276,7 +276,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
         person: name,
         description: description,
         price: price,
-        updatedDate: DateTime.now());
+        updatedDate: DateTime.now().toLocal());
     try {
       //We're not going to update the Expense with the provider.
       widget.updateHandler!(newExpense);

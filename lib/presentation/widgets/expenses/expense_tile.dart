@@ -3,7 +3,6 @@ import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/dialogs/expense_options_dialog.dart';
 import 'package:gastos/providers/expense_provider.dart';
 
-//TODO: SELF MANAGEMENT FOR THE UPDATING OF THIS WIDGET => AVOID REBUILD ALL THE LIST WHEN UPDATING
 class ExpenseTile extends StatefulWidget {
   const ExpenseTile(
       {Key? key,
@@ -30,20 +29,21 @@ class _ExpenseTileState extends State<ExpenseTile> {
   }
 
   void updateExpense(Expense exp) {
-    print('CALLING SET STATE!!!!');
     setState(() {
       expense = expense.copyWith(
-        updatedDate: exp.updatedDate,
-        person: exp.person,
-        price: exp.price,
-
-      );
+          updatedDate: exp.updatedDate,
+          person: exp.person,
+          price: exp.price,
+          description: exp.description);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('Rebuild Expense with ID: ${widget.expense.id}');
+
     return Container(
+      key: Key(widget.expense.id),
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: ListTile(
         onLongPress: () {
