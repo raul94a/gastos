@@ -6,9 +6,8 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: const [Expanded(child: ExpenseList())],
-    );
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    return ExpenseList();
   }
 }

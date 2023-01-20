@@ -1,23 +1,26 @@
 import 'dart:math';
 
+import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/services/expenses_service.dart';
+import 'package:gastos/utils/date_formatter.dart';
 
 class ExpensesRepository {
   final service = ExpenseService();
 
-  Future<Map<String, List<Expense>>> readAll() async {
+  Future<Map<String, List<Expense>>> readAll(DateType type) async {
     final result = await service.readAll();
     Map<String, List<Expense>> expensesByDateType = {};
     int length = result.length;
     for (int i = 0; i < length; i++) {
       final expense = result[i];
-      if (!expensesByDateType.containsKey(expense['date'])) {
+      String date = MyDateFormatter.dateByType(type, expense['date']);
+      if (!expensesByDateType.containsKey(date)) {
         expensesByDateType.addAll({
-          expense['date'].toString(): [Expense.fromMap(expense)]
+          date.toString(): [Expense.fromMap(expense)]
         });
       } else {
-        final list = expensesByDateType[expense['date']];
+        final list = expensesByDateType[date];
         list?.add(Expense.fromMap(expense));
       }
     }
@@ -26,6 +29,8 @@ class ExpensesRepository {
 
     return expensesByDateType;
   }
+
+  
 
   Future<Expense> save(Expense expense) async {
     String id = await service.save(expense.toMap());

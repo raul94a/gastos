@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ExpenseList extends StatelessWidget {
@@ -19,7 +20,7 @@ class ExpenseList extends StatelessWidget {
         child: SizedBox(
           width: width * 0.995,
           child: ListView.builder(
-              physics: const ScrollPhysics(),
+             
               itemCount: state.expenses.keys.toList().length,
               itemBuilder: (ctx, index) =>
                   ExpensesByDateList(state: state, index: index)),
@@ -60,9 +61,24 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            GestureDetector(
-                onTap: changeShowStatus, child: Text(orderedKeys[keyIndex])),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(orderedKeys[keyIndex],
+                    style: GoogleFonts.yujiBoku(fontSize: 24.2)),
+                SizedBox(
+                  width: 10,
+                ),
+                IconButton(
+                    onPressed: changeShowStatus,
+                    icon: Icon(show
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined))
+              ],
+            ),
             if (show)
               ListView.builder(
                   shrinkWrap: true,
@@ -74,7 +90,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                     final date = orderedKeys[keyIndex];
                     final List<Expense> expenses = widget.state.expenses[date]!;
                     final expense = expenses[i];
-    
+
                     return ExpenseTile(
                         key: UniqueKey(),
                         state: widget.state,

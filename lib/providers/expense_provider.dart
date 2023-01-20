@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/repository/expenses_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
@@ -116,12 +117,13 @@ class ExpenseProvider with ChangeNotifier {
     error = false;
   }
 
-  Future<void> get() async {
+  Future<void> get([DateType type = DateType.day]) async {
     loading = true;
 
     notifyListeners();
     try {
-      _expenses.addAll(await repository.readAll());
+      _expenses.clear();
+      _expenses.addAll(await repository.readAll(type));
     } catch (err) {
       rethrow;
     } finally {
@@ -129,5 +131,8 @@ class ExpenseProvider with ChangeNotifier {
       initialFetchFinished = true;
       notifyListeners();
     }
+  }
+  Future<void> getByDateType(DateType type) async {
+    await get(type);
   }
 }

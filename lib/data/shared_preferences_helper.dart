@@ -1,3 +1,4 @@
+import 'package:gastos/data/enums/date_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
@@ -49,12 +50,4 @@ class SharedPreferencesHelper {
   }
 }
 
-enum DateType {
-  day("day"),
-  month("month"),
-  year("year"),
-  week("week");
 
-  final String value;
-  const DateType(this.value);
-}
