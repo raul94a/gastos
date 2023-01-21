@@ -1,4 +1,5 @@
 import 'package:gastos/data/firestore_manager.dart';
+import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/queries/expense_queries.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
@@ -30,7 +31,8 @@ class ExpenseService {
     }
   }
 
-  Future<void> fetchLastSyncFromFirestore(int lastSync) async {
+  Future<List<Expense>> fetchLastSyncFromFirestore(int lastSync,
+      [bool returnInsertedDate = false]) async {
     final firestore = firestoreManager.firestore;
     final List<Map<String, dynamic>> firestoreData = [];
 
@@ -54,6 +56,9 @@ class ExpenseService {
     } catch (err) {
       rethrow;
     }
+
+    if (!returnInsertedDate || firestoreData.isEmpty) return [];
+    return firestoreData.map(Expense.fromMap).toList();
   }
 
   //sql services
@@ -80,12 +85,17 @@ class ExpenseService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> readAll() async {
+  Future<List<Map<String, dynamic>>> readAll(int offset) async {
     final db = sqliteManager.database;
-    List<Map<String,dynamic>> result = await db.rawQuery(ExpenseQueries.readExpenses());
-
- 
+    List<Map<String, dynamic>> result =
+        await db.rawQuery(ExpenseQueries.readExpenses(offset));
 
     return result;
+  }
+
+  Future<int> countExpenses() async {
+    final db = sqliteManager.database;
+    final res = await db.rawQuery("select count(*) as 'res' from expenses ");
+    return res.first['res'] as int;
   }
 }

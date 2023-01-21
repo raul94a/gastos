@@ -54,7 +54,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
 
   @override
   Widget build(BuildContext context) {
-    print('Rebuild Expense with ID: ${widget.expense.id}');
+//    print('Rebuild Expense with ID: ${widget.expense.id}');
     final size = MediaQuery.of(context).size;
     final width = size.width;
     bool isEven = widget.position % 2 == 0;

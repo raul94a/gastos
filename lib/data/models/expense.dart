@@ -10,6 +10,7 @@ class Expense {
   final DateTime createdDate;
   final DateTime updatedDate;
   final int deleted;
+  
   Expense({
     this.id = "",
     required this.person,
@@ -58,7 +59,7 @@ class Expense {
   }
 
   factory Expense.fromMap(Map<String, dynamic> map) {
-    print(map);
+    //print(map);
     return Expense(
       id: map['id'] as String,
       person: map['person'] as String,

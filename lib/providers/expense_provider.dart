@@ -20,12 +20,55 @@ class ExpenseProvider with ChangeNotifier {
   bool initialFetchFinished = false;
   bool success = false;
   bool error = false;
+  bool blockInfiniteScroll = false;
+  bool blockFunction = false;
+  int offset = 0;
 
   //getters
   Map<String, List<Expense>> get expenses => _expenses;
 
-  List<String> get orderedDate =>
-      (_expenses.keys.toList())..sort((a, b) => b.compareTo(a));
+  List<String> get orderedDate {
+    final type = preferences.getDateType();
+    if (type == DateType.week) {
+      return (_expenses.keys.toList())
+        ..sort((a, b) {
+          final splitBySpaceA = a.split(' ');
+          final splitBySpaceB = b.split(' ');
+          final int numA = int.parse(splitBySpaceA[1]);
+          final int numB = int.parse(splitBySpaceB[1]);
+          return numB.compareTo(numA);
+        });
+    } else if (type == DateType.month) {
+      return (_expenses.keys.toList())
+        ..sort((a, b) {
+          //Multiplication of the year by 12 is necessary for the correct sorting, as
+          //a number should be generated with the year + month number, we must ensure that any
+          //month of the highest year is on the top of the list
+          // let's say: Enero 2022 (1 + 2022 = 2023) and Diciembre 2021 (12 + 2021 = 2032)
+          // if we don't multiply the year by 12, the last one would be previous to the first one (2032 > 2022)
+          // However after the multiplication...
+          // 2022 * 12 + 1 = 24265
+          // 2021 * 12 + 12 = 24264
+          //Ej.
+          // a => Septiembre de 2023
+          // b => Diciembre de 2023
+          // splitBySpaceA = ['Septiembre','de','2023']
+          // splitBySpaceB = ['Diciembre, 'de', '2022']
+          // numA = 9 + 2023 * 12
+          // numB = 12 + 2022 * 12
+          // numA > numB
+
+          final splitBySpaceA = a.split(' ');
+          final splitBySpaceB = b.split(' ');
+          final int numA = MyDateFormatter.monthNumber(splitBySpaceA[0]) +
+              int.parse(splitBySpaceA.last) * 12;
+          final int numB = MyDateFormatter.monthNumber(splitBySpaceB[0]) +
+              int.parse(splitBySpaceB.last) * 12;
+          return numB.compareTo(numA);
+        });
+    }
+    return (_expenses.keys.toList())..sort((a, b) => b.compareTo(a));
+  }
 
   //methods
   bool expensesContainsDate(String date) => _expenses.containsKey(date);
@@ -36,7 +79,10 @@ class ExpenseProvider with ChangeNotifier {
     notifyListeners();
     try {
       final newExpense = await repository.save(expense);
-      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      final dateType = preferences.getDateType();
+      final dateString = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      final date = MyDateFormatter.dateByType(dateType, dateString);
+      
       if (expensesContainsDate(date)) {
         final list = _expenses[date];
         list!.add(newExpense);
@@ -117,13 +163,13 @@ class ExpenseProvider with ChangeNotifier {
     error = false;
   }
 
-  Future<void> get([DateType type = DateType.day]) async {
+  Future<void> get([DateType type = DateType.day, int offset = 0]) async {
     loading = true;
 
     notifyListeners();
     try {
-      _expenses.clear();
-      _expenses.addAll(await repository.readAll(type));
+      // _expenses.clear();
+      _expenses.addAll(await repository.readAll(type, offset));
     } catch (err) {
       rethrow;
     } finally {
@@ -132,7 +178,66 @@ class ExpenseProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> getByDateType(DateType type) async {
+    offset = 0;
+    blockInfiniteScroll = false;
+    blockFunction = false;
+    _expenses.clear();
     await get(type);
+  }
+
+  Future<void> getByScroll() async {
+    if (blockFunction | blockInfiniteScroll) return;
+    blockFunction = true;
+    offset += 100;
+    int count = await repository.countRows();
+    print('OFFSET: $offset');
+    if (offset - 100 >= count) {
+      print('MAXIMUM REACHED');
+      blockInfiniteScroll = true;
+      return;
+    }
+    final type = preferences.getDateType();
+    final newList = await repository.getByScroll(offset);
+    for (final o in newList) {
+      String date = MyDateFormatter.dateByType(
+          type, MyDateFormatter.toYYYYMMdd(o.createdDate));
+      if (_expenses.containsKey(date)) {
+        List<Expense> list = _expenses[date]!;
+        list.add(o);
+      } else {
+        _expenses.addAll({
+          date: [o]
+        });
+      }
+    }
+    blockFunction = false;
+    print('EXPENSES LENGTH: ${_expenses.keys.length}');
+    notifyListeners();
+  }
+
+  Future<void> refreshData() async {
+    int lastSync = preferences.getLastSync();
+    DateType type = preferences.getDateType();
+    final newEntries = await repository.fetchLastSyncExpenses(lastSync);
+    print(newEntries);
+    if (newEntries.isNotEmpty) {
+      for (final entry in newEntries) {
+        String date = MyDateFormatter.dateByType(
+            type, MyDateFormatter.toYYYYMMdd(entry.createdDate));
+            print(date);
+        if (!_expenses.containsKey(date)) {
+          _expenses.addAll({
+            date: [entry]
+          });
+        } else {
+          final List<Expense> list = _expenses[date]!;
+          list.add(entry);
+        }
+      }
+      print('Refreshing data');
+      notifyListeners();
+    }
   }
 }

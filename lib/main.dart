@@ -8,6 +8,7 @@ import 'package:gastos/presentation/pages/inital_load.dart';
 import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
 import 'package:gastos/presentation/widgets/main/should_abandon.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +38,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ExpenseProvider(),
           lazy: false,
-        )
+        ),
+        ChangeNotifierProvider(create: (c) => JumpButtonsProvider())
       ],
       child: MaterialApp(
           title: 'Flutter Demo',
@@ -51,7 +53,9 @@ class MyApp extends StatelessWidget {
               child: Scaffold(
                 appBar: AppBar(
                     //backgroundColor: Colors.white,
-                    title: const SortDateButtons()),
+                    title: SortDateButtons(
+                  expenseState: appContext.read<ExpenseProvider>(),
+                )),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () => showExpenseDialog(appContext),
                   child: const Icon(Icons.add_rounded),
@@ -65,40 +69,48 @@ class MyApp extends StatelessWidget {
 }
 
 class SortDateButtons extends StatelessWidget with MaterialStatePropertyMixin {
-  const SortDateButtons({
-    Key? key,
-  }) : super(key: key);
+  const SortDateButtons({Key? key, required this.expenseState})
+      : super(key: key);
+
+  final ExpenseProvider expenseState;
+  Future<void> _sortBy(DateType type) async {
+    expenseState.preferences.saveDateType(type);
+    expenseState.getByDateType(type);
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final expenseState = context.read<ExpenseProvider>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         ElevatedButton(
             style: ButtonStyle(fixedSize: getProperty(Size(width * 0.21, 40))),
             onPressed: () {
-              expenseState.getByDateType(DateType.day);
+              const type = DateType.day;
+              _sortBy(type);
             },
             child: Text('Dia')),
         ElevatedButton(
             style: ButtonStyle(fixedSize: getProperty(Size(width * 0.25, 40))),
             onPressed: () {
-              expenseState.getByDateType(DateType.week);
+              const type = DateType.week;
+              _sortBy(type);
             },
             child: Text('Semana')),
         ElevatedButton(
             style: ButtonStyle(fixedSize: getProperty(Size(width * 0.21, 40))),
             onPressed: () {
-              expenseState.getByDateType(DateType.month);
+              const type = DateType.month;
+              _sortBy(type);
             },
             child: Text('Mes')),
         ElevatedButton(
             style: ButtonStyle(fixedSize: getProperty(Size(width * 0.21, 40))),
             onPressed: () {
-              expenseState.getByDateType(DateType.year);
+              const type = DateType.year;
+              _sortBy(type);
             },
             child: Text('Año'))
       ],

@@ -27,6 +27,7 @@ class InitialLoad extends StatelessWidget {
   Future<void> initialLoad(BuildContext context) async {
     final expenseProvider = context.read<ExpenseProvider>();
     await expenseProvider.fetchExpenses();
-    await expenseProvider.get();
+    final type = expenseProvider.preferences.getDateType();
+    await expenseProvider.get(type);
   }
 }

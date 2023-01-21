@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:intl/intl.dart';
 
@@ -64,6 +63,35 @@ class MyDateFormatter {
         return 'Noviembre';
       default:
         return 'Diciembre';
+    }
+  }
+
+  static int monthNumber(String month) {
+    switch (month) {
+      case 'Enero':
+        return 1;
+      case 'Febrero':
+        return 2;
+      case 'Marzo':
+        return 3;
+      case 'Abril':
+        return 4;
+      case 'Mayo':
+        return 5;
+      case 'Junio':
+        return 6;
+      case 'Julio':
+        return 7;
+      case 'Agosto':
+        return 8;
+      case 'Septiembre':
+        return 9;
+      case 'Octubre':
+        return 10;
+      case 'Noviembre':
+        return 11;
+      default:
+        return 12;
     }
   }
 }
