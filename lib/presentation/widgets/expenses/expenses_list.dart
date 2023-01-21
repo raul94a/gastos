@@ -34,6 +34,14 @@ class _ExpenseListState extends State<ExpenseList> {
       await state.getByScroll();
     }
   }
+  
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('Init state on main page');
+  }
 
   @override
   void dispose() {
@@ -43,6 +51,7 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   Widget build(BuildContext context) {
+    print('Build Main Page');
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final expState = context.read<ExpenseProvider>();

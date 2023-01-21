@@ -9,7 +9,15 @@ import 'package:gastos/utils/date_formatter.dart';
 
 class ExpenseProvider with ChangeNotifier {
   //firebase
-
+  ExpenseProvider() {
+    _initialLoad();
+  }
+  Future<void> _initialLoad() async {
+    await fetchExpenses();
+    _dateType = dateType;
+    lastSyncTime = lastSync;
+    await get();
+  }
   //sqlite
 
   //variables
@@ -30,7 +38,7 @@ class ExpenseProvider with ChangeNotifier {
 
   //setters
   set dateType(DateType type) => _dateType = type;
-
+  set lastSyncTime(int number) => _lastSync = number;
   //getters
   Map<String, List<Expense>> get expenses => _expenses;
   DateType get dateType => _dateType ??= preferences.getDateType();
@@ -124,7 +132,7 @@ class ExpenseProvider with ChangeNotifier {
     //notifyListeners();
     try {
       print('Starting removal of expense ${expense.id}');
-        final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
       final list = _expenses[date];
       print('Expense was created in dae: $date');
       print('Expenses list for $date is: $list');
@@ -156,11 +164,11 @@ class ExpenseProvider with ChangeNotifier {
     try {
       await repository.fetchLastSync(preferences.getLastSync());
     } catch (err) {
+      loading = false;
+      notifyListeners();
       rethrow;
     } finally {
-      loading = false;
-
-      notifyListeners();
+      //Not really needed to notify loading false because it is gonna be called in get method
     }
   }
 
@@ -170,28 +178,32 @@ class ExpenseProvider with ChangeNotifier {
     error = false;
   }
 
-  Future<void> get([DateType type = DateType.day, int offset = 0]) async {
-    loading = true;
-
-    notifyListeners();
+  Future<void> get([int offset = 0]) async {
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 650));
+    }
     try {
       // _expenses.clear();
-      _expenses.addAll(await repository.readAll(type, offset));
+      _expenses.addAll(await repository.readAll(dateType, offset));
     } catch (err) {
       rethrow;
     } finally {
       loading = false;
       initialFetchFinished = true;
       notifyListeners();
+      
     }
   }
 
   Future<void> getByDateType(DateType type) async {
     offset = 0;
+    dateType = type;
     blockInfiniteScroll = false;
     blockFunction = false;
     _expenses.clear();
-    await get(type);
+    await get();
   }
 
   Future<void> getByScroll() async {

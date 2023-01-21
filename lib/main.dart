@@ -3,12 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
-import 'package:gastos/presentation/pages/inital_load.dart';
-import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
-import 'package:gastos/presentation/widgets/main/should_abandon.dart';
-import 'package:gastos/presentation/widgets/main/sort_by_date_type.dart';
+import 'package:gastos/presentation/pages/initial_loading.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
+import 'package:gastos/providers/navigation_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -23,17 +21,11 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  showExpenseDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (ctx) => const ExpenseDialog());
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (c) => NavigationProvider()),
         ChangeNotifierProvider(
           create: (_) => ExpenseProvider(),
           lazy: false,
@@ -45,22 +37,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: Builder(builder: (appContext) {
-            return ShouldAbandonApp(
-              child: Scaffold(
-                appBar: AppBar(
-                    //backgroundColor: Colors.white,
-                    title: SortDateButtons(
-                  expenseState: appContext.read<ExpenseProvider>(),
-                )),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () => showExpenseDialog(appContext),
-                  child: const Icon(Icons.add_rounded),
-                ),
-                body: const SafeArea(child: InitialLoad()),
-              ),
-            );
-          })),
+          home: const InitialLoading()),
     );
   }
 }

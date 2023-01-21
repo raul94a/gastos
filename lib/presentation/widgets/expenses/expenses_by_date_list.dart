@@ -89,6 +89,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
     }
     // print('Rebuilding for index ${widget.index}!');
     return Card(
+      color: isCurrentDate() ? const Color.fromARGB(255, 210, 255, 236): null,
       margin: EdgeInsets.only(
           top: 10, left: 5, right: 5, bottom: isLastDate ? 80 : 0),
       elevation: 6,
@@ -139,7 +140,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
               ),
 
             //Add expense to Past Date
-            if (!isToday() && showExpenses(showProvider))
+            if (!isCurrentDate() && showExpenses(showProvider))
               ElevatedButton(
                   onPressed: () {
                     showDialog(
@@ -163,12 +164,14 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
     return date;
   }
 
-  bool isToday() {
+  bool isCurrentDate() {
     final selectedDate = widget.state.orderedDate[widget.index];
     final createdDate = widget.state.expenses[selectedDate]!.first.createdDate;
     final date = MyDateFormatter.toYYYYMMdd(createdDate);
     final today = MyDateFormatter.toYYYYMMdd(DateTime.now());
-    return date == today;
+    final todayByType = MyDateFormatter.dateByType(widget.state.dateType, today);
+    final dateByType = MyDateFormatter.dateByType(widget.state.dateType, date);
+    return dateByType == todayByType;
   }
 }
 
