@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
@@ -86,7 +87,9 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                   })),
             if (widget.index != 0 && show)
               ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(context: context, builder: (ctx)=> ExpenseDialog(date: orderedKeys[keyIndex]));
+                  },
                   child: Text(
                       'Añadir gasto a ${widget.state.orderedDate[widget.index]}')),
           ],

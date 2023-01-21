@@ -23,9 +23,13 @@ class ExpenseProvider with ChangeNotifier {
   bool blockInfiniteScroll = false;
   bool blockFunction = false;
   int offset = 0;
+  int? _lastSync;
+  DateType? _dateType;
 
   //getters
   Map<String, List<Expense>> get expenses => _expenses;
+  DateType get dateType => _dateType ??= preferences.getDateType();
+  int get lastSync => _lastSync ??= preferences.getLastSync();
 
   List<String> get orderedDate {
     final type = preferences.getDateType();
@@ -72,6 +76,16 @@ class ExpenseProvider with ChangeNotifier {
 
   //methods
   bool expensesContainsDate(String date) => _expenses.containsKey(date);
+  void _addToExpenses(Expense exp, String date) {
+    if (!expensesContainsDate(date)) {
+      _expenses.addAll({
+        date: [exp]
+      });
+    } else {
+      final List<Expense> list = _expenses[date]!;
+      list.add(exp);
+    }
+  }
   //state management
 
   Future<void> add(Expense expense) async {
@@ -79,20 +93,10 @@ class ExpenseProvider with ChangeNotifier {
     notifyListeners();
     try {
       final newExpense = await repository.save(expense);
-      final dateType = preferences.getDateType();
       final dateString = MyDateFormatter.toYYYYMMdd(expense.createdDate);
       final date = MyDateFormatter.dateByType(dateType, dateString);
-      
-      if (expensesContainsDate(date)) {
-        final list = _expenses[date];
-        list!.add(newExpense);
-      } else {
-        print('La fecha no existe: $date\nCreando Nueva expense');
-        _expenses.addAll({
-          date: [newExpense]
-        });
-        print(_expenses);
-      }
+
+      _addToExpenses(newExpense, date);
       success = true;
     } catch (err) {
       rethrow;
@@ -192,9 +196,8 @@ class ExpenseProvider with ChangeNotifier {
     blockFunction = true;
     offset += 100;
     int count = await repository.countRows();
-    print('OFFSET: $offset');
     if (offset - 100 >= count) {
-      print('MAXIMUM REACHED');
+      print('Infinite Scrolling has been blocked');
       blockInfiniteScroll = true;
       return;
     }
@@ -203,40 +206,21 @@ class ExpenseProvider with ChangeNotifier {
     for (final o in newList) {
       String date = MyDateFormatter.dateByType(
           type, MyDateFormatter.toYYYYMMdd(o.createdDate));
-      if (_expenses.containsKey(date)) {
-        List<Expense> list = _expenses[date]!;
-        list.add(o);
-      } else {
-        _expenses.addAll({
-          date: [o]
-        });
-      }
+      _addToExpenses(o, date);
     }
     blockFunction = false;
-    print('EXPENSES LENGTH: ${_expenses.keys.length}');
+
     notifyListeners();
   }
 
   Future<void> refreshData() async {
-    int lastSync = preferences.getLastSync();
-    DateType type = preferences.getDateType();
     final newEntries = await repository.fetchLastSyncExpenses(lastSync);
-    print(newEntries);
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
         String date = MyDateFormatter.dateByType(
-            type, MyDateFormatter.toYYYYMMdd(entry.createdDate));
-            print(date);
-        if (!_expenses.containsKey(date)) {
-          _expenses.addAll({
-            date: [entry]
-          });
-        } else {
-          final List<Expense> list = _expenses[date]!;
-          list.add(entry);
-        }
+            dateType, MyDateFormatter.toYYYYMMdd(entry.createdDate));
+        _addToExpenses(entry, date);
       }
-      print('Refreshing data');
       notifyListeners();
     }
   }

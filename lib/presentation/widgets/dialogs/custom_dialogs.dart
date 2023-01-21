@@ -7,9 +7,10 @@ import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
 class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
-  const ExpenseDialog({Key? key, this.expense, this.updateHandler})
+  const ExpenseDialog({Key? key, this.expense, this.updateHandler, this.date})
       : super(key: key);
   final Expense? expense;
+  final String? date;
   final Function(Expense)? updateHandler;
 
   @override
@@ -34,10 +35,11 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
                   if (expense == null && state.success) {
                     return const SuccessDialog();
                   }
-    
+
                   return ExpenseHandlerContent(
                     expense: expense,
                     updateHandler: updateHandler,
+                    date: date,
                   );
                 },
               ),
@@ -62,7 +64,9 @@ class SuccessDialog extends StatelessWidget with MaterialStatePropertyMixin {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const SizedBox(height: 40,),
+        const SizedBox(
+          height: 40,
+        ),
         Wrap(
           runAlignment: WrapAlignment.spaceBetween,
           alignment: WrapAlignment.center,
@@ -96,9 +100,11 @@ class SuccessDialog extends StatelessWidget with MaterialStatePropertyMixin {
 
 class ExpenseHandlerContent extends StatefulWidget
     with MaterialStatePropertyMixin {
-  const ExpenseHandlerContent({super.key, this.expense, this.updateHandler});
+  const ExpenseHandlerContent(
+      {super.key, this.expense, this.updateHandler, this.date});
   final Expense? expense;
   final Function(Expense)? updateHandler;
+  final String? date;
   @override
   State<ExpenseHandlerContent> createState() => _ExpenseHandlerContentState();
 }
@@ -249,7 +255,11 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String name,
       required String description,
       required num price}) async {
-    final createdDate = DateTime.now().toLocal();
+    //if Date is not null, the creation is being triggered through the add button for past dates.
+    //so, the only thing needed to be done is to fetch an expense from that date and borrow its createdDate
+    final createdDate = widget.date != null
+        ? state.expenses[widget.date!]!.first.createdDate
+        : DateTime.now().toLocal();
     final updatedDate = createdDate;
     final expense = Expense(
         person: name,
@@ -260,7 +270,6 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
 
     try {
       await state.add(expense);
-      //  Navigator.of(context).pop();
     } catch (err) {
       print(err);
     } finally {}
