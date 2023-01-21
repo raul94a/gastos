@@ -36,6 +36,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
           person: exp.person,
           price: exp.price,
           description: exp.description);
+        
     });
   }
 

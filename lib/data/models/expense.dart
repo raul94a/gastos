@@ -65,7 +65,7 @@ class Expense {
       person: map['person'] as String,
       description: map['description'] as String,
       picture: map['picture'] as String,
-      price: map['price'] as num,
+      price: num.parse((map['price'] as num).toStringAsFixed(2)),
       createdDate: DateTime.fromMillisecondsSinceEpoch(map['createdDate'] as int).toLocal(),
       updatedDate: DateTime.fromMillisecondsSinceEpoch(map['updatedDate'] as int).toLocal(),
       deleted: map['deleted'] as int,

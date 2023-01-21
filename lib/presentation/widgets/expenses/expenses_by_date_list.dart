@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
+import 'package:gastos/presentation/widgets/dialogs/expense_info_dialog.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/show_expenses_provider.dart';
@@ -89,7 +90,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
     }
     // print('Rebuilding for index ${widget.index}!');
     return Card(
-      color: isCurrentDate() ? const Color.fromARGB(255, 210, 255, 236): null,
+      color: isCurrentDate() ? const Color.fromARGB(255, 210, 255, 236) : null,
       margin: EdgeInsets.only(
           top: 10, left: 5, right: 5, bottom: isLastDate ? 80 : 0),
       elevation: 6,
@@ -99,21 +100,31 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             //Card Header (Date + Visibility handler button)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(titleDate, style: GoogleFonts.yujiBoku(fontSize: 24.2)),
-                const SizedBox(
-                  width: 10,
-                ),
-                IconButton(
-                    onPressed: () =>
-                        changeShowStatus(widget.index, showProvider),
-                    icon: Icon(showExpenses(showProvider)
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined))
-              ],
+            GestureDetector(
+              onLongPress: () {
+                showDialog(
+                    context: context,
+                    builder: (ctx) => ExpenseInfoDialog(
+                        dateTitle: titleDate,
+                        numberOfExpenses: expenses.length,
+                        total: getTotalOfDate()));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(titleDate, style: GoogleFonts.yujiBoku(fontSize: 24.2)),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  IconButton(
+                      onPressed: () =>
+                          changeShowStatus(widget.index, showProvider),
+                      icon: Icon(showExpenses(showProvider)
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined))
+                ],
+              ),
             ),
             //First five date items -> controlled by the ShowExpensesProvider
             if (widget.index <= 5)
@@ -139,6 +150,14 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                 ),
               ),
 
+            //stats
+            if (showExpenses(showProvider))
+              Column(
+                children: [
+                  Text(
+                      'Gastos de ${getDate()}: ${getTotalOfDate().toStringAsFixed(2)} €')
+                ],
+              ),
             //Add expense to Past Date
             if (!isCurrentDate() && showExpenses(showProvider))
               ElevatedButton(
@@ -164,12 +183,23 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
     return date;
   }
 
+  double getTotalOfDate() {
+    String date = widget.state.orderedDate[widget.index];
+    List<Expense> exps = widget.state.expenses[date]!;
+    double totalOfDate = 0.0;
+    for (final e in exps) {
+      totalOfDate += e.price;
+    }
+    return totalOfDate;
+  }
+
   bool isCurrentDate() {
     final selectedDate = widget.state.orderedDate[widget.index];
     final createdDate = widget.state.expenses[selectedDate]!.first.createdDate;
     final date = MyDateFormatter.toYYYYMMdd(createdDate);
     final today = MyDateFormatter.toYYYYMMdd(DateTime.now());
-    final todayByType = MyDateFormatter.dateByType(widget.state.dateType, today);
+    final todayByType =
+        MyDateFormatter.dateByType(widget.state.dateType, today);
     final dateByType = MyDateFormatter.dateByType(widget.state.dateType, date);
     return dateByType == todayByType;
   }

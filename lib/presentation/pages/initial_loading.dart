@@ -7,6 +7,11 @@ import 'package:provider/provider.dart';
 class InitialLoading extends StatelessWidget {
   const InitialLoading({super.key});
 
+  void goToExpenseList(BuildContext context) {
+    Future.microtask(() => Navigator.of(context)
+        .pushReplacement(MaterialPageRoute(builder: (ctx) => const Init())));
+  }
+
   @override
   Widget build(BuildContext context) {
     final expensesProvider = context.watch<ExpenseProvider>();
@@ -14,9 +19,8 @@ class InitialLoading extends StatelessWidget {
       return const Scaffold(body: Loading());
     }
 
-    Future.microtask(() => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (ctx) => const Init())));
+    goToExpenseList(context);
 
-    return const Scaffold(body:  SizedBox.shrink());
+    return const Scaffold(body: SizedBox.shrink());
   }
 }

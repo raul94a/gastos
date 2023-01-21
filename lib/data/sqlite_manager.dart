@@ -81,7 +81,7 @@ class ExpenseCreator {
         id: id,
           person: 'Raul',
           description: 'Random${Random.secure().nextInt(555555555)}',
-          price: Random.secure().nextDouble() * 88888888888,
+          price: Random().nextDouble() * 15,
           createdDate: createdDate,
           updatedDate: createdDate));
     }

@@ -121,6 +121,13 @@ class ExpenseProvider with ChangeNotifier {
 
   Future<void> update(Expense expense) async {
     try {
+      final dateTime = expense.createdDate;
+      final dateString = MyDateFormatter.toYYYYMMdd(dateTime);
+      final date = MyDateFormatter.dateByType(dateType, dateString);
+      List<Expense> expenses = _expenses[date]!;
+      final id = expense.id;
+      final indexOf = expenses.indexWhere((e)=> e.id == id);
+      expenses[indexOf] = expense;
       repository.update(expense);
     } catch (err) {
       rethrow;
@@ -132,7 +139,8 @@ class ExpenseProvider with ChangeNotifier {
     //notifyListeners();
     try {
       print('Starting removal of expense ${expense.id}');
-      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      String date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+      date = MyDateFormatter.dateByType(dateType, date);
       final list = _expenses[date];
       print('Expense was created in dae: $date');
       print('Expenses list for $date is: $list');
@@ -193,7 +201,6 @@ class ExpenseProvider with ChangeNotifier {
       loading = false;
       initialFetchFinished = true;
       notifyListeners();
-      
     }
   }
 
