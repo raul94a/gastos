@@ -19,19 +19,18 @@ class ExpensesByDateList extends StatefulWidget {
   State<ExpensesByDateList> createState() => _ExpensesByDateListState();
 }
 
-
 ///Handling the visibility of the first five items has required to use a provider (ShowExpensesProvider)
 ///As the show variable controls the expenses list of a date, when scrolling back to the top, the first 5 records
 ///where always shown, even though when they were made invisible.
 ///This was managed in the init state in that way:
-///```dart 
+///```dart
 /// bool show = false;
 /// @override
 /// void initState(){
 ///   super.initState();
 ///   show = widget.index <= 5 ? true : false
 /// }
-/// 
+///
 ///```
 ///For the correct managing of invisibility from the five first results, it was required to split the ExpenseTileListView in
 ///Two ListViews, one of them rendering only when the widget.index value was 5 or less, and the other with the rest of the Items.
@@ -139,7 +138,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                 ),
               ),
 
-              //Add expense to Past Date
+            //Add expense to Past Date
             if (!isToday() && showExpenses(showProvider))
               ElevatedButton(
                   onPressed: () {
@@ -148,12 +147,20 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                         builder: (ctx) =>
                             ExpenseDialog(date: orderedKeys[keyIndex]));
                   },
-                  child: Text(
-                      'Añadir gasto a ${widget.state.orderedDate[widget.index]}')),
+                  child: Text('Añadir gasto a ${getDate()}')),
           ],
         ),
       ),
     );
+  }
+
+  String getDate() {
+    String date = widget.state.orderedDate[widget.index];
+    if (widget.state.dateType == DateType.day) {
+      final parsedDate = MyDateFormatter.fromYYYYMMdd(date);
+      date = MyDateFormatter.toFormat('dd-MM-yyyy', parsedDate);
+    }
+    return date;
   }
 
   bool isToday() {

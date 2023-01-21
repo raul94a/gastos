@@ -10,6 +10,7 @@ class SortDateButtons extends StatelessWidget with MaterialStatePropertyMixin {
   final ExpenseProvider expenseState;
   Future<void> _sortBy(DateType type) async {
     expenseState.preferences.saveDateType(type);
+    expenseState.dateType = type;
     expenseState.getByDateType(type);
   }
 

@@ -28,6 +28,9 @@ class ExpenseProvider with ChangeNotifier {
   int? _lastSync;
   DateType? _dateType;
 
+  //setters
+  set dateType(DateType type) => _dateType = type;
+
   //getters
   Map<String, List<Expense>> get expenses => _expenses;
   DateType get dateType => _dateType ??= preferences.getDateType();
