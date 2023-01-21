@@ -98,7 +98,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
         trailing: SizedBox(
           width: width * 0.2,
           child: IconButton(
-              onPressed: showOptionDialog, icon: Icon(Icons.more_vert)),
+              onPressed: showOptionDialog, icon: const  Icon(Icons.more_vert)),
         ),
       ),
     );

@@ -1,9 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/queries/expense_queries.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
-import 'package:gastos/utils/date_formatter.dart';
 
 class ExpenseService {
   SqliteManager sqliteManager = SqliteManager.instance;
@@ -81,7 +81,9 @@ class ExpenseService {
         await db.insert(table, object);
       }
     } catch (err) {
-      print(err);
+      if (kDebugMode) {
+        print(err);
+      }
     }
   }
 

@@ -19,7 +19,7 @@ class SqliteManager {
   Database get database => _database!;
 
   //tables
-  String _expensesTable = "expenses";
+  final String _expensesTable = "expenses";
   String get expensesTable => _expensesTable;
 
   Future<void> open() async {

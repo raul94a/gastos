@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
@@ -119,9 +121,7 @@ class ExpenseProvider with ChangeNotifier {
     //notifyListeners();
     try {
       print('Starting removal of expense ${expense.id}');
-      final exp = repository.remove(expense);
-
-      final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
+        final date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
       final list = _expenses[date];
       print('Expense was created in dae: $date');
       print('Expenses list for $date is: $list');

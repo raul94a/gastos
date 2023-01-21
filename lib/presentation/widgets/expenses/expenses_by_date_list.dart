@@ -4,6 +4,7 @@ import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/show_expenses_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -18,18 +19,63 @@ class ExpensesByDateList extends StatefulWidget {
   State<ExpensesByDateList> createState() => _ExpensesByDateListState();
 }
 
+
+///Handling the visibility of the first five items has required to use a provider (ShowExpensesProvider)
+///As the show variable controls the expenses list of a date, when scrolling back to the top, the first 5 records
+///where always shown, even though when they were made invisible.
+///This was managed in the init state in that way:
+///```dart 
+/// bool show = false;
+/// @override
+/// void initState(){
+///   super.initState();
+///   show = widget.index <= 5 ? true : false
+/// }
+/// 
+///```
+///For the correct managing of invisibility from the five first results, it was required to split the ExpenseTileListView in
+///Two ListViews, one of them rendering only when the widget.index value was 5 or less, and the other with the rest of the Items.
+///The first one is managed through the provider. The last one is controlled by the show state variable
+///
 class _ExpensesByDateListState extends State<ExpensesByDateList> {
-  bool show = true;
+  bool show = false;
+  bool lastShowStatus = true;
+  bool showFirsts = true;
   @override
   void initState() {
     super.initState();
-    show = widget.index <= 5 ? true : false;
+
+    if (widget.index <= 5) {
+      context.read<ShowExpensesProvider>().initStates(widget.index);
+      showFirsts = context.read<ShowExpensesProvider>().getState(widget.index);
+    }
   }
 
-  void changeShowStatus() => setState(() => show = !show);
+  void changeShowStatus(int index, ShowExpensesProvider showState) {
+    setState(() {
+      if (index <= 5) {
+        showState.updateState(index, !showFirsts);
+        showFirsts = !showFirsts;
+      } else {
+        show = !show;
+      }
+    });
+  }
+
+  bool showExpenses(ShowExpensesProvider showProvider) {
+    final index = widget.index;
+
+    if (index > 5) {
+      return show;
+    }
+    bool showFirstPositions = showProvider.getState(index);
+    // print('INDEX: $index state: $showFirstPositions');
+    return showFirstPositions;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final showProvider = context.read<ShowExpensesProvider>();
     final orderedKeys = widget.state.orderedDate;
     final keyIndex = widget.index;
     final expenses = widget.state.expenses;
@@ -42,6 +88,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
       final date = MyDateFormatter.fromYYYYMMdd(orderedKeys[keyIndex]);
       titleDate = MyDateFormatter.toFormat('dd-MM-yyyy', date);
     }
+    // print('Rebuilding for index ${widget.index}!');
     return Card(
       margin: EdgeInsets.only(
           top: 10, left: 5, right: 5, bottom: isLastDate ? 80 : 0),
@@ -51,6 +98,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
         child: Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
+            //Card Header (Date + Visibility handler button)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -60,35 +108,45 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                   width: 10,
                 ),
                 IconButton(
-                    onPressed: changeShowStatus,
-                    icon: Icon(show
+                    onPressed: () =>
+                        changeShowStatus(widget.index, showProvider),
+                    icon: Icon(showExpenses(showProvider)
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined))
               ],
             ),
-            if (show)
-              ListView.builder(
-                  shrinkWrap: true,
-                  primary: false, // shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: expensesOfDate.length,
-                  itemBuilder: ((context, i) {
-                    final date = orderedKeys[keyIndex];
-                    final List<Expense> expenses = widget.state.expenses[date]!;
-                    final expense = expenses[i];
-
-                    return ExpenseTile(
-                        key: Key('Date-${expense.id}'),
+            //First five date items -> controlled by the ShowExpensesProvider
+            if (widget.index <= 5)
+              Consumer<ShowExpensesProvider>(
+                builder: (ctx, state, _) => state.getState(widget.index)
+                    ? _ExpenseTileListView(
+                        expensesOfDate: expensesOfDate,
+                        orderedKeys: orderedKeys,
+                        keyIndex: keyIndex,
                         state: widget.state,
-                        date: date,
-                        expense: expense,
-                        position: i);
-                  })),
-            if (widget.index != 0 && show)
+                      )
+                    : const SizedBox.shrink(),
+              )
+            //Rest of Date Items
+            else
+              Visibility(
+                visible: showExpenses(showProvider),
+                child: _ExpenseTileListView(
+                  expensesOfDate: expensesOfDate,
+                  orderedKeys: orderedKeys,
+                  keyIndex: keyIndex,
+                  state: widget.state,
+                ),
+              ),
+
+              //Add expense to Past Date
+            if (!isToday() && showExpenses(showProvider))
               ElevatedButton(
                   onPressed: () {
-                    showDialog(context: context, builder: (ctx)=> ExpenseDialog(date: orderedKeys[keyIndex]));
+                    showDialog(
+                        context: context,
+                        builder: (ctx) =>
+                            ExpenseDialog(date: orderedKeys[keyIndex]));
                   },
                   child: Text(
                       'Añadir gasto a ${widget.state.orderedDate[widget.index]}')),
@@ -96,5 +154,49 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
         ),
       ),
     );
+  }
+
+  bool isToday() {
+    final selectedDate = widget.state.orderedDate[widget.index];
+    final createdDate = widget.state.expenses[selectedDate]!.first.createdDate;
+    final date = MyDateFormatter.toYYYYMMdd(createdDate);
+    final today = MyDateFormatter.toYYYYMMdd(DateTime.now());
+    return date == today;
+  }
+}
+
+class _ExpenseTileListView extends StatelessWidget {
+  const _ExpenseTileListView(
+      {Key? key,
+      required this.expensesOfDate,
+      required this.orderedKeys,
+      required this.keyIndex,
+      required this.state})
+      : super(key: key);
+
+  final List<Expense> expensesOfDate;
+  final List<String> orderedKeys;
+  final int keyIndex;
+  final ExpenseProvider state;
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        shrinkWrap: true,
+        primary: false, // shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: expensesOfDate.length,
+        itemBuilder: ((context, i) {
+          final date = orderedKeys[keyIndex];
+          final List<Expense> expenses = state.expenses[date]!;
+          final expense = expenses[i];
+
+          return ExpenseTile(
+              key: Key('Date-${expense.id}'),
+              state: state,
+              date: date,
+              expense: expense,
+              position: i);
+        }));
   }
 }

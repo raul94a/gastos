@@ -39,19 +39,17 @@ class ShouldAbandonApp extends StatelessWidget with MaterialStatePropertyMixin {
                 children: [
                   ElevatedButton(
                       style: ButtonStyle(
-                        fixedSize: getProperty(Size(size.width *0.3, 50))
-                      ),
+                          fixedSize: getProperty(Size(size.width * 0.3, 50))),
                       onPressed: () => Navigator.of(context).pop(false),
-                      child: Text('No')),
-                 const SizedBox(
+                      child: const Text('No')),
+                  const SizedBox(
                     width: 15,
                   ),
                   ElevatedButton(
                       style: ButtonStyle(
-                        fixedSize: getProperty(Size(size.width *0.3, 50))
-                      ),
+                          fixedSize: getProperty(Size(size.width * 0.3, 50))),
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text('Sí')),
+                      child: const Text('Sí')),
                 ],
               )
             ],

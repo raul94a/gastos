@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/presentation/widgets/expenses/expenses_by_date_list.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
+import 'package:gastos/providers/show_expenses_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -25,8 +27,10 @@ class _ExpenseListState extends State<ExpenseList> {
     final viewPort = controller.position.viewportDimension;
 
     if (pixels >= maxScrollExtent * 0.8) {
-      print(
+      if (kDebugMode) {
+        print(
           '\nMaxScrollExtent: $maxScrollExtent\nPixels: $pixels\nViewPort: $viewPort');
+      }
       await state.getByScroll();
     }
   }
@@ -58,12 +62,15 @@ class _ExpenseListState extends State<ExpenseList> {
                   color: Colors.red,
                   backgroundColor: Colors.black,
                   onRefresh: () => state.refreshData(),
-                  child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: scrollController,
-                      itemCount: state.expenses.keys.toList().length,
-                      itemBuilder: (ctx, index) =>
-                          ExpensesByDateList(state: state, index: index)),
+                  child: ChangeNotifierProvider(
+                    create: (ctx) => ShowExpensesProvider(),
+                    child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: scrollController,
+                        itemCount: state.expenses.keys.toList().length,
+                        itemBuilder: (ctx, index) =>
+                            ExpensesByDateList(state: state, index: index)),
+                  ),
                 ),
               ),
             ),
@@ -98,7 +105,7 @@ class _FloatingButtonJumpDown extends StatelessWidget {
                     duration: const Duration(seconds: 8),
                     curve: Curves.easeIn);
               },
-              icon: Icon(Icons.keyboard_double_arrow_down)),
+              icon: const Icon(Icons.keyboard_double_arrow_down)),
         ),
       ),
     );
@@ -125,7 +132,7 @@ class _FloatingButtonJumpUp extends StatelessWidget {
                   duration: const Duration(seconds: 8),
                   curve: Curves.easeInCubic);
             },
-            icon: Icon(Icons.keyboard_double_arrow_up)),
+            icon: const Icon(Icons.keyboard_double_arrow_up)),
       ),
     );
   }

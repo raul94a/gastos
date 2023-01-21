@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/style/form_style.dart';
@@ -80,7 +81,7 @@ class SuccessDialog extends StatelessWidget with MaterialStatePropertyMixin {
                 size: 70,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             const Text('¡El gasto ha sido añadido con éxito!'),
@@ -207,7 +208,9 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                             priceController.text.replaceFirst(',', '.');
                         num? price = num.tryParse(priceString);
                         if (price == null) {
-                          print('Price is null');
+                          if (kDebugMode) {
+                            print('Price is null');
+                          }
                           return;
                         }
                         if (widget.expense == null) {
@@ -271,7 +274,9 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     try {
       await state.add(expense);
     } catch (err) {
-      print(err);
+      if (kDebugMode) {
+        print(err);
+      }
     } finally {}
   }
 
@@ -292,7 +297,9 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       await state.update(newExpense);
       Navigator.of(context).pop();
     } catch (err) {
-      print(err);
+      if (kDebugMode) {
+        print(err);
+      }
     }
   }
 }
