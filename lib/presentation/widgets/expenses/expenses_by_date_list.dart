@@ -106,7 +106,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                     context: context,
                     builder: (ctx) => ExpenseInfoDialog(
                         dateTitle: titleDate,
-                        numberOfExpenses: expenses.length,
+                        numberOfExpenses: expensesOfDate.length,
                         total: getTotalOfDate()));
               },
               child: Row(
