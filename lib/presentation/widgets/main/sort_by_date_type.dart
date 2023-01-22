@@ -21,6 +21,7 @@ class SortDateButtons extends StatelessWidget with MaterialStatePropertyMixin {
     final state = context.watch<ExpenseProvider>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         ElevatedButton(
             style: ButtonStyle(

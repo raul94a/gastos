@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gastos/presentation/widgets/expenses/expenses_by_date_list.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
 import 'package:gastos/presentation/widgets/shared/loading.dart';
+import 'package:gastos/presentation/widgets/slivers/sliver_date_flexible_app_bar.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/providers/show_expenses_provider.dart';
@@ -75,12 +76,17 @@ class _ExpenseListState extends State<ExpenseList> {
                         onRefresh: () => state.refreshData(),
                         child: ChangeNotifierProvider(
                           create: (ctx) => ShowExpensesProvider(),
-                          child: ListView.builder(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              controller: scrollController,
-                              itemCount: state.expenses.keys.toList().length,
-                              itemBuilder: (ctx, index) => ExpensesByDateList(
-                                  state: state, index: index)),
+                          child: SliverDateFlexibleAppBar(
+                            controller: scrollController,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              primary: false,
+                                physics: const NeverScrollableScrollPhysics(),
+                                //controller: scrollController,
+                                itemCount: state.expenses.keys.toList().length,
+                                itemBuilder: (ctx, index) => ExpensesByDateList(
+                                    state: state, index: index)),
+                          ),
                         ),
                       ),
                     ),
