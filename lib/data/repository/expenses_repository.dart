@@ -59,4 +59,7 @@ class ExpensesRepository {
       await service.fetchLastSyncFromFirestore(lastSync, true);
 
   Future<int> countRows() async => await service.countExpenses();
+
+  Future<bool> existsId(String id) async =>
+      await service.countIdEntries(id) > 0;
 }

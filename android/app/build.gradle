@@ -58,6 +58,22 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+     //flavors
+    flavorDimensions 'app'
+    productFlavors{
+        dev {
+            dimension "app"
+            buildConfigField "boolean", "isDev", "true" 
+            applicationId "com.raul.gastos"
+           
+
+        }
+        prod {
+            dimension "app"
+            applicationId "com.raul.gastos"
+            applicationIdSuffix ".prod"
+        }
+    }
 }
 
 flutter {

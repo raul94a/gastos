@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:gastos/data/firestore_manager.dart';
+import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/data/services/categories_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SqliteManager {
   final String dbName = "expenses.db";
-
-  
 
   //singleton
   SqliteManager._();
@@ -20,15 +22,16 @@ class SqliteManager {
 
   //tables
   final String _expensesTable = "expenses";
+  final String _categoriesTable = "categories";
   String get expensesTable => _expensesTable;
+  String get categoriesTable => _categoriesTable;
 
   Future<void> open() async {
     _database = await openDatabase(
       dbName,
-      version: 2,
+      version: 1,
       onCreate: _onCreate,
       onOpen: (db) async {
-
         // final res = await db.rawQuery('select count(*) as "res" from expenses');
         // print(res);
         // final exps = ExpenseCreator.create();
@@ -47,7 +50,35 @@ class SqliteManager {
   FutureOr<void> _onCreate(Database db, int descriptor) async {
     await db.execute('CREATE TABLE expenses (id varchar(255) primary key,'
         'person varchar(255), description TEXT, picture TEXT, price REAL,'
-        'createdDate int, updatedDate int, deleted BOOLEAN)');
+        'createdDate int, updatedDate int, deleted BOOLEAN, category varchar(255))');
+    final batch = db.batch();
+    batch.execute('CREATE TABLE categories (id varchar(255) primary key,'
+        'name varchar(255), r int, g int, b int,'
+        ' createdDate int, updatedDate int, deleted BOOLEAN)');
+    final now = DateTime.now();
+    int millis = now.millisecondsSinceEpoch;
+
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("rojo", "Combustible", 255,0,0, $millis, $millis, 0)');
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("verde", "Doméstico", 0,255,0, $millis, $millis, 0)');
+
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("azul", "Médico", 0,0,255, $millis, $millis, 0)');
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("amarillo", "Ocio", 255,255,0, $millis, $millis, 0)');
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("azulclaro", "Veterinario", 0, 102, 255, $millis, $millis, 0)');
+
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("rosa", "Ropa", 255, 51, 204, $millis, $millis, 0)');
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("marron", "Comida", 128, 0, 0, $millis, $millis, 0)');
+
+    batch.execute(
+        'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("grisaceo", "Otros",153, 153, 102, $millis, $millis, 0)');
+
+    await batch.commit();
   }
 }
 
@@ -78,7 +109,7 @@ class ExpenseCreator {
       final createdDate = DateTime(year, randomMonth, randomDay);
       final id = randomId(50);
       exp.add(Expense(
-        id: id,
+          id: id,
           person: 'Raul',
           description: 'Random${Random.secure().nextInt(555555555)}',
           price: Random().nextDouble() * 15,

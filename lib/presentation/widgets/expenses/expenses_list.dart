@@ -52,19 +52,18 @@ class _ExpenseListState extends State<ExpenseList> {
 
   @override
   Widget build(BuildContext context) {
-    print('Build Main Page');
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final expState = context.read<ExpenseProvider>();
     scrollController.addListener(
         () => _scrollControllerHandler(expState, scrollController));
-    //MainScrollNotification listens when the scrolling starts or stops and notifies to JumpButtonsProvider
+    print('Build Main Page');
     return MainScrollNotification(
       controller: scrollController,
       child: Stack(
         children: [
-          Consumer<ExpenseProvider>(
-            builder: (ctx, state, _) => state.loading
+          Consumer<ExpenseProvider>(builder: (ctx, state, _) {
+            return state.loading
                 ? const Loading()
                 : Center(
                     child: SizedBox(
@@ -79,8 +78,8 @@ class _ExpenseListState extends State<ExpenseList> {
                           child: SliverDateFlexibleAppBar(
                             controller: scrollController,
                             child: ListView.builder(
-                              shrinkWrap: true,
-                              primary: false,
+                                shrinkWrap: true,
+                                primary: false,
                                 physics: const NeverScrollableScrollPhysics(),
                                 //controller: scrollController,
                                 itemCount: state.expenses.keys.toList().length,
@@ -90,8 +89,8 @@ class _ExpenseListState extends State<ExpenseList> {
                         ),
                       ),
                     ),
-                  ),
-          ),
+                  );
+          }),
           _FloatingButtonJumpUp(scrollController: scrollController),
           _FloatingButtonJumpDown(scrollController: scrollController)
         ],

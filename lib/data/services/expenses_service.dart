@@ -37,6 +37,7 @@ class ExpenseService {
     final List<Map<String, dynamic>> firestoreData = [];
 
     try {
+      print('LAST SYNC $lastSync');
       final docs = await firestore
           .collection('expenses')
           .where('updatedDate', isGreaterThanOrEqualTo: lastSync)
@@ -98,6 +99,13 @@ class ExpenseService {
   Future<int> countExpenses() async {
     final db = sqliteManager.database;
     final res = await db.rawQuery("select count(*) as 'res' from expenses ");
+    return res.first['res'] as int;
+  }
+
+  Future<int> countIdEntries(String id) async {
+    final db = sqliteManager.database;
+    final res = await db
+        .rawQuery("select count(*) as 'res' from expenses where id = '$id'");
     return res.first['res'] as int;
   }
 }

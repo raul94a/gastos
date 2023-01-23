@@ -5,8 +5,8 @@ class FirestoreManager {
     _init();
   }
 
-  static FirestoreManager? firestoreManager;
-  static FirestoreManager get instance => firestoreManager ??= FirestoreManager._();
+  static FirestoreManager? _firestoreManager;
+  static FirestoreManager get instance => _firestoreManager ??= FirestoreManager._();
 
   FirebaseFirestore? _firestore;
   FirebaseFirestore get firestore => _firestore!;

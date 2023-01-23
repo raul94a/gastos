@@ -15,7 +15,6 @@ class ExpenseProvider with ChangeNotifier {
   Future<void> _initialLoad() async {
     await fetchExpenses();
     _dateType = dateType;
-    lastSyncTime = lastSync;
     await get();
   }
   //sqlite
@@ -33,16 +32,14 @@ class ExpenseProvider with ChangeNotifier {
   bool blockInfiniteScroll = false;
   bool blockFunction = false;
   int offset = 0;
-  int? _lastSync;
+
   DateType? _dateType;
 
   //setters
   set dateType(DateType type) => _dateType = type;
-  set lastSyncTime(int number) => _lastSync = number;
   //getters
   Map<String, List<Expense>> get expenses => _expenses;
   DateType get dateType => _dateType ??= preferences.getDateType();
-  int get lastSync => _lastSync ??= preferences.getLastSync();
 
   List<String> get orderedDate {
     final type = preferences.getDateType();
@@ -126,7 +123,7 @@ class ExpenseProvider with ChangeNotifier {
       final date = MyDateFormatter.dateByType(dateType, dateString);
       List<Expense> expenses = _expenses[date]!;
       final id = expense.id;
-      final indexOf = expenses.indexWhere((e)=> e.id == id);
+      final indexOf = expenses.indexWhere((e) => e.id == id);
       expenses[indexOf] = expense;
       repository.update(expense);
     } catch (err) {
@@ -236,13 +233,18 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   Future<void> refreshData() async {
-    final newEntries = await repository.fetchLastSyncExpenses(lastSync);
+    final newEntries =
+        await repository.fetchLastSyncExpenses(preferences.getLastSync());
+
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
         String date = MyDateFormatter.dateByType(
             dateType, MyDateFormatter.toYYYYMMdd(entry.createdDate));
-        _addToExpenses(entry, date);
+        if (!await repository.existsId(entry.id)) {
+          _addToExpenses(entry, date);
+        }
       }
+      await preferences.saveLastSync(DateTime.now().millisecondsSinceEpoch);
       notifyListeners();
     }
   }

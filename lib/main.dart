@@ -4,6 +4,7 @@ import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/presentation/pages/initial_loading.dart';
+import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/providers/navigation_provider.dart';
@@ -26,6 +27,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (c) => NavigationProvider()),
+        ChangeNotifierProvider(
+          create: (ctx) => CategoriesProvider(),
+        ),
         ChangeNotifierProvider(
           create: (_) => ExpenseProvider(),
           lazy: false,

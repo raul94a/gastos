@@ -21,6 +21,6 @@ class InitialLoading extends StatelessWidget {
 
     goToExpenseList(context);
 
-    return const Scaffold(body: SizedBox.shrink());
+    return const Scaffold(body: Text('Algo ha fallado'));
   }
 }

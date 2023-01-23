@@ -22,6 +22,8 @@ class Init extends StatelessWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle().copyWith(
         statusBarColor: Colors.black, systemNavigationBarColor: Colors.black));
+
+        print('Init widghetttt');
     return ShouldAbandonApp(
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
