@@ -68,6 +68,19 @@ class CategoriesProvider with ChangeNotifier {
     }
   }
 
+  void updateLocal(Category category) {
+    try {
+      final id = category.id;
+      final indexOf = categories.indexWhere((e) => e.id == id);
+      _categories[indexOf] = category;
+      repository.updateLocal(category);
+    } catch (err) {
+      print(err);
+      rethrow;
+    }
+    notifyListeners();
+  }
+
   Future<void> update(Category category) async {
     try {
       final id = category.id;
@@ -77,6 +90,7 @@ class CategoriesProvider with ChangeNotifier {
     } catch (err) {
       rethrow;
     }
+    notifyListeners();
   }
 
   Future<void> read() async {
@@ -91,6 +105,7 @@ class CategoriesProvider with ChangeNotifier {
   }
 
   Future<void> refreshData() async {
+    print('Refreshing categories');
     final lastSync = preferences.getLastSync();
     final newEntries = await repository.fetchLastSyncCategories(lastSync);
     if (newEntries.isNotEmpty) {

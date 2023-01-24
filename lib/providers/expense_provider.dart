@@ -233,6 +233,7 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   Future<void> refreshData() async {
+    print('refreshing expenses');
     final newEntries =
         await repository.fetchLastSyncExpenses(preferences.getLastSync());
 

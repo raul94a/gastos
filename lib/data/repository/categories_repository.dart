@@ -38,6 +38,9 @@ class CategoriesRepository {
   Future<void> update(Category category) async {
     await service.update(category.toMap());
   }
+  Future<void> updateLocal(Category category) async {
+    service.updateLocal(category.toMap());
+  }
 
   Future<void> fetchLastSync(int lastSync) async =>
       await service.fetchLastSyncFromFirestore(lastSync);

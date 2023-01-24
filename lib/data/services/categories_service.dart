@@ -25,9 +25,21 @@ class CategoriesService {
   Future<void> update(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
     try {
-      await firestore.collection('categories').doc(data['id']).set(data);
+      await firestore
+          .collection('categories')
+          .doc(data['id'])
+          .update({"name": data['name'], "updatedDate": data['updatedDate']});
       await _updateLocal(data);
     } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateLocal(Map<String, dynamic> data) async {
+    try {
+      _updateLocal(data);
+    } catch (err) {
+      print(err);
       rethrow;
     }
   }
@@ -76,7 +88,7 @@ class CategoriesService {
     final db = sqliteManager.database;
     try {
       for (final object in data) {
-          final results = await countIdEntries(object['id']);
+        final results = await countIdEntries(object['id']);
         if (results > 0) {
           await db.update(table, object);
         } else {
@@ -98,7 +110,8 @@ class CategoriesService {
 
     return result;
   }
-    Future<Map<String, dynamic>> readOne(String id) async {
+
+  Future<Map<String, dynamic>> readOne(String id) async {
     final db = sqliteManager.database;
     final res = await db.rawQuery(
         'SELECT * from ${sqliteManager.categoriesTable} where id = $id LIMIT 1');
@@ -110,7 +123,8 @@ class CategoriesService {
     final res = await db.rawQuery("select count(*) as 'res' from categories");
     return res.first['res'] as int;
   }
-   Future<int> countIdEntries(String id) async {
+
+  Future<int> countIdEntries(String id) async {
     final db = sqliteManager.database;
     final res = await db
         .rawQuery("select count(*) as 'res' from categories where id = '$id'");

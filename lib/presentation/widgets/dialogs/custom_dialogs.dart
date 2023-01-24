@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/style/form_style.dart';
+import 'package:gastos/presentation/widgets/dialogs/expense_dialog_widgets/categories_dropdown.dart';
 import 'package:gastos/presentation/widgets/shared/block_back_button.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
@@ -18,7 +19,6 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final categoriesState = context.read<CategoriesProvider>();
     return BlockBackButton(
       child: SingleChildScrollView(
         child: Dialog(
@@ -147,14 +147,11 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     buttonNode.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final categoriesState = context.read<CategoriesProvider>();
-    print(categoriesState.categories);
-   
     return Form(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,38 +181,19 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
               controller: descriptionController,
             ),
           ),
+          const SizedBox(height: 20,),
+          const Text('Categoría del gasto'),
+          CategoriesDropdown(
+              categoriesState: categoriesState,
+              selectedCategory: selectedCategory,
+              categoryHandler: (str) {
+                setState(() {
+                  selectedCategory = str!;
+                });
+              }),
+         
           const SizedBox(
             height: 20,
-          ),
-          DropdownButton<String>(
-            value: selectedCategory,
-            onChanged: (str) {
-              print('selected: $str');
-              setState(() {
-                selectedCategory = str!;
-              });
-            },
-            items: categoriesState.categories
-                .map((e) => DropdownMenuItem<String>(
-                    value: e.id,
-                  
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 10,
-                          width: 10,
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(e.r, e.g, e.b, 1),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(e.name),
-                      ],
-                    )))
-                .toList(),
           ),
           const Text('precio (€)'),
           Padding(
@@ -227,7 +205,6 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
               focusNode: priceNode,
               decoration: basisFormDecoration(),
               controller: priceController,
-              //    onFieldSubmitted: (value) => priceNode.nextFocus(),
             ),
           ),
           const SizedBox(

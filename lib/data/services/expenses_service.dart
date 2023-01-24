@@ -38,7 +38,6 @@ class ExpenseService {
     final List<Map<String, dynamic>> firestoreData = [];
 
     try {
-      print('LAST SYNC $lastSync');
       final docs = await firestore
           .collection('expenses')
           .where('updatedDate', isGreaterThanOrEqualTo: lastSync)
@@ -124,5 +123,4 @@ class ExpenseService {
         .rawQuery("select count(*) as 'res' from expenses where id = '$id'");
     return res.first['res'] as int;
   }
-  
 }
