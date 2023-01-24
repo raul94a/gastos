@@ -8,7 +8,7 @@ import 'package:gastos/data/sqlite_manager.dart';
 class ExpenseService {
   SqliteManager sqliteManager = SqliteManager.instance;
   FirestoreManager firestoreManager = FirestoreManager.instance;
-  
+
   Future<String> save(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
     try {
@@ -80,7 +80,15 @@ class ExpenseService {
     final db = sqliteManager.database;
     try {
       for (final object in data) {
-        await db.insert(table, object);
+        //two possible scenarios:
+        // 1. The record exists, so it should be updated
+        // 2. The record doesn't exists, so it should be inserted
+        final results = await countIdEntries(object['id']);
+        if (results > 0) {
+          await db.update(table, object);
+        } else {
+          await db.insert(table, object);
+        }
       }
     } catch (err) {
       if (kDebugMode) {
@@ -89,10 +97,11 @@ class ExpenseService {
     }
   }
 
-  Future<Map<String,dynamic>> readOne(String id) async {
-     final db = sqliteManager.database;
-     final res = await db.rawQuery('SELECT * from ${sqliteManager.expensesTable} where id = $id LIMIT 1');
-     return res.first;
+  Future<Map<String, dynamic>> readOne(String id) async {
+    final db = sqliteManager.database;
+    final res = await db.rawQuery(
+        'SELECT * from ${sqliteManager.expensesTable} where id = $id LIMIT 1');
+    return res.first;
   }
 
   Future<List<Map<String, dynamic>>> readAll(int offset) async {
@@ -115,4 +124,5 @@ class ExpenseService {
         .rawQuery("select count(*) as 'res' from expenses where id = '$id'");
     return res.first['res'] as int;
   }
+  
 }

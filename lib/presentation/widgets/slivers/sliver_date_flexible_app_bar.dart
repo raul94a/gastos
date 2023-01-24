@@ -30,7 +30,7 @@ class SliverDateFlexibleAppBar extends StatelessWidget {
             child
           ]))
           //This results in rebuilding the entire page, so for this case is not good
-        //  SliverList(delegate: SliverChildBuilderDelegate((ctx, i) => child))
+          //  SliverList(delegate: SliverChildBuilderDelegate((ctx, i) => child))
         ],
       ),
     );

@@ -15,6 +15,11 @@ class CategoriesRepository {
     return categories;
   }
 
+  Future<Category> readOne(String id) async {
+    final result = await service.readOne(id);
+    return Category.fromMap(result);
+  }
+
   Future<Category> save(Category category) async {
     String id = await service.save(category.toMap());
     return category.copyWith(id: id);
@@ -41,4 +46,7 @@ class CategoriesRepository {
       await service.fetchLastSyncFromFirestore(lastSync, true);
 
   Future<int> countRows() async => await service.countCategories();
+
+  Future<bool> existsId(String id) async =>
+      await service.countIdEntries(id) > 0;
 }

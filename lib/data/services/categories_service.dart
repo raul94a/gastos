@@ -76,6 +76,12 @@ class CategoriesService {
     final db = sqliteManager.database;
     try {
       for (final object in data) {
+          final results = await countIdEntries(object['id']);
+        if (results > 0) {
+          await db.update(table, object);
+        } else {
+          await db.insert(table, object);
+        }
         await db.insert(table, object);
       }
     } catch (err) {
@@ -92,10 +98,22 @@ class CategoriesService {
 
     return result;
   }
+    Future<Map<String, dynamic>> readOne(String id) async {
+    final db = sqliteManager.database;
+    final res = await db.rawQuery(
+        'SELECT * from ${sqliteManager.categoriesTable} where id = $id LIMIT 1');
+    return res.first;
+  }
 
   Future<int> countCategories() async {
     final db = sqliteManager.database;
     final res = await db.rawQuery("select count(*) as 'res' from categories");
+    return res.first['res'] as int;
+  }
+   Future<int> countIdEntries(String id) async {
+    final db = sqliteManager.database;
+    final res = await db
+        .rawQuery("select count(*) as 'res' from categories where id = '$id'");
     return res.first['res'] as int;
   }
 }

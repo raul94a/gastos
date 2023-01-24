@@ -6,7 +6,7 @@ import 'package:gastos/utils/date_formatter.dart';
 
 class CategoriesProvider with ChangeNotifier {
   CategoriesProvider() {
-   _initialLoad();
+    _initialLoad();
   }
   final List<Category> _categories = [];
   final repository = CategoriesRepository();
@@ -94,8 +94,22 @@ class CategoriesProvider with ChangeNotifier {
     final lastSync = preferences.getLastSync();
     final newEntries = await repository.fetchLastSyncCategories(lastSync);
     if (newEntries.isNotEmpty) {
-      _categories.addAll(newEntries);
-      notifyListeners();
+      for (final entry in newEntries) {
+        if (!await repository.existsId(entry.id)) {
+          _categories.add(entry);
+          notifyListeners();
+        } else {
+          //two situations:
+          //  1. Update the expense
+          //  2. Delete the expense
+          Category category = await repository.readOne(entry.id);
+          if (entry.deleted == 1) {
+            remove(category.id);
+          } else {
+            update(entry);
+          }
+        }
+      }
     }
   }
 }
