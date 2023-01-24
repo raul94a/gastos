@@ -242,10 +242,20 @@ class ExpenseProvider with ChangeNotifier {
             dateType, MyDateFormatter.toYYYYMMdd(entry.createdDate));
         if (!await repository.existsId(entry.id)) {
           _addToExpenses(entry, date);
+          notifyListeners();
+        } else {
+          //two situations:
+          //  1. Update the expense
+          //  2. Delete the expense
+          Expense expense = await repository.readOne(entry.id);
+          if (entry.deleted == 1) {
+            remove(expense);
+          } else {
+            update(entry);
+          }
         }
       }
       await preferences.saveLastSync(DateTime.now().millisecondsSinceEpoch);
-      notifyListeners();
     }
   }
 }

@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (c) => NavigationProvider()),
         ChangeNotifierProvider(
+          lazy: false,
           create: (ctx) => CategoriesProvider(),
         ),
         ChangeNotifierProvider(

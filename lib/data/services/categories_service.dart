@@ -1,18 +1,18 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' as f;
 import 'package:gastos/data/firestore_manager.dart';
-import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/data/queries/expense_queries.dart';
-import 'package:gastos/data/shared_preferences_helper.dart';
+import 'package:gastos/data/models/category.dart';
+import 'package:gastos/data/queries/categories_queries.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 
-class ExpenseService {
+class CategoriesService {
   SqliteManager sqliteManager = SqliteManager.instance;
   FirestoreManager firestoreManager = FirestoreManager.instance;
-  
+
   Future<String> save(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
+
     try {
-      final doc = await firestore.collection('expenses').add(data);
+      final doc = await firestore.collection('categories').add(data);
       String id = doc.id;
       data.update('id', (value) => id);
       await _saveLocal(data);
@@ -25,22 +25,21 @@ class ExpenseService {
   Future<void> update(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
     try {
-      await firestore.collection('expenses').doc(data['id']).set(data);
+      await firestore.collection('categories').doc(data['id']).set(data);
       await _updateLocal(data);
     } catch (error) {
       rethrow;
     }
   }
 
-  Future<List<Expense>> fetchLastSyncFromFirestore(int lastSync,
+  Future<List<Category>> fetchLastSyncFromFirestore(int lastSync,
       [bool returnInsertedDate = false]) async {
     final firestore = firestoreManager.firestore;
     final List<Map<String, dynamic>> firestoreData = [];
 
     try {
-      print('LAST SYNC $lastSync');
       final docs = await firestore
-          .collection('expenses')
+          .collection('categories')
           .where('updatedDate', isGreaterThanOrEqualTo: lastSync)
           .get();
 
@@ -50,69 +49,53 @@ class ExpenseService {
         data.update('id', (value) => query.id);
         firestoreData.add(data);
       }
-      if (firestoreData.isNotEmpty) {
-        await SharedPreferencesHelper.instance
-            .saveLastSync(DateTime.now().millisecondsSinceEpoch);
-      }
+
       _insertSynchronizedData(firestoreData);
     } catch (err) {
       rethrow;
     }
 
     if (!returnInsertedDate || firestoreData.isEmpty) return [];
-    return firestoreData.map(Expense.fromMap).toList();
+    return firestoreData.map(Category.fromMap).toList();
   }
 
   //sql services
   Future<void> _saveLocal(Map<String, dynamic> data) async {
-    String table = sqliteManager.expensesTable;
+    String table = sqliteManager.categoriesTable;
     await sqliteManager.database.insert(table, data);
   }
 
   Future<void> _updateLocal(Map<String, dynamic> data) async {
-    String table = sqliteManager.expensesTable;
+    String table = sqliteManager.categoriesTable;
     await sqliteManager.database
         .update(table, data, where: 'id = ?', whereArgs: [data['id']]);
   }
 
   Future<void> _insertSynchronizedData(List<Map<String, dynamic>> data) async {
-    final table = sqliteManager.expensesTable;
+    final table = sqliteManager.categoriesTable;
     final db = sqliteManager.database;
     try {
       for (final object in data) {
         await db.insert(table, object);
       }
     } catch (err) {
-      if (kDebugMode) {
+      if (f.kDebugMode) {
         print(err);
       }
     }
   }
 
-  Future<Map<String,dynamic>> readOne(String id) async {
-     final db = sqliteManager.database;
-     final res = await db.rawQuery('SELECT * from ${sqliteManager.expensesTable} where id = $id LIMIT 1');
-     return res.first;
-  }
-
-  Future<List<Map<String, dynamic>>> readAll(int offset) async {
+  Future<List<Map<String, dynamic>>> readAll() async {
     final db = sqliteManager.database;
     List<Map<String, dynamic>> result =
-        await db.rawQuery(ExpenseQueries.readExpenses(offset));
+        await db.rawQuery(CategoriesQueries.getAllSQL());
 
     return result;
   }
 
-  Future<int> countExpenses() async {
+  Future<int> countCategories() async {
     final db = sqliteManager.database;
-    final res = await db.rawQuery("select count(*) as 'res' from expenses ");
-    return res.first['res'] as int;
-  }
-
-  Future<int> countIdEntries(String id) async {
-    final db = sqliteManager.database;
-    final res = await db
-        .rawQuery("select count(*) as 'res' from expenses where id = '$id'");
+    final res = await db.rawQuery("select count(*) as 'res' from categories");
     return res.first['res'] as int;
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/style/form_style.dart';
 import 'package:gastos/presentation/widgets/shared/block_back_button.dart';
+import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
@@ -17,15 +18,16 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
+    final categoriesState = context.read<CategoriesProvider>();
     return BlockBackButton(
       child: SingleChildScrollView(
         child: Dialog(
+          alignment: Alignment.center,
           insetPadding: const EdgeInsets.all(10),
           child: Padding(
             padding: const EdgeInsets.all(14.5),
             child: SizedBox(
-              height: size.height * 0.6,
+              height: size.height * 0.8,
               child: Consumer<ExpenseProvider>(
                 builder: (ctx, state, _) {
                   if (expense == null && state.loading) {
@@ -115,10 +117,12 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       descriptionController = TextEditingController(),
       priceController = TextEditingController();
 
+  String selectedCategory = '';
   final FocusNode nameNode = FocusNode(),
       descriptionNode = FocusNode(),
       priceNode = FocusNode(),
       buttonNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -128,6 +132,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       descriptionController.text = widget.expense!.description;
       priceController.text = widget.expense!.price.toString();
     }
+    selectedCategory = context.read<CategoriesProvider>().categories.first.id;
   }
 
   @override
@@ -142,10 +147,14 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     buttonNode.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
+    final categoriesState = context.read<CategoriesProvider>();
+    print(categoriesState.categories);
+   
     return Form(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,6 +186,36 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
           ),
           const SizedBox(
             height: 20,
+          ),
+          DropdownButton<String>(
+            value: selectedCategory,
+            onChanged: (str) {
+              print('selected: $str');
+              setState(() {
+                selectedCategory = str!;
+              });
+            },
+            items: categoriesState.categories
+                .map((e) => DropdownMenuItem<String>(
+                    value: e.id,
+                  
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 10,
+                          width: 10,
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(e.r, e.g, e.b, 1),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(e.name),
+                      ],
+                    )))
+                .toList(),
           ),
           const Text('precio (€)'),
           Padding(
@@ -218,6 +257,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                               context: context,
                               state: state,
                               name: name,
+                              category: selectedCategory,
                               description: description,
                               price: price);
                         } else {
@@ -225,6 +265,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                               context: context,
                               state: state,
                               name: name,
+                              category: selectedCategory,
                               description: description,
                               price: price);
                         }
@@ -256,6 +297,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       {required BuildContext context,
       required ExpenseProvider state,
       required String name,
+      required String category,
       required String description,
       required num price}) async {
     //if Date is not null, the creation is being triggered through the add button for past dates.
@@ -268,6 +310,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
         person: name,
         description: description,
         price: price,
+        category: category,
         createdDate: createdDate,
         updatedDate: updatedDate);
 
@@ -284,12 +327,14 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       {required BuildContext context,
       required ExpenseProvider state,
       required String name,
+      required String category,
       required String description,
       required num price}) async {
     final newExpense = widget.expense!.copyWith(
         person: name,
         description: description,
         price: price,
+        category: category,
         updatedDate: DateTime.now().toLocal());
     try {
       //We're not going to update the Expense with the provider.

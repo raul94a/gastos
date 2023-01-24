@@ -33,6 +33,11 @@ class ExpensesRepository {
     return expensesByDateType;
   }
 
+  Future<Expense> readOne(String id) async {
+    final result = await service.readOne(id);
+    return Expense.fromMap(result);
+  }
+
   Future<Expense> save(Expense expense) async {
     String id = await service.save(expense.toMap());
     return expense.copyWith(id: id);
