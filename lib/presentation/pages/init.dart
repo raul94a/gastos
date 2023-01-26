@@ -25,6 +25,7 @@ class Init extends StatelessWidget {
 
     return ShouldAbandonApp(
       child: Scaffold(
+        
         floatingActionButton: FloatingActionButton(
           onPressed: () => showExpenseDialog(context),
           child: const Icon(Icons.add_rounded),

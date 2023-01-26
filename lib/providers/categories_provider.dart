@@ -21,6 +21,7 @@ class CategoriesProvider with ChangeNotifier {
   List<Category> get categories => _categories;
 
   //methods
+
   Future<void> _initialLoad() async {
     await fetchCategories();
     await read();
@@ -41,12 +42,28 @@ class CategoriesProvider with ChangeNotifier {
     }
   }
 
+  void addEmpty() {
+    _categories.add(Category(
+        name: 'Escribe el nombre...',
+        r: 0,
+        g: 0,
+        b: 0,
+        createdDate: DateTime.now(),
+        updatedDate: DateTime.now(),
+        deleted: 1));
+    notifyListeners();
+  }
+
+  void removeEmpty() {
+    _categories.removeWhere((element) => element.deleted == 1);
+    //notifyListeners();
+  }
+
   Future<void> add(Category category) async {
     loading = true;
     notifyListeners();
     try {
       await repository.save(category);
-      _categories.add(category);
     } catch (err) {
       print(err);
       rethrow;

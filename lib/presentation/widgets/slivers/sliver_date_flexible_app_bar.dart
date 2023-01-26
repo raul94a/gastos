@@ -19,6 +19,7 @@ class SliverDateFlexibleAppBar extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverAppBar(
+            automaticallyImplyLeading: false,
             expandedHeight: 50,
             floating: true,
             flexibleSpace: FlexibleSpaceBar(
