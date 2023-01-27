@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gastos/data/models/category.dart';
@@ -144,11 +145,19 @@ class PickColorContainer extends StatefulWidget {
 
 class _PickColorContainerState extends State<PickColorContainer> {
   late Color selectedColor;
+  Timer? timer;
   @override
   void initState() {
     super.initState();
     selectedColor = Color.fromARGB(
         200, widget.category.r, widget.category.g, widget.category.b);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    timer?.cancel();
   }
 
   @override
@@ -164,24 +173,10 @@ class _PickColorContainerState extends State<PickColorContainer> {
                   child: ColorPicker(
                       labelTypes: const [ColorLabelType.rgb],
                       pickerColor: selectedColor,
-                      onColorChanged: (color) async {
+                      onColorChanged: (color) {
                         //update color
                         //print('Color');
-                        if (widget.addMode) {
-                          widget.colorPicker!(color);
-                          setState(() {
-                            selectedColor = color;
-                          });
-                          return;
-                        }
-
-                        Category newCa = widget.category.copyWith(
-                            r: color.red, g: color.green, b: color.blue);
-
-                        context.read<CategoriesProvider>().updateLocal(newCa);
-                        setState(() {
-                          selectedColor = color;
-                        });
+                        debounceColor(() => pickColorHandler(color));
                       }),
                 );
               });
@@ -198,10 +193,40 @@ class _PickColorContainerState extends State<PickColorContainer> {
           ),
         ));
   }
+
+  void pickColorHandler(Color color) async {
+    if (widget.addMode) {
+      widget.colorPicker!(color);
+      setState(() {
+        selectedColor = color;
+      });
+      return;
+    }
+
+    Category newCa =
+        widget.category.copyWith(r: color.red, g: color.green, b: color.blue);
+
+    context.read<CategoriesProvider>().updateLocal(newCa);
+    setState(() {
+      selectedColor = color;
+    });
+  }
+
+  void debounceColor(Function() callback) {
+    if (timer != null) {
+      timer?.cancel();
+      print('cancel');
+    }
+    timer = Timer(const Duration(milliseconds: 700), () {
+      callback();
+      print('SELECTED');
+      timer?.cancel();
+    });
+  }
 }
 
 class CategoryCard extends StatelessWidget {
-  const CategoryCard(
+  CategoryCard(
       {super.key,
       required this.containerHeight,
       required this.containerWidth,
@@ -210,6 +235,7 @@ class CategoryCard extends StatelessWidget {
   final double containerHeight, containerWidth;
   final Category category;
   final CategoriesProvider state;
+  Timer? timer;
   @override
   Widget build(BuildContext context) {
     bool addMode = category.deleted == 1;
@@ -283,17 +309,19 @@ class CategoryCard extends StatelessWidget {
                           focusedBorder: fieldBorderOutlined(
                               Colors.lightBlueAccent.shade700, 0.95)),
                       onChanged: (value) {
-                        if (addMode) {
-                          final index = state.categories
-                              .indexWhere((element) => element.deleted == 1);
-                          state.categories[index] =
-                              category.copyWith(name: value);
-                          return;
-                        }
-                        //update name
-                        Category newCat = category.copyWith(
-                            name: value, updatedDate: DateTime.now());
-                        state.update(newCat);
+                        debounce(() {
+                          if (addMode) {
+                            final index = state.categories
+                                .indexWhere((element) => element.deleted == 1);
+                            state.categories[index] =
+                                category.copyWith(name: value);
+                            return;
+                          }
+                          //update name
+                          Category newCat = category.copyWith(
+                              name: value, updatedDate: DateTime.now());
+                          state.update(newCat);
+                        });
                       },
                     ),
                   ],
@@ -302,6 +330,15 @@ class CategoryCard extends StatelessWidget {
             ),
           )),
     );
+  }
+
+  void debounce(Function() callback) {
+    if (timer != null) {
+      timer?.cancel();
+    }
+    timer = Timer(const Duration(milliseconds: 700), () {
+      callback();
+    });
   }
 
   InputBorder fieldBorderUnderline() {
