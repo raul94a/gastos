@@ -34,6 +34,7 @@ class Init extends StatelessWidget {
             builder: (ctx, state, _) => _PageSelector(index: state.page)),
         bottomNavigationBar: Consumer<NavigationProvider>(
           builder: (ctx, state, _) => BottomNavigationBar(
+            
               backgroundColor: Colors.black,
               selectedItemColor: Colors.blueAccent.shade100,
               unselectedItemColor: Colors.white,

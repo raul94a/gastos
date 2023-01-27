@@ -37,6 +37,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
       expense = expense.copyWith(
           updatedDate: exp.updatedDate,
           person: exp.person,
+          category: exp.category,
           price: exp.price,
           description: exp.description);
     });
@@ -62,12 +63,11 @@ class _ExpenseTileState extends State<ExpenseTile> {
     final width = size.width;
     bool isEven = widget.position % 2 == 0;
     final categories = context.read<CategoriesProvider>().categories;
-    final tag = widget.expense.category;
     Category? cat;
     Color? color;
     Color textColor = Colors.black;
     try {
-      cat = categories.firstWhere((element) => element.id == tag);
+      cat = categories.firstWhere((element) => element.id == expense.category);
       color = Color.fromARGB(190,cat.r, cat.g, cat.b);
       if (!ColorComputation.colorsMatch(color)) {
         textColor = Colors.white;

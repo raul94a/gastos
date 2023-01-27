@@ -132,7 +132,12 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       descriptionController.text = widget.expense!.description;
       priceController.text = widget.expense!.price.toString();
     }
-    selectedCategory = context.read<CategoriesProvider>().categories.first.id;
+    if(widget.expense != null){
+      selectedCategory = widget.expense!.category;
+    }else{
+      selectedCategory = context.read<CategoriesProvider>().categories.first.id;
+
+    }
   }
 
   @override
