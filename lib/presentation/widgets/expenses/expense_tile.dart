@@ -78,6 +78,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
       key: Key(widget.expense.id),
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: ListTile(
+        isThreeLine: true,
         onLongPress: showOptionDialog,
         contentPadding: const EdgeInsets.all(8),
         tileColor: color ??
@@ -110,11 +111,12 @@ class _ExpenseTileState extends State<ExpenseTile> {
           ),
         ),
         title: Text(
-          expense.description,
+          expense.description + getCategoryName(cat),
           style: GoogleFonts.raleway(fontSize: 16, color: textColor),
         ),
         subtitle: Text(
           expense.person,
+          maxLines: 2,
           style: GoogleFonts.raleway(fontSize: 16, color: textColor),
         ),
         trailing: SizedBox(
@@ -128,6 +130,10 @@ class _ExpenseTileState extends State<ExpenseTile> {
         ),
       ),
     );
+  }
+   String getCategoryName(Category? cat){
+    if(cat == null) return '';
+    return ' (${cat.name})';
   }
 }
 
@@ -179,4 +185,6 @@ class ColorComputation {
     final b = color.blue * (1 - _shadeFactor);
     return Color.fromRGBO(r.toInt(), g.toInt(), b.toInt(), 1);
   }
+
+ 
 }

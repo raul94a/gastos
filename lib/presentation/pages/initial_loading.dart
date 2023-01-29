@@ -16,6 +16,11 @@ class InitialLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final expensesProvider = context.watch<ExpenseProvider>();
+    if (context.read<UserProvider>().loggedUser == null) {
+      context
+          .read<UserProvider>()
+          .setLoggedUser(FirebaseAuth.instance.currentUser!.uid);
+    }
     if (expensesProvider.loading || !expensesProvider.initialFetchFinished) {
       return const Scaffold(body: Loading());
     }

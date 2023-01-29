@@ -6,6 +6,7 @@ import 'package:gastos/presentation/widgets/dialogs/expense_dialog_widgets/categ
 import 'package:gastos/presentation/widgets/shared/block_back_button.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
@@ -132,7 +133,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       descriptionController.text = widget.expense!.description;
       priceController.text = widget.expense!.price.toString();
     }
-    if(widget.expense != null){
+    if(widget.expense != null && widget.expense!.category.isNotEmpty){
       selectedCategory = widget.expense!.category;
     }else{
       selectedCategory = context.read<CategoriesProvider>().categories.first.id;
@@ -157,24 +158,26 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final categoriesState = context.read<CategoriesProvider>();
+    final userStte = context.read<UserProvider>();
+    print(userStte.loggedUser);
     return Form(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Nombre'),
-          Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                keyboardType: TextInputType.name,
-                textInputAction: TextInputAction.next,
-                focusNode: nameNode,
-                decoration: basisFormDecoration(),
-                controller: nameController,
-                // onFieldSubmitted: (value) => nameNode.nextFocus(),
-              )),
-          const SizedBox(
-            height: 20,
-          ),
+          // const Text('Nombre'),
+          // Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: TextFormField(
+          //       keyboardType: TextInputType.name,
+          //       textInputAction: TextInputAction.next,
+          //       focusNode: nameNode,
+          //       decoration: basisFormDecoration(),
+          //       controller: nameController,
+          //       // onFieldSubmitted: (value) => nameNode.nextFocus(),
+          //     )),
+          // const SizedBox(
+          //   height: 20,
+          // ),
           const Text('Descripción del gasto'),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -289,7 +292,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
         : DateTime.now().toLocal();
     final updatedDate = createdDate;
     final expense = Expense(
-        person: name,
+        person: context.read<UserProvider>().loggedUser!.name,
         description: description,
         price: price,
         category: category,
@@ -313,7 +316,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String description,
       required num price}) async {
     final newExpense = widget.expense!.copyWith(
-        person: name,
+        person: context.read<UserProvider>().loggedUser!.name,
         description: description,
         price: price,
         category: category,
