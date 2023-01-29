@@ -8,7 +8,7 @@ class CategoriesProvider with ChangeNotifier {
   CategoriesProvider() {
     _initialLoad();
   }
-  final List<Category> _categories = [];
+   List<Category> _categories = [];
   final repository = CategoriesRepository();
   final preferences = SharedPreferencesHelper.instance;
 
@@ -102,6 +102,7 @@ class CategoriesProvider with ChangeNotifier {
     try {
       final id = category.id;
       final indexOf = categories.indexWhere((e) => e.id == id);
+      print(indexOf);
       _categories[indexOf] = category;
       repository.update(category);
     } catch (err) {
@@ -128,7 +129,9 @@ class CategoriesProvider with ChangeNotifier {
     final newEntries = await repository.fetchLastSyncCategories(lastSync);
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
-        if (!await repository.existsId(entry.id)) {
+        final existsId = await _categories.any((cat) => cat.id == entry.id);
+        print('ExistsId ? $existsId ID: ${entry.id}');
+        if (!existsId) {
           _categories.add(entry);
           notifyListeners();
         } else {
@@ -137,10 +140,12 @@ class CategoriesProvider with ChangeNotifier {
           //  2. Delete the expense
           Category category = await repository.readOne(entry.id);
           if (entry.deleted == 1) {
-            remove(category.id);
+              _categories.removeWhere((element) => element.id == entry.id);
           } else {
-            update(entry);
+            final index = _categories.indexWhere((c) => c.id == entry.id);
+            _categories[index] = category;
           }
+          notifyListeners();
         }
       }
     }

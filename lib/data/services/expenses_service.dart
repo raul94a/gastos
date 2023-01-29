@@ -53,7 +53,7 @@ class ExpenseService {
         await SharedPreferencesHelper.instance
             .saveLastSync(DateTime.now().millisecondsSinceEpoch);
       }
-      _insertSynchronizedData(firestoreData);
+      await _insertSynchronizedData(firestoreData);
     } catch (err) {
       rethrow;
     }
@@ -99,7 +99,7 @@ class ExpenseService {
   Future<Map<String, dynamic>> readOne(String id) async {
     final db = sqliteManager.database;
     final res = await db.rawQuery(
-        'SELECT * from ${sqliteManager.expensesTable} where id = $id LIMIT 1');
+        'SELECT * from ${sqliteManager.expensesTable} where id = "$id" LIMIT 1');
     return res.first;
   }
 
@@ -122,5 +122,12 @@ class ExpenseService {
     final res = await db
         .rawQuery("select count(*) as 'res' from expenses where id = '$id'");
     return res.first['res'] as int;
+  }
+
+  Future<num> sumExpensesOfUser(String name) async {
+    final db = sqliteManager.database;
+    final res = await db.rawQuery(ExpenseQueries.readExpensesOfUserByDate(name));
+    print(res);
+    return res.first['total'] as num;
   }
 }

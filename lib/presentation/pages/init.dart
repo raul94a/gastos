@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gastos/presentation/pages/settings.dart';
+import 'package:gastos/presentation/pages/info.dart';
 import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
 import 'package:gastos/presentation/pages/expenses_list.dart';
 import 'package:gastos/presentation/widgets/main/should_abandon.dart';
@@ -61,17 +62,9 @@ class _PageSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (index == 0) return const ExpenseList();
-    if (index == 1) return const Info();
+    if (index == 1) return const InfoPage();
 
     return const Settings();
   }
 }
 
-class Info extends StatelessWidget {
-  const Info({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}

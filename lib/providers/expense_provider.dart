@@ -259,4 +259,19 @@ class ExpenseProvider with ChangeNotifier {
       await preferences.saveLastSync(DateTime.now().millisecondsSinceEpoch);
     }
   }
+
+  Future<num?> sumExpensesOfUser({required String name}) async{
+    loading = true;
+    notifyListeners();
+    try{
+
+    }catch(err){
+      final result = await repository.sumUserExpenses(name);
+      print(result);
+      return result;
+    }finally{
+      loading = false;
+      notifyListeners();
+    }
+  }
 }

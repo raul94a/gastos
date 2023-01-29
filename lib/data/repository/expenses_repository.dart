@@ -67,4 +67,6 @@ class ExpensesRepository {
 
   Future<bool> existsId(String id) async =>
       await service.countIdEntries(id) > 0;
+
+  Future<num> sumUserExpenses(String name) async => await service.sumExpensesOfUser(name);
 }

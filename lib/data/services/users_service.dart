@@ -1,14 +1,11 @@
-import 'package:flutter/foundation.dart' as f;
 import 'package:gastos/data/firestore_manager.dart';
-import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/user.dart';
-import 'package:gastos/data/queries/categories_queries.dart';
+import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 
 class UserService {
   SqliteManager sqliteManager = SqliteManager.instance;
   FirestoreManager firestoreManager = FirestoreManager.instance;
-
   Future<void> save(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
 
@@ -32,27 +29,6 @@ class UserService {
     }
   }
 
-  /*Future<void> update(Map<String, dynamic> data) async {
-    final firestore = firestoreManager.firestore;
-    try {
-      await firestore
-          .collection('categories')
-          .doc(data['id'])
-          .update({"name": data['name'], "updatedDate": data['updatedDate']});
-      await _updateLocal(data);
-    } catch (error) {
-      rethrow;
-    }
-  }*/
-
-  /*Future<void> updateLocal(Map<String, dynamic> data) async {
-    try {
-      _updateLocal(data);
-    } catch (err) {
-      print(err);
-      rethrow;
-    }
-  }*/
 
   Future<List<AppUser>> fetchLastSyncFromFirestore(int lastSync,
       [bool returnInsertedDate = false]) async {
@@ -73,7 +49,10 @@ class UserService {
         //data.update('id', (value) => query.id);
         firestoreData.add(data);
       }
-      _insertSynchronizedData(firestoreData);
+      if(d.isNotEmpty){
+        await SharedPreferencesHelper.instance.saveLastSyncUsers(DateTime.now().millisecondsSinceEpoch);
+      }
+      await _insertSynchronizedData(firestoreData);
 
     } catch (err) {
       rethrow;
@@ -89,12 +68,6 @@ class UserService {
     await sqliteManager.database.insert(table, data);
   }
 
-  // Future<void> _updateLocal(Map<String, dynamic> data) async {
-  //   String table = sqliteManager.usersTable;
-  //   await sqliteManager.database
-  //       .update(table, data, where: 'id = ?', whereArgs: [data['id']]);
-  // }
-
   Future<void> _insertSynchronizedData(List<Map<String, dynamic>> data) async {
     final table = sqliteManager.usersTable;
     final db = sqliteManager.database;
@@ -103,7 +76,7 @@ class UserService {
         final results = await countIdEntries(object['firebaseUID']);
         if (results > 0) {
           print('UPDATING USER');
-          await db.update(table, object);
+          await db.update(table, object, where: 'firebaseUID = ?', whereArgs: [object['firebaseUID']]);
         } else {
           print('INSERTING USER');
           final res = await db.insert(table, object);
@@ -121,6 +94,7 @@ class UserService {
     final db = sqliteManager.database;
     List<Map<String, dynamic>> result =
         await db.rawQuery('SELECT * FROM users');
+        print('select * from users: $result');
 
     return result;
   }

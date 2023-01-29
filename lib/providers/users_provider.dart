@@ -30,22 +30,23 @@ class UserProvider with ChangeNotifier {
   //methods
 
   Future<void> _initialLoad() async {
-    await fetchUsers();
-    await read();
+    fetchUsers().then((_) async {
+      await read();
+    });
   }
 
   Future<void> fetchUsers() async {
     loading = true;
-    notifyListeners();
+    //notifyListeners();
 
     try {
-      await repository.fetchLastSync(preferences.getLastSync());
+      await repository.fetchLastSync(preferences.getLastSyncUsers());
     } catch (err) {
-      notifyListeners();
+     // notifyListeners();
       rethrow;
     } finally {
       loading = false;
-      notifyListeners();
+     // notifyListeners();
       //Not really needed to notify loading false because it is gonna be called in get method
     }
   }
@@ -77,7 +78,7 @@ class UserProvider with ChangeNotifier {
 
   Future<void> refreshData() async {
     print('Refreshing users');
-    final lastSync = preferences.getLastSync();
+    final lastSync = preferences.getLastSyncUsers();
     final newEntries = await repository.fetchLastSyncUsers(lastSync);
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
@@ -95,7 +96,6 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> signIn(AppUser user) async {
-   
     _loggedUser = user;
   }
 
@@ -136,8 +136,7 @@ class UserProvider with ChangeNotifier {
       }
     } catch (e) {
       print(e);
-    }
-    finally{
+    } finally {
       loading = false;
       notifyListeners();
     }
@@ -158,8 +157,7 @@ class UserProvider with ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       showErrorDialog(
           context, 'Error', 'Alguna de las credenciales no es correcta');
-    }
-    finally{
+    } finally {
       loading = false;
       notifyListeners();
     }

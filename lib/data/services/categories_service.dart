@@ -60,6 +60,7 @@ class CategoriesService {
 
       final d = docs.docs;
       print('cats list $d');
+      print('${docs.docChanges}');
       for (final query in d) {
         final data = query.data();
         print(data);
@@ -121,7 +122,7 @@ class CategoriesService {
   Future<Map<String, dynamic>> readOne(String id) async {
     final db = sqliteManager.database;
     final res = await db.rawQuery(
-        'SELECT * from ${sqliteManager.categoriesTable} where id = $id LIMIT 1');
+        'SELECT * from ${sqliteManager.categoriesTable} where id = "$id" LIMIT 1');
     return res.first;
   }
 
@@ -133,6 +134,7 @@ class CategoriesService {
 
   Future<int> countIdEntries(String id) async {
     final db = sqliteManager.database;
+    //print(await db.rawQuery('SELECT * FROM categories where id = "$id"'));
     final res = await db
         .rawQuery("select count(*) as 'res' from categories where id = '$id'");
     return res.first['res'] as int;

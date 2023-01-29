@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
           create: (_) => ExpenseProvider(),
           lazy: false,
         ),
-        ChangeNotifierProvider(create: (ctx) => UserProvider()),
+        ChangeNotifierProvider(create: (ctx) => UserProvider(),lazy: false,),
         ChangeNotifierProvider(create: (c) => JumpButtonsProvider())
       ],
       child: Builder(
