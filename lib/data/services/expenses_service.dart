@@ -84,7 +84,7 @@ class ExpenseService {
         // 2. The record doesn't exists, so it should be inserted
         final results = await countIdEntries(object['id']);
         if (results > 0) {
-          await db.update(table, object);
+          await db.update(table, object, where: 'id = ?' ,whereArgs: [object['id']]);
         } else {
           await db.insert(table, object);
         }

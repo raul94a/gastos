@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/presentation/widgets/shared/loading.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/users_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+
 class InitialLoading extends StatelessWidget {
   const InitialLoading({super.key});
 
@@ -19,6 +22,6 @@ class InitialLoading extends StatelessWidget {
 
     goToExpenseList(context);
 
-    return const Scaffold(body: Text('Algo ha fallado'));
+    return const Scaffold(body: Loading());
   }
 }

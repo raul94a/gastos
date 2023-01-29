@@ -32,7 +32,7 @@ class CategoriesProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      await repository.fetchLastSync(preferences.getLastSync());
+      await repository.fetchLastSync(preferences.getLastSyncCat());
     } catch (err) {
       loading = false;
       notifyListeners();
@@ -112,6 +112,7 @@ class CategoriesProvider with ChangeNotifier {
 
   Future<void> read() async {
     final res = await repository.readAll();
+
     print('REsult: $res');
     _categories.addAll(res);
     notifyListeners();
@@ -123,7 +124,7 @@ class CategoriesProvider with ChangeNotifier {
 
   Future<void> refreshData() async {
     print('Refreshing categories');
-    final lastSync = preferences.getLastSync();
+    final lastSync = preferences.getLastSyncCat();
     final newEntries = await repository.fetchLastSyncCategories(lastSync);
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {

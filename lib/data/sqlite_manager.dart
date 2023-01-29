@@ -23,8 +23,10 @@ class SqliteManager {
   //tables
   final String _expensesTable = "expenses";
   final String _categoriesTable = "categories";
+  final String _usersTable = "users";
   String get expensesTable => _expensesTable;
   String get categoriesTable => _categoriesTable;
+  String get usersTable => _usersTable;
 
   Future<void> open() async {
     _database = await openDatabase(
@@ -51,6 +53,9 @@ class SqliteManager {
     await db.execute('CREATE TABLE expenses (id varchar(255) primary key,'
         'person varchar(255), description TEXT, picture TEXT, price REAL,'
         'createdDate int, updatedDate int, deleted BOOLEAN, category varchar(255))');
+    await db.execute('CREATE TABLE users (firebaseUID varchar(255) primary key,'
+        'name varchar(255), email varchar(255),'
+        'createdDate int, updatedDate int)');
     final batch = db.batch();
     batch.execute('CREATE TABLE categories (id varchar(255) primary key,'
         'name varchar(255), r int, g int, b int,'

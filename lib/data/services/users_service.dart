@@ -1,29 +1,38 @@
 import 'package:flutter/foundation.dart' as f;
 import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/models/category.dart';
+import 'package:gastos/data/models/user.dart';
 import 'package:gastos/data/queries/categories_queries.dart';
-import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 
-class CategoriesService {
+class UserService {
   SqliteManager sqliteManager = SqliteManager.instance;
   FirestoreManager firestoreManager = FirestoreManager.instance;
 
-  Future<String> save(Map<String, dynamic> data) async {
+  Future<void> save(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
 
     try {
-      final doc = await firestore.collection('categories').add(data);
-      String id = doc.id;
-      data.update('id', (value) => id);
+      final checkDoc = await firestore
+          .collection('users')
+          .where('email', isEqualTo: data['email'])
+          .get();
+      if (checkDoc.docs.isNotEmpty) {
+        print('El email ya está en uso');
+        throw Exception('El email ya está en uso');
+      }
+      final doc = await firestore
+          .collection('users')
+          .doc(data['firebaseUID'])
+          .set(data);
+
       await _saveLocal(data);
-      return id;
     } catch (error) {
       rethrow;
     }
   }
 
-  Future<void> update(Map<String, dynamic> data) async {
+  /*Future<void> update(Map<String, dynamic> data) async {
     final firestore = firestoreManager.firestore;
     try {
       await firestore
@@ -34,107 +43,107 @@ class CategoriesService {
     } catch (error) {
       rethrow;
     }
-  }
+  }*/
 
-  Future<void> updateLocal(Map<String, dynamic> data) async {
+  /*Future<void> updateLocal(Map<String, dynamic> data) async {
     try {
       _updateLocal(data);
     } catch (err) {
       print(err);
       rethrow;
     }
-  }
+  }*/
 
-  Future<List<Category>> fetchLastSyncFromFirestore(int lastSync,
+  Future<List<AppUser>> fetchLastSyncFromFirestore(int lastSync,
       [bool returnInsertedDate = false]) async {
     final firestore = firestoreManager.firestore;
     final List<Map<String, dynamic>> firestoreData = [];
 
     try {
       final docs = await firestore
-          .collection('categories')
+          .collection('users')
           .where('updatedDate', isGreaterThanOrEqualTo: lastSync)
           .get();
 
-      print('lastSync: $lastSync fetching cats!!!!!!!!! $docs');
-
       final d = docs.docs;
-      print('cats list $d');
+      print('Users from firestore: ${d}');
       for (final query in d) {
+        print('User object: ${query.data()}');
         final data = query.data();
-        print(data);
-        data.addAll({'id': query.id});
+        //data.update('id', (value) => query.id);
         firestoreData.add(data);
       }
-      if (firestoreData.isNotEmpty) {
-        await SharedPreferencesHelper.instance
-            .saveLastSyncCat(DateTime.now().millisecondsSinceEpoch);
-        await _insertSynchronizedData(firestoreData);
-      }
+      _insertSynchronizedData(firestoreData);
+
     } catch (err) {
-      print(err);
       rethrow;
     }
 
     if (!returnInsertedDate || firestoreData.isEmpty) return [];
-    return firestoreData.map(Category.fromMap).toList();
+    return firestoreData.map(AppUser.fromMap).toList();
   }
 
   //sql services
   Future<void> _saveLocal(Map<String, dynamic> data) async {
-    String table = sqliteManager.categoriesTable;
+    String table = sqliteManager.usersTable;
     await sqliteManager.database.insert(table, data);
   }
 
-  Future<void> _updateLocal(Map<String, dynamic> data) async {
-    String table = sqliteManager.categoriesTable;
-    await sqliteManager.database
-        .update(table, data, where: 'id = ?', whereArgs: [data['id']]);
-  }
+  // Future<void> _updateLocal(Map<String, dynamic> data) async {
+  //   String table = sqliteManager.usersTable;
+  //   await sqliteManager.database
+  //       .update(table, data, where: 'id = ?', whereArgs: [data['id']]);
+  // }
 
   Future<void> _insertSynchronizedData(List<Map<String, dynamic>> data) async {
-    final table = sqliteManager.categoriesTable;
+    final table = sqliteManager.usersTable;
     final db = sqliteManager.database;
     try {
       for (final object in data) {
-        print('Cateogry obejct $object');
-        final results = await countIdEntries(object['id']);
+        final results = await countIdEntries(object['firebaseUID']);
         if (results > 0) {
-          await db.update(table, object, where: 'id = ?', whereArgs: [object['id']]);
+          print('UPDATING USER');
+          await db.update(table, object);
         } else {
-          await db.insert(table, object);
+          print('INSERTING USER');
+          final res = await db.insert(table, object);
+         
         }
       }
     } catch (err) {
-      print(err);
+      
+        print('Error in _synchroUserData: $err');
+      
     }
   }
 
   Future<List<Map<String, dynamic>>> readAll() async {
     final db = sqliteManager.database;
     List<Map<String, dynamic>> result =
-        await db.rawQuery(CategoriesQueries.getAllSQL());
+        await db.rawQuery('SELECT * FROM users');
 
     return result;
   }
 
   Future<Map<String, dynamic>> readOne(String id) async {
+    print('FIREBASE UID: $id');
     final db = sqliteManager.database;
     final res = await db.rawQuery(
-        'SELECT * from ${sqliteManager.categoriesTable} where id = $id LIMIT 1');
+        "SELECT * from users where firebaseUID = '$id' LIMIT 1");
+      if(res.isEmpty) return {};
     return res.first;
   }
 
-  Future<int> countCategories() async {
+  Future<int> countUsers() async {
     final db = sqliteManager.database;
-    final res = await db.rawQuery("select count(*) as 'res' from categories");
+    final res = await db.rawQuery("select count(*) as 'res' from users");
     return res.first['res'] as int;
   }
 
   Future<int> countIdEntries(String id) async {
     final db = sqliteManager.database;
-    final res = await db
-        .rawQuery("select count(*) as 'res' from categories where id = '$id'");
+    final res = await db.rawQuery(
+        "select count(*) as 'res' from users where firebaseUID = '$id'");
     return res.first['res'] as int;
   }
 }

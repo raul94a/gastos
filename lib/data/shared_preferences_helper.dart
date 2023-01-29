@@ -11,6 +11,7 @@ class SharedPreferencesHelper {
       _sharedPreferencesHelper ??= SharedPreferencesHelper._();
 
   final String _lastSync = "LAST_SYNC";
+  final String _lastSyncCategories = "LAST_SYNC_CAT";
   final String _dateType = "DATE_TYPE";
   SharedPreferences? _prefs;
 
@@ -28,6 +29,13 @@ class SharedPreferencesHelper {
   }
 
   int getLastSync() => preferences.getInt(_lastSync) ?? 0;
+
+  //cats
+  Future<void> saveLastSyncCat(int millis) async {
+    preferences.setInt(_lastSyncCategories, millis);
+  }
+
+  int getLastSyncCat() => preferences.getInt(_lastSyncCategories) ?? 0;
   DateType getDateType() {
     final type = preferences.getString(_dateType);
     if (type == null) {
@@ -49,5 +57,3 @@ class SharedPreferencesHelper {
     }
   }
 }
-
-

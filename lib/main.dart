@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:gastos/data/firestore_manager.dart';
@@ -7,6 +8,7 @@ import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/providers/navigation_provider.dart';
+import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/routes/router.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +22,7 @@ Future<void> _initDependencies() async {
   SharedPreferencesHelper.instance;
   await SqliteManager.instance.open();
   await Firebase.initializeApp();
+
   FirestoreManager.instance;
 }
 
@@ -39,14 +42,19 @@ class MyApp extends StatelessWidget {
           create: (_) => ExpenseProvider(),
           lazy: false,
         ),
+        ChangeNotifierProvider(create: (ctx) => UserProvider()),
         ChangeNotifierProvider(create: (c) => JumpButtonsProvider())
       ],
-      child: MaterialApp.router(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        routerConfig: router,
+      child: Builder(
+        builder: (context) {
+          return MaterialApp.router(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            routerConfig: router,
+          );
+        }
       ),
     );
   }
