@@ -1,18 +1,18 @@
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/data/services/expenses_service.dart';
+import 'package:gastos/data/services/individual_expenses_service.dart';
 import 'package:gastos/utils/date_formatter.dart';
 
-class ExpensesRepository {
-  final service = ExpenseService();
+class IndividualExpensesRepository {
+  final service = IndividualExpenseService();
 
-  Future<List<Expense>> getByScroll(int offset) async {
-    final List<Map<String, dynamic>> result = await service.readAll(offset);
+  Future<List<Expense>> getByScroll(String id, int offset) async {
+    final List<Map<String, dynamic>> result = await service.readAll(id,offset);
     return result.map(Expense.fromMap).toList();
   }
 
-  Future<Map<String, List<Expense>>> readAll(DateType type, int offset) async {
-    final result = await service.readAll(offset);
+  Future<Map<String, List<Expense>>> readAll(DateType type, String personFirebaseUID, int offset) async {
+    final result = await service.readAll(personFirebaseUID, offset);
     Map<String, List<Expense>> expensesByDateType = {};
     int length = result.length;
     for (int i = 0; i < length; i++) {
@@ -29,7 +29,7 @@ class ExpensesRepository {
     }
 
     //print(expensesByDateType);
-  
+
     return expensesByDateType;
   }
 
@@ -63,10 +63,10 @@ class ExpensesRepository {
   Future<List<Expense>> fetchLastSyncExpenses(int lastSync) async =>
       await service.fetchLastSyncFromFirestore(lastSync, true);
 
-  Future<int> countRows() async => await service.countExpenses();
+  Future<int> countRows(String id) async => await service.countExpenses(id);
 
   Future<bool> existsId(String id) async =>
       await service.countIdEntries(id) > 0;
 
-  Future<num> sumUserExpenses(String name) async => await service.sumExpensesOfUser(name);
+  Future<num> sumUserExpenses(String id) async => await service.sumExpensesOfUser(id);
 }

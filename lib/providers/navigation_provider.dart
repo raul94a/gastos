@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class NavigationProvider with ChangeNotifier {
-  int page = 0;
+  int page = 1;
 
 
 
