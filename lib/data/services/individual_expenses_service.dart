@@ -5,7 +5,7 @@ import 'package:gastos/data/queries/expense_queries.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 
-class ExpenseService {
+class IndividualExpenseService {
   SqliteManager sqliteManager = SqliteManager.instance;
   FirestoreManager firestoreManager = FirestoreManager.instance;
 
@@ -103,17 +103,17 @@ class ExpenseService {
     return res.first;
   }
 
-  Future<List<Map<String, dynamic>>> readAll(int offset) async {
+  Future<List<Map<String, dynamic>>> readAll(String id, int offset) async {
     final db = sqliteManager.database;
     List<Map<String, dynamic>> result =
-        await db.rawQuery(ExpenseQueries.readExpenses(offset));
+        await db.rawQuery(ExpenseQueries.readExpensesIndividual(id, offset));
 
     return result;
   }
 
-  Future<int> countExpenses() async {
+  Future<int> countExpenses(String id) async {
     final db = sqliteManager.database;
-    final res = await db.rawQuery("select count(*) as 'res' from expenses where isCommonExpense = 1");
+    final res = await db.rawQuery("select count(*) as 'res' from expenses where isCommonExpense = 0 AND personFirebaseUID = '$id'");
     return res.first['res'] as int;
   }
 
@@ -124,9 +124,9 @@ class ExpenseService {
     return res.first['res'] as int;
   }
 
-  Future<num> sumExpensesOfUser(String name) async {
+  Future<num> sumExpensesOfUser(String id) async {
     final db = sqliteManager.database;
-    final res = await db.rawQuery(ExpenseQueries.readExpensesOfUserByDate(name));
+    final res = await db.rawQuery(ExpenseQueries.readExpensesOfUserByDateIndividual(id));
     print(res);
     return res.first['total'] as num;
   }

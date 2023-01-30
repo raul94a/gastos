@@ -51,7 +51,7 @@ class SqliteManager {
 
   FutureOr<void> _onCreate(Database db, int descriptor) async {
     await db.execute('CREATE TABLE expenses (id varchar(255) primary key,'
-        'person varchar(255), description TEXT, picture TEXT, price REAL,'
+        'person varchar(255), description TEXT, picture TEXT, price REAL, personFirebaseUID varchar(255), isCommonExpense int, '
         'createdDate int, updatedDate int, deleted BOOLEAN, category varchar(255))');
     await db.execute('CREATE TABLE users (firebaseUID varchar(255) primary key,'
         'name varchar(255), email varchar(255),'
@@ -115,6 +115,7 @@ class ExpenseCreator {
       final id = randomId(50);
       exp.add(Expense(
           id: id,
+          
           person: 'Raul',
           description: 'Random${Random.secure().nextInt(555555555)}',
           price: Random().nextDouble() * 15,

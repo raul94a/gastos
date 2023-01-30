@@ -6,6 +6,7 @@ import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/individual_expenses_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/providers/navigation_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
@@ -42,20 +43,22 @@ class MyApp extends StatelessWidget {
           create: (_) => ExpenseProvider(),
           lazy: false,
         ),
-        ChangeNotifierProvider(create: (ctx) => UserProvider(),lazy: false,),
+        ChangeNotifierProvider(create: (ctx) => IndividualExpenseProvider()),
+        ChangeNotifierProvider(
+          create: (ctx) => UserProvider(),
+          lazy: false,
+        ),
         ChangeNotifierProvider(create: (c) => JumpButtonsProvider())
       ],
-      child: Builder(
-        builder: (context) {
-          return MaterialApp.router(
-            title: 'Flutter Demo',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-            routerConfig: router,
-          );
-        }
-      ),
+      child: Builder(builder: (context) {
+        return MaterialApp.router(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          routerConfig: router,
+        );
+      }),
     );
   }
 }
