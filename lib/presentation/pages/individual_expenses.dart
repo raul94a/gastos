@@ -26,8 +26,8 @@ class IndividualExpensesPage extends StatefulWidget {
 
 class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
   final scrollController = AutoScrollController();
-  void _scrollControllerHandler(String userId, ExpenseProvider state,
-      AutoScrollController controller) async {
+  void _scrollControllerHandler(
+      ExpenseProvider state, AutoScrollController controller) async {
     if (state.blockInfiniteScroll | state.blockFunction) return;
     final maxScrollExtent = controller.position.maxScrollExtent;
     final pixels = controller.position.pixels;
@@ -61,8 +61,8 @@ class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
     final expState = context.read<ExpenseProvider>();
     final categoriesState = context.read<CategoriesProvider>();
     final userProvider = context.read<UserProvider>();
-    scrollController.addListener(() => _scrollControllerHandler(
-        userProvider.loggedUser!.firebaseUID, expState, scrollController));
+    scrollController.addListener(
+        () => _scrollControllerHandler(expState, scrollController));
     print('Build Individual Expenses Page');
     return MainScrollNotification(
       controller: scrollController,
@@ -236,8 +236,16 @@ class _IndividualExpensesByDateListState
     final keyIndex = widget.index;
     final expenses = widget.state.expenses;
     final isLastDate = keyIndex == expenses.keys.length - 1;
+    //from the orderedKeys (dates) we fetch a date using the keyIndex we are passing to this class 
+    //Then, using this date we can access the list of expenses for that date. 
     final List<Expense> expensesOfDate = expenses[orderedKeys[keyIndex]]!;
     String titleDate = orderedKeys[keyIndex];
+    final loggedUser = context.read<UserProvider>().loggedUser!;
+    final expensesOfUser = expensesOfDate
+        .where((element) =>
+            element.isCommonExpense == 0 &&
+            element.personFirebaseUID == loggedUser.firebaseUID)
+        .toList();
 
     if (context.read<ExpenseProvider>().preferences.getDateType() ==
         DateType.day) {
@@ -299,7 +307,7 @@ class _IndividualExpensesByDateListState
               Visibility(
                 visible: showExpenses(showProvider),
                 child: _ExpenseTileListView(
-                  expensesOfDate: expensesOfDate,
+                  expensesOfDate: expensesOfUser,
                   orderedKeys: orderedKeys,
                   keyIndex: keyIndex,
                   state: widget.state,
@@ -384,8 +392,8 @@ class _ExpenseTileListView extends StatelessWidget {
         itemCount: expensesOfDate.length,
         itemBuilder: ((context, i) {
           final date = orderedKeys[keyIndex];
-          final List<Expense> expenses = state.expenses[date]!;
-          final expense = expenses[i];
+          
+          final expense = expensesOfDate[i];
 
           return IndividualExpenseTile(
               key: Key('Date-${expense.id}'),
