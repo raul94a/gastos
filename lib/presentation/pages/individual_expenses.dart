@@ -10,7 +10,6 @@ import 'package:gastos/presentation/widgets/shared/loading.dart';
 import 'package:gastos/presentation/widgets/slivers/sliver_date_flexible_app_bar.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
-import 'package:gastos/providers/individual_expenses_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/providers/show_expenses_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
@@ -27,7 +26,7 @@ class IndividualExpensesPage extends StatefulWidget {
 
 class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
   final scrollController = AutoScrollController();
-  void _scrollControllerHandler(String userId, IndividualExpenseProvider state,
+  void _scrollControllerHandler(String userId, ExpenseProvider state,
       AutoScrollController controller) async {
     if (state.blockInfiniteScroll | state.blockFunction) return;
     final maxScrollExtent = controller.position.maxScrollExtent;
@@ -39,7 +38,7 @@ class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
         print(
             '\nMaxScrollExtent: $maxScrollExtent\nPixels: $pixels\nViewPort: $viewPort');
       }
-      await state.getByScroll(userId);
+      await state.getByScroll();
     }
   }
 
@@ -59,7 +58,7 @@ class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final expState = context.read<IndividualExpenseProvider>();
+    final expState = context.read<ExpenseProvider>();
     final categoriesState = context.read<CategoriesProvider>();
     final userProvider = context.read<UserProvider>();
     scrollController.addListener(() => _scrollControllerHandler(
@@ -69,7 +68,7 @@ class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
       controller: scrollController,
       child: Stack(
         children: [
-          Consumer<IndividualExpenseProvider>(builder: (ctx, state, _) {
+          Consumer<ExpenseProvider>(builder: (ctx, state, _) {
             return state.loading
                 ? const Loading()
                 : Center(
@@ -168,7 +167,7 @@ class IndividualExpensesByDateList extends StatefulWidget {
   const IndividualExpensesByDateList(
       {Key? key, required this.state, required this.index})
       : super(key: key);
-  final IndividualExpenseProvider state;
+  final ExpenseProvider state;
   final int index;
 
   @override
@@ -374,7 +373,7 @@ class _ExpenseTileListView extends StatelessWidget {
   final List<Expense> expensesOfDate;
   final List<String> orderedKeys;
   final int keyIndex;
-  final IndividualExpenseProvider state;
+  final ExpenseProvider state;
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -406,7 +405,7 @@ class IndividualExpenseTile extends StatefulWidget {
       required this.expense,
       required this.position})
       : super(key: key);
-  final IndividualExpenseProvider state;
+  final ExpenseProvider state;
   final String date;
   final Expense expense;
   final int position;
@@ -587,7 +586,7 @@ class IndividualExpenseOptionsDialog extends StatelessWidget {
       required this.updateHandler,
       required this.expense})
       : super(key: key);
-  final IndividualExpenseProvider state;
+  final ExpenseProvider state;
   final String date;
   final int index;
   final Function(Expense) updateHandler;
