@@ -51,7 +51,7 @@ class SqliteManager {
 
   FutureOr<void> _onCreate(Database db, int descriptor) async {
     await db.execute('CREATE TABLE expenses (id varchar(255) primary key,'
-        'person varchar(255), description TEXT, picture TEXT, price REAL, personFirebaseUID varchar(255), isCommonExpense int, '
+        'person varchar(255), description TEXT, picture TEXT, price REAL, personFirebaseUID varchar(255) DEFAULT "", isCommonExpense int DEFAULT 1, '
         'createdDate int, updatedDate int, deleted BOOLEAN, category varchar(255))');
     await db.execute('CREATE TABLE users (firebaseUID varchar(255) primary key,'
         'name varchar(255), email varchar(255),'

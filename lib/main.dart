@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:gastos/data/firestore_manager.dart';
@@ -6,7 +5,6 @@ import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
-import 'package:gastos/providers/individual_expenses_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/providers/navigation_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
