@@ -94,6 +94,15 @@ class ExpenseProvider with ChangeNotifier {
     }
   }
 
+  //directly add the expense to the correct place
+  void _addExpense(bool individual, Expense expense, String date) {
+    if (!individual) {
+      _addToExpenses(expense, date);
+    } else {
+      _addToIndividualExpenses(expense, date);
+    }
+  }
+
   //state management
   Future<void> add({required Expense expense, bool individual = false}) async {
     loading = true;
@@ -103,11 +112,7 @@ class ExpenseProvider with ChangeNotifier {
       final dateString = MyDateFormatter.toYYYYMMdd(expense.createdDate);
       final date = MyDateFormatter.dateByType(dateType, dateString);
 
-      if (!individual) {
-        _addToExpenses(newExpense, date);
-      } else {
-        _addToIndividualExpenses(newExpense, date);
-      }
+      _addExpense(individual, newExpense, date);
       success = true;
     } catch (err) {
       rethrow;
@@ -276,11 +281,9 @@ class ExpenseProvider with ChangeNotifier {
         String date = MyDateFormatter.dateByType(
             dateType, MyDateFormatter.toYYYYMMdd(entry.createdDate));
         if (!await repository.existsId(entry.id)) {
-          if (entry.isCommonExpense == 1) {
-            _addToExpenses(entry, date);
-          } else {
-            _addToIndividualExpenses(entry, date);
-          }
+          //if isCommonExpense is 0, the expense is individual
+          bool isIndividual = entry.isCommonExpense == 0;
+          _addExpense(isIndividual, entry, date);
           notifyListeners();
         } else {
           //two situations:
