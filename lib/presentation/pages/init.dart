@@ -36,6 +36,7 @@ class Init extends StatelessWidget {
         bottomNavigationBar: Consumer<NavigationProvider>(
           builder: (ctx, state, _) => BottomNavigationBar(
               backgroundColor: Colors.black,
+              type: BottomNavigationBarType.fixed,
               selectedItemColor: Colors.blueAccent.shade100,
               unselectedItemColor: Colors.white,
               unselectedLabelStyle: const TextStyle(color: Colors.white),
