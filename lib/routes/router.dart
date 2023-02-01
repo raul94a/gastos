@@ -14,6 +14,7 @@ final GoRouter router = GoRouter(
         return StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
+              print('Auth State change');
               final user = snapshot.data;
               if (user!= null) {
                 return const InitialLoading();

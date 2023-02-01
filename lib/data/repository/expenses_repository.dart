@@ -1,5 +1,6 @@
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/data/models/total_expenses.dart';
 import 'package:gastos/data/services/expenses_service.dart';
 import 'package:gastos/utils/date_formatter.dart';
 
@@ -11,26 +12,24 @@ class ExpensesRepository {
     return result.map(Expense.fromMap).toList();
   }
 
-  Future<Map<String, List<Expense>>> readAll(DateType type, int offset) async {
+  Future<TotalExpenses> readAll(
+      DateType type, int offset, String firebaseUID) async {
     final result = await service.readAll(offset);
-    Map<String, List<Expense>> expensesByDateType = {};
     int length = result.length;
+    final totalExpenses = TotalExpenses();
     for (int i = 0; i < length; i++) {
       final expense = result[i];
-      String date = MyDateFormatter.dateByType(type, expense['date']);
-      if (!expensesByDateType.containsKey(date)) {
-        expensesByDateType.addAll({
-          date.toString(): [Expense.fromMap(expense)]
-        });
-      } else {
-        final list = expensesByDateType[date];
-        list?.add(Expense.fromMap(expense));
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(type, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(type, expense);
       }
     }
-
-    //print(expensesByDateType);
-  
-    return expensesByDateType;
+    return totalExpenses;
   }
 
   Future<Expense> readOne(String id) async {
@@ -68,5 +67,6 @@ class ExpensesRepository {
   Future<bool> existsId(String id) async =>
       await service.countIdEntries(id) > 0;
 
-  Future<num> sumUserExpenses(String name) async => await service.sumExpensesOfUser(name);
+  Future<num> sumUserExpenses(String name) async =>
+      await service.sumExpensesOfUser(name);
 }

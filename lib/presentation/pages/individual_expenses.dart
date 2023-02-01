@@ -64,6 +64,7 @@ class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
     scrollController.addListener(
         () => _scrollControllerHandler(expState, scrollController));
     print('Build Individual Expenses Page');
+    
     return MainScrollNotification(
       controller: scrollController,
       child: Stack(
@@ -90,7 +91,7 @@ class _IndividualExpensesPageState extends State<IndividualExpensesPage> {
                                 primary: false,
                                 physics: const NeverScrollableScrollPhysics(),
                                 //controller: scrollController,
-                                itemCount: state.expenses.keys.toList().length,
+                                itemCount: state.individualExpenses.keys.toList().length,
                                 itemBuilder: (ctx, index) =>
                                     IndividualExpensesByDateList(
                                         state: state, index: index)),
@@ -127,7 +128,7 @@ class _FloatingButtonJumpDown extends StatelessWidget {
               onPressed: () {
                 scrollController.animateTo(
                     scrollController.position.maxScrollExtent,
-                    duration: const Duration(seconds: 8),
+                    duration: const Duration(seconds: 2),
                     curve: Curves.easeIn);
               },
               icon: const Icon(Icons.keyboard_double_arrow_down)),
@@ -232,20 +233,16 @@ class _IndividualExpensesByDateListState
   @override
   Widget build(BuildContext context) {
     final showProvider = context.read<ShowExpensesProvider>();
-    final orderedKeys = widget.state.orderedDate;
+    final orderedKeys = widget.state.orderedDateIndividualExpenses;
     final keyIndex = widget.index;
-    final expenses = widget.state.expenses;
+    final expenses = widget.state.individualExpenses;
     final isLastDate = keyIndex == expenses.keys.length - 1;
     //from the orderedKeys (dates) we fetch a date using the keyIndex we are passing to this class 
     //Then, using this date we can access the list of expenses for that date. 
     final List<Expense> expensesOfDate = expenses[orderedKeys[keyIndex]]!;
     String titleDate = orderedKeys[keyIndex];
-    final loggedUser = context.read<UserProvider>().loggedUser!;
-    final expensesOfUser = expensesOfDate
-        .where((element) =>
-            element.isCommonExpense == 0 &&
-            element.personFirebaseUID == loggedUser.firebaseUID)
-        .toList();
+  
+  
 
     if (context.read<ExpenseProvider>().preferences.getDateType() ==
         DateType.day) {
@@ -307,7 +304,7 @@ class _IndividualExpensesByDateListState
               Visibility(
                 visible: showExpenses(showProvider),
                 child: _ExpenseTileListView(
-                  expensesOfDate: expensesOfUser,
+                  expensesOfDate: expensesOfDate,
                   orderedKeys: orderedKeys,
                   keyIndex: keyIndex,
                   state: widget.state,

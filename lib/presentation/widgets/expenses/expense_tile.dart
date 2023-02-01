@@ -161,7 +161,7 @@ class ColorComputation {
     final backgroundIndex = (299 * r + 587 * g + 114 * b) / 1000;
     final textIndex = (299 * r2 + 587 * g2 + 114 * b2) / 1000;
     final result = (textIndex - backgroundIndex).abs();
-    print('Brightness diff: $result');
+    // print('Brightness diff: $result');
     return result >= _brightnessLimit;
   }
 
@@ -175,7 +175,7 @@ class ColorComputation {
     final b2 = _textColor.blue;
 
     final result = (r - r2).abs() + (g - g2).abs() + (b - b2).abs();
-    print('Color diff: $result');
+    // print('Color diff: $result');
     return result >= _colorDifferenceLimit;
   }
 

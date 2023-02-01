@@ -15,16 +15,16 @@ class InitialLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final expensesProvider = context.watch<ExpenseProvider>();
-    final currentUID = FirebaseAuth.instance.currentUser!.uid;    
+    print('Building initial Loading');
+    final expensesProvider = context.read<ExpenseProvider>();
+    final currentUID = FirebaseAuth.instance.currentUser!.uid;
     if (context.read<UserProvider>().loggedUser == null) {
       context.read<UserProvider>().setLoggedUser(currentUID);
     }
-    if (expensesProvider.loading || !expensesProvider.initialFetchFinished) {
-      return const Scaffold(body: Loading());
-    }
-
-    goToExpenseList(context);
+    //Muy importante!
+    Future.microtask(() => expensesProvider
+        .initialLoad(firebaseUID: currentUID)
+        .then((value) => goToExpenseList(context)));
 
     return const Scaffold(body: Loading());
   }
