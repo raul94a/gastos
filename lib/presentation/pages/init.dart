@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:gastos/presentation/pages/individual_expenses.dart';
 import 'package:gastos/presentation/pages/settings.dart';
 import 'package:gastos/presentation/pages/info.dart';
-import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
+import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
 import 'package:gastos/presentation/pages/expenses_list.dart';
+import 'package:gastos/presentation/widgets/dialogs/individual_expense_dialogs.dart';
 import 'package:gastos/presentation/widgets/main/should_abandon.dart';
 import 'package:gastos/providers/navigation_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,14 @@ class Init extends StatelessWidget {
     showDialog(
         context: context,
         barrierDismissible: true,
-        builder: (ctx) => const ExpenseDialog());
+        builder: (ctx) => const CommonExpenseDialog());
+  }
+
+  showIndividualExpenseDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (ctx) => const IndividualExpenseDialog());
   }
 
   @override
@@ -27,10 +35,28 @@ class Init extends StatelessWidget {
 
     return ShouldAbandonApp(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => showExpenseDialog(context),
-          child: const Icon(Icons.add_rounded),
-        ),
+        floatingActionButton:
+            Consumer<NavigationProvider>(builder: (ctx, state, _) {
+          return FloatingActionButton(
+            onPressed: () {
+              switch (state.pageName) {
+                case PageName.individual:
+                  showIndividualExpenseDialog(context);
+                  break;
+                case PageName.common:
+                  showExpenseDialog(context);
+                  break;
+                case PageName.info:
+                  // TODO: Handle this case.
+                  break;
+                case PageName.settings:
+                  // TODO: Handle this case.
+                  break;
+              }
+            },
+            child: const Icon(Icons.add_rounded),
+          );
+        }),
         body: Consumer<NavigationProvider>(
             builder: (ctx, state, _) => _PageSelector(index: state.page)),
         bottomNavigationBar: Consumer<NavigationProvider>(
@@ -49,7 +75,9 @@ class Init extends StatelessWidget {
     );
   }
 }
-const alpha = BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Invidivuales');
+
+const alpha =
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Invidivuales');
 const a = BottomNavigationBarItem(icon: Icon(Icons.euro), label: 'Gastos');
 const b = BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info');
 const c = BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes');

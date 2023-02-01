@@ -69,6 +69,9 @@ class ExpenseProvider with ChangeNotifier {
 
   //methods
   bool expensesContainsDate(String date) => _expenses.containsKey(date);
+  bool individualExpensesContainsDate(String date) =>
+      _individualExpenses.containsKey(date);
+
   void _addToExpenses(Expense exp, String date) {
     if (!expensesContainsDate(date)) {
       _expenses.addAll({
@@ -79,9 +82,20 @@ class ExpenseProvider with ChangeNotifier {
       list.add(exp);
     }
   }
-  //state management
 
-  Future<void> add(Expense expense) async {
+  void _addToIndividualExpenses(Expense exp, String date) {
+    if (!individualExpensesContainsDate(date)) {
+      _individualExpenses.addAll({
+        date: [exp]
+      });
+    } else {
+      final List<Expense> list = individualExpenses[date]!;
+      list.add(exp);
+    }
+  }
+
+  //state management
+  Future<void> add({required Expense expense, bool individual = false}) async {
     loading = true;
     notifyListeners();
     try {
@@ -89,7 +103,11 @@ class ExpenseProvider with ChangeNotifier {
       final dateString = MyDateFormatter.toYYYYMMdd(expense.createdDate);
       final date = MyDateFormatter.dateByType(dateType, dateString);
 
-      _addToExpenses(newExpense, date);
+      if (!individual) {
+        _addToExpenses(newExpense, date);
+      } else {
+        _addToIndividualExpenses(newExpense, date);
+      }
       success = true;
     } catch (err) {
       rethrow;
@@ -99,40 +117,68 @@ class ExpenseProvider with ChangeNotifier {
     }
   }
 
-  Future<void> update(Expense expense) async {
+  Future<void> update(
+      {required Expense expense, bool individual = false}) async {
     try {
       final dateTime = expense.createdDate;
       final dateString = MyDateFormatter.toYYYYMMdd(dateTime);
       final date = MyDateFormatter.dateByType(dateType, dateString);
-      List<Expense> expenses = _expenses[date]!;
-      final id = expense.id;
-      final indexOf = expenses.indexWhere((e) => e.id == id);
-      expenses[indexOf] = expense;
+      if (!individual) {
+        List<Expense> expenses = _expenses[date]!;
+        final id = expense.id;
+        final indexOf = expenses.indexWhere((e) => e.id == id);
+        expenses[indexOf] = expense;
+      } else {
+        List<Expense> expenses = _individualExpenses[date]!;
+        final id = expense.id;
+        final indexOf = expenses.indexWhere((e) => e.id == id);
+        expenses[indexOf] = expense;
+      }
       repository.update(expense);
     } catch (err) {
       rethrow;
     }
   }
 
-  void remove(Expense expense) {
+  void remove({required Expense expense, bool individual = false}) {
     //loading = true;
     //notifyListeners();
     try {
       print('Starting removal of expense ${expense.id}');
       String date = MyDateFormatter.toYYYYMMdd(expense.createdDate);
       date = MyDateFormatter.dateByType(dateType, date);
-      final list = _expenses[date];
-      print('Expense was created in dae: $date');
-      print('Expenses list for $date is: $list');
-      if (list != null) {
-        final index = list.indexWhere((element) => element.id == expense.id);
-        print('Expense ${expense.id} is at $index');
-        final removedExpense = list.removeAt(index);
-        print('removedExpense: $removedExpense');
-        _expenses[date] = [...list];
+      //common expenses
+      if (!individual) {
+        final list = _expenses[date];
+        print('Expense was created in dae: $date');
+        print('Expenses list for $date is: $list');
+        if (list != null) {
+          final index = list.indexWhere((element) => element.id == expense.id);
+          print('Expense ${expense.id} is at $index');
+          final removedExpense = list.removeAt(index);
+          print('removedExpense: $removedExpense');
+          _expenses[date] = [...list];
 
-        if (list.isEmpty) {
-          _expenses.remove(date);
+          if (list.isEmpty) {
+            _expenses.remove(date);
+          }
+        }
+      }
+      //individual expenses
+      else {
+        final list = _individualExpenses[date];
+        print('Expense was created in dae: $date');
+        print('Expenses list for $date is: $list');
+        if (list != null) {
+          final index = list.indexWhere((element) => element.id == expense.id);
+          print('Expense ${expense.id} is at $index');
+          final removedExpense = list.removeAt(index);
+          print('removedExpense: $removedExpense');
+          _individualExpenses[date] = [...list];
+
+          if (list.isEmpty) {
+            _individualExpenses.remove(date);
+          }
         }
       }
     } catch (err) {
@@ -230,7 +276,11 @@ class ExpenseProvider with ChangeNotifier {
         String date = MyDateFormatter.dateByType(
             dateType, MyDateFormatter.toYYYYMMdd(entry.createdDate));
         if (!await repository.existsId(entry.id)) {
-          _addToExpenses(entry, date);
+          if (entry.isCommonExpense == 1) {
+            _addToExpenses(entry, date);
+          } else {
+            _addToIndividualExpenses(entry, date);
+          }
           notifyListeners();
         } else {
           //two situations:
@@ -238,9 +288,9 @@ class ExpenseProvider with ChangeNotifier {
           //  2. Delete the expense
           Expense expense = await repository.readOne(entry.id);
           if (entry.deleted == 1) {
-            remove(expense);
+            remove(expense: expense, individual: expense.isCommonExpense == 0);
           } else {
-            update(entry);
+            update(expense: entry, individual: expense.isCommonExpense == 0);
           }
         }
       }

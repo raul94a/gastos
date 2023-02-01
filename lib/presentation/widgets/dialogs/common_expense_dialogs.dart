@@ -10,8 +10,8 @@ import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
-class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
-  const ExpenseDialog({Key? key, this.expense, this.updateHandler, this.date})
+class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
+  const CommonExpenseDialog({Key? key, this.expense, this.updateHandler, this.date})
       : super(key: key);
   final Expense? expense;
   final String? date;
@@ -133,11 +133,10 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       descriptionController.text = widget.expense!.description;
       priceController.text = widget.expense!.price.toString();
     }
-    if(widget.expense != null && widget.expense!.category.isNotEmpty){
+    if (widget.expense != null && widget.expense!.category.isNotEmpty) {
       selectedCategory = widget.expense!.category;
-    }else{
+    } else {
       selectedCategory = context.read<CategoriesProvider>().categories.first.id;
-
     }
   }
 
@@ -189,7 +188,9 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
               controller: descriptionController,
             ),
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           const Text('Categoría del gasto'),
           CategoriesDropdown(
               categoriesState: categoriesState,
@@ -199,7 +200,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                   selectedCategory = str!;
                 });
               }),
-         
+
           const SizedBox(
             height: 20,
           ),
@@ -285,6 +286,8 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String category,
       required String description,
       required num price}) async {
+    final userId = context.read<UserProvider>().loggedUser!.firebaseUID;
+
     //if Date is not null, the creation is being triggered through the add button for past dates.
     //so, the only thing needed to be done is to fetch an expense from that date and borrow its createdDate
     final createdDate = widget.date != null
@@ -295,12 +298,14 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
         person: context.read<UserProvider>().loggedUser!.name,
         description: description,
         price: price,
+        isCommonExpense: 1,
+        personFirebaseUID: userId,
         category: category,
         createdDate: createdDate,
         updatedDate: updatedDate);
 
     try {
-      await state.add(expense);
+      await state.add(expense:expense, individual: false);
     } catch (err) {
       if (kDebugMode) {
         print(err);
@@ -315,16 +320,20 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String category,
       required String description,
       required num price}) async {
+
+    final userId = context.read<UserProvider>().loggedUser!.firebaseUID;
     final newExpense = widget.expense!.copyWith(
         person: context.read<UserProvider>().loggedUser!.name,
         description: description,
         price: price,
+        isCommonExpense: 1,
+        personFirebaseUID: userId,
         category: category,
         updatedDate: DateTime.now().toLocal());
     try {
       //We're not going to update the Expense with the provider.
       widget.updateHandler!(newExpense);
-      await state.update(newExpense);
+      await state.update(expense: newExpense,individual: false);
       Navigator.of(context).pop();
     } catch (err) {
       if (kDebugMode) {

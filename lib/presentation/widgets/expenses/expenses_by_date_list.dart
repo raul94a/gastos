@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
+import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
 import 'package:gastos/presentation/widgets/dialogs/expense_info_dialog.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/providers/expense_provider.dart';
@@ -165,7 +165,7 @@ class _ExpensesByDateListState extends State<ExpensesByDateList> {
                     showDialog(
                         context: context,
                         builder: (ctx) =>
-                            ExpenseDialog(date: orderedKeys[keyIndex]));
+                            CommonExpenseDialog(date: orderedKeys[keyIndex]));
                   },
                   child: Text('Añadir gasto a ${getDate()}')),
           ],
