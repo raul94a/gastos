@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
+import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
 import 'package:gastos/providers/expense_provider.dart';
 
 class ExpenseOptionsDialog extends StatelessWidget {
@@ -29,7 +29,7 @@ class ExpenseOptionsDialog extends StatelessWidget {
               Navigator.of(context).pop();
               showDialog(
                   context: context,
-                  builder: (ctx) => ExpenseDialog(
+                  builder: (ctx) => CommonExpenseDialog(
                       expense: expense, updateHandler: updateHandler));
             },
             icon: const Icon(
@@ -40,7 +40,7 @@ class ExpenseOptionsDialog extends StatelessWidget {
                 style: TextStyle(color: Colors.blue))),
         TextButton.icon(
             onPressed: () => {
-                  state.remove(state.expenses[date]![index]),
+                  state.remove(expense: state.expenses[date]![index]),
                   Navigator.of(context).pop()
                 },
             icon: const Icon(Icons.update, color: Colors.blue),

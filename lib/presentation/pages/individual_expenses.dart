@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/presentation/widgets/dialogs/custom_dialogs.dart';
+import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
 import 'package:gastos/presentation/widgets/dialogs/expense_info_dialog.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
 import 'package:gastos/presentation/widgets/shared/loading.dart';
@@ -326,7 +326,7 @@ class _IndividualExpensesByDateListState
                     showDialog(
                         context: context,
                         builder: (ctx) =>
-                            ExpenseDialog(date: orderedKeys[keyIndex]));
+                            CommonExpenseDialog(date: orderedKeys[keyIndex]));
                   },
                   child: Text('Añadir gasto a ${getDate()}')),
           ],
@@ -336,7 +336,7 @@ class _IndividualExpensesByDateListState
   }
 
   String getDate() {
-    String date = widget.state.orderedDate[widget.index];
+    String date = widget.state.orderedDateIndividualExpenses[widget.index];
     if (widget.state.dateType == DateType.day) {
       final parsedDate = MyDateFormatter.fromYYYYMMdd(date);
       date = MyDateFormatter.toFormat('dd-MM-yyyy', parsedDate);
@@ -345,8 +345,8 @@ class _IndividualExpensesByDateListState
   }
 
   double getTotalOfDate() {
-    String date = widget.state.orderedDate[widget.index];
-    List<Expense> exps = widget.state.expenses[date]!;
+    String date = widget.state.orderedDateIndividualExpenses[widget.index];
+    List<Expense> exps = widget.state.individualExpenses[date]!;
     double totalOfDate = 0.0;
     for (final e in exps) {
       totalOfDate += e.price;
@@ -355,8 +355,8 @@ class _IndividualExpensesByDateListState
   }
 
   bool isCurrentDate() {
-    final selectedDate = widget.state.orderedDate[widget.index];
-    final createdDate = widget.state.expenses[selectedDate]!.first.createdDate;
+    final selectedDate = widget.state.orderedDateIndividualExpenses[widget.index];
+    final createdDate = widget.state.individualExpenses[selectedDate]!.first.createdDate;
     final date = MyDateFormatter.toYYYYMMdd(createdDate);
     final today = MyDateFormatter.toYYYYMMdd(DateTime.now());
     final todayByType =
@@ -608,7 +608,7 @@ class IndividualExpenseOptionsDialog extends StatelessWidget {
               Navigator.of(context).pop();
               showDialog(
                   context: context,
-                  builder: (ctx) => ExpenseDialog(
+                  builder: (ctx) => CommonExpenseDialog(
                       expense: expense, updateHandler: updateHandler));
             },
             icon: const Icon(
@@ -619,7 +619,7 @@ class IndividualExpenseOptionsDialog extends StatelessWidget {
                 style: TextStyle(color: Colors.blue))),
         TextButton.icon(
             onPressed: () => {
-                  state.remove(state.expenses[date]![index]),
+                  state.remove(expense: state.expenses[date]![index],individual: true),
                   Navigator.of(context).pop()
                 },
             icon: const Icon(Icons.update, color: Colors.blue),
