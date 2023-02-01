@@ -5,17 +5,17 @@ import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/repository/expenses_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
+import 'package:gastos/logic/sorter.dart';
 import 'package:gastos/utils/date_formatter.dart';
 
 class ExpenseProvider with ChangeNotifier {
   //firebase
-  ExpenseProvider() {
-    _initialLoad();
-  }
-  Future<void> _initialLoad() async {
+  ExpenseProvider();
+
+  Future<void> initialLoad({required String firebaseUID}) async {
     await fetchExpenses();
     _dateType = dateType;
-    await get();
+    await get(firebaseUID);
   }
   //sqlite
 
@@ -24,6 +24,7 @@ class ExpenseProvider with ChangeNotifier {
   final preferences = SharedPreferencesHelper.instance;
 
   final Map<String, List<Expense>> _expenses = {};
+  final Map<String, List<Expense>> _individualExpenses = {};
 
   bool loading = false;
   bool initialFetchFinished = false;
@@ -39,49 +40,31 @@ class ExpenseProvider with ChangeNotifier {
   set dateType(DateType type) => _dateType = type;
   //getters
   Map<String, List<Expense>> get expenses => _expenses;
+  Map<String, List<Expense>> get individualExpenses => _individualExpenses;
+
   DateType get dateType => _dateType ??= preferences.getDateType();
 
+  //sort maps
   List<String> get orderedDate {
     final type = preferences.getDateType();
+    final sorter = MySortter();
     if (type == DateType.week) {
-      return (_expenses.keys.toList())
-        ..sort((a, b) {
-          final splitBySpaceA = a.split(' ');
-          final splitBySpaceB = b.split(' ');
-          final int numA = int.parse(splitBySpaceA[1]);
-          final int numB = int.parse(splitBySpaceB[1]);
-          return numB.compareTo(numA);
-        });
+      return (_expenses.keys.toList())..sort(sorter.sortByWeek);
     } else if (type == DateType.month) {
-      return (_expenses.keys.toList())
-        ..sort((a, b) {
-          //Multiplication of the year by 12 is necessary for the correct sorting, as
-          //a number should be generated with the year + month number, we must ensure that any
-          //month of the highest year is on the top of the list
-          // let's say: Enero 2022 (1 + 2022 = 2023) and Diciembre 2021 (12 + 2021 = 2032)
-          // if we don't multiply the year by 12, the last one would be previous to the first one (2032 > 2022)
-          // However after the multiplication...
-          // 2022 * 12 + 1 = 24265
-          // 2021 * 12 + 12 = 24264
-          //Ej.
-          // a => Septiembre de 2023
-          // b => Diciembre de 2023
-          // splitBySpaceA = ['Septiembre','de','2023']
-          // splitBySpaceB = ['Diciembre, 'de', '2022']
-          // numA = 9 + 2023 * 12
-          // numB = 12 + 2022 * 12
-          // numA > numB
-
-          final splitBySpaceA = a.split(' ');
-          final splitBySpaceB = b.split(' ');
-          final int numA = MyDateFormatter.monthNumber(splitBySpaceA[0]) +
-              int.parse(splitBySpaceA.last) * 12;
-          final int numB = MyDateFormatter.monthNumber(splitBySpaceB[0]) +
-              int.parse(splitBySpaceB.last) * 12;
-          return numB.compareTo(numA);
-        });
+      return (_expenses.keys.toList())..sort(sorter.sortByMonth);
     }
     return (_expenses.keys.toList())..sort((a, b) => b.compareTo(a));
+  }
+
+  List<String> get orderedDateIndividualExpenses {
+    final type = preferences.getDateType();
+    final sorter = MySortter();
+    if (type == DateType.week) {
+      return (_individualExpenses.keys.toList())..sort(sorter.sortByWeek);
+    } else if (type == DateType.month) {
+      return (_individualExpenses.keys.toList())..sort(sorter.sortByMonth);
+    }
+    return (_individualExpenses.keys.toList())..sort((a, b) => b.compareTo(a));
   }
 
   //methods
@@ -183,16 +166,20 @@ class ExpenseProvider with ChangeNotifier {
     error = false;
   }
 
-  Future<void> get([int offset = 0]) async {
+  Future<void> get(String firebaseUID, [int offset = 0]) async {
+    print('CALLING GET ${expenses.length}');
     if (!loading) {
       loading = true;
       notifyListeners();
-      await Future.delayed(const Duration(milliseconds: 650));
+      await Future.delayed(const Duration(milliseconds: 150));
     }
     try {
-      // _expenses.clear();
-      _expenses.addAll(await repository.readAll(dateType, offset));
+      final totalExpenses =
+          await repository.readAll(dateType, offset, firebaseUID);
+      _expenses.addAll(totalExpenses.commonExpenses);
+      _individualExpenses.addAll(totalExpenses.individualExpenses);
     } catch (err) {
+      print(err);
       rethrow;
     } finally {
       loading = false;
@@ -201,13 +188,14 @@ class ExpenseProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getByDateType(DateType type) async {
+  Future<void> getByDateType(
+      {required DateType type, required String firebaseUID}) async {
     offset = 0;
     dateType = type;
     blockInfiniteScroll = false;
     blockFunction = false;
     _expenses.clear();
-    await get();
+    await get(firebaseUID);
   }
 
   Future<void> getByScroll() async {
@@ -260,16 +248,14 @@ class ExpenseProvider with ChangeNotifier {
     }
   }
 
-  Future<num?> sumExpensesOfUser({required String name}) async{
+  Future<num?> sumExpensesOfUser({required String name}) async {
     loading = true;
     notifyListeners();
-    try{
-
-    }catch(err){
+    try {} catch (err) {
       final result = await repository.sumUserExpenses(name);
       print(result);
       return result;
-    }finally{
+    } finally {
       loading = false;
       notifyListeners();
     }

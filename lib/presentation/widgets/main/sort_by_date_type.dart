@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/providers/expense_provider.dart';
@@ -10,8 +11,9 @@ class SortDateButtons extends StatelessWidget with MaterialStatePropertyMixin {
 
   final ExpenseProvider expenseState;
   Future<void> _sortBy(DateType type) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     expenseState.preferences.saveDateType(type);
-    expenseState.getByDateType(type);
+    expenseState.getByDateType(firebaseUID: uid, type: type);
   }
 
   @override
