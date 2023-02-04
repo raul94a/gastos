@@ -47,10 +47,10 @@ class Init extends StatelessWidget {
                   showExpenseDialog(context);
                   break;
                 case PageName.info:
-                  // TODO: Handle this case.
+
                   break;
                 case PageName.settings:
-                  // TODO: Handle this case.
+
                   break;
               }
             },

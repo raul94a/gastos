@@ -19,7 +19,7 @@ class ShouldAbandonApp extends StatelessWidget with MaterialStatePropertyMixin {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20), topRight: Radius.circular(20)),
             side: BorderSide(
-                color: Colors.transparent, strokeAlign: StrokeAlign.outside)),
+                color: Colors.transparent, strokeAlign: 0.0)),
         context: context,
         builder: (ctx) {
           return Column(

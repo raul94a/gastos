@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/models/user.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
@@ -18,7 +20,7 @@ class UserService {
         print('El email ya está en uso');
         throw Exception('El email ya está en uso');
       }
-      final doc = await firestore
+     await firestore
           .collection('users')
           .doc(data['firebaseUID'])
           .set(data);
@@ -42,7 +44,7 @@ class UserService {
           .get();
 
       final d = docs.docs;
-      print('Users from firestore: ${d}');
+      print('Users from firestore: $d');
       for (final query in d) {
         print('User object: ${query.data()}');
         final data = query.data();
@@ -79,7 +81,7 @@ class UserService {
           await db.update(table, object, where: 'firebaseUID = ?', whereArgs: [object['firebaseUID']]);
         } else {
           print('INSERTING USER');
-          final res = await db.insert(table, object);
+          await db.insert(table, object);
          
         }
       }

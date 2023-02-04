@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' as f;
+// ignore_for_file: avoid_print
+
 import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/queries/categories_queries.dart';

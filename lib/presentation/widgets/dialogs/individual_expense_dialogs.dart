@@ -159,7 +159,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final categoriesState = context.read<CategoriesProvider>();
-    final userStte = context.read<UserProvider>();
+
 
     return Form(
       child: Column(

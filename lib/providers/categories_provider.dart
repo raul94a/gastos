@@ -1,14 +1,13 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/repository/categories_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
-import 'package:gastos/utils/date_formatter.dart';
 
 class CategoriesProvider with ChangeNotifier {
-  CategoriesProvider() {
-    _initialLoad();
-  }
-   List<Category> _categories = [];
+  CategoriesProvider();
+  final List<Category> _categories = [];
   final repository = CategoriesRepository();
   final preferences = SharedPreferencesHelper.instance;
 
@@ -21,21 +20,18 @@ class CategoriesProvider with ChangeNotifier {
   List<Category> get categories => _categories;
 
   //methods
-
-  Future<void> _initialLoad() async {
+  Future<void> initialLoad() async {
     await fetchCategories();
     await read();
   }
 
   Future<void> fetchCategories() async {
-    loading = true;
-    notifyListeners();
+    
 
     try {
       await repository.fetchLastSync(preferences.getLastSyncCat());
     } catch (err) {
-      loading = false;
-      notifyListeners();
+      
       rethrow;
     } finally {
       //Not really needed to notify loading false because it is gonna be called in get method
@@ -129,7 +125,7 @@ class CategoriesProvider with ChangeNotifier {
     final newEntries = await repository.fetchLastSyncCategories(lastSync);
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
-        final existsId = await _categories.any((cat) => cat.id == entry.id);
+        final existsId = _categories.any((cat) => cat.id == entry.id);
         print('ExistsId ? $existsId ID: ${entry.id}');
         if (!existsId) {
           _categories.add(entry);
