@@ -14,6 +14,7 @@ class InitialLoading extends StatefulWidget {
   State<InitialLoading> createState() => _InitialLoadingState();
 }
 
+
 class _InitialLoadingState extends State<InitialLoading> {
   @override
   void initState() {
@@ -35,11 +36,10 @@ class _InitialLoadingState extends State<InitialLoading> {
     context.go('/init');
   }
 
+
   @override
   Widget build(BuildContext context) {
     print('Building initial Loading');
-
-
-    return const Scaffold(body: Loading());
+      return const Scaffold(body: Loading());
   }
 }

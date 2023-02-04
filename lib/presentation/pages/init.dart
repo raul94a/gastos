@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:gastos/presentation/pages/individual_expenses.dart';
 import 'package:gastos/presentation/pages/settings.dart';
@@ -29,6 +30,7 @@ class Init extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle().copyWith(
         statusBarColor: Colors.black, systemNavigationBarColor: Colors.black));
@@ -38,6 +40,8 @@ class Init extends StatelessWidget {
         floatingActionButton:
             Consumer<NavigationProvider>(builder: (ctx, state, _) {
           return FloatingActionButton(
+            heroTag: 'hero-fab',
+
             onPressed: () {
               switch (state.pageName) {
                 case PageName.individual:
@@ -47,7 +51,6 @@ class Init extends StatelessWidget {
                   showExpenseDialog(context);
                   break;
                 case PageName.info:
-
                   break;
                 case PageName.settings:
 
@@ -77,7 +80,9 @@ class Init extends StatelessWidget {
 }
 
 const alpha =
-    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Invidivuales');
+
+    BottomNavigationBarItem(icon: Hero(tag: 'individual',child: Icon(Icons.person)), label: 'Invidivuales');
+
 const a = BottomNavigationBarItem(icon: Icon(Icons.euro), label: 'Gastos');
 const b = BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info');
 const c = BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes');

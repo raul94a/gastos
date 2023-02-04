@@ -20,32 +20,41 @@ class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixi
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return BlockBackButton(
-      child: SingleChildScrollView(
-        child: Dialog(
-          alignment: Alignment.center,
-          insetPadding: const EdgeInsets.all(10),
-          child: Padding(
-            padding: const EdgeInsets.all(14.5),
-            child: SizedBox(
-              height: size.height * 0.8,
-              child: Consumer<ExpenseProvider>(
-                builder: (ctx, state, _) {
-                  if (expense == null && state.loading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (expense == null && state.success) {
-                    return const SuccessDialog();
-                  }
 
-                  return ExpenseHandlerContent(
-                    expense: expense,
-                    updateHandler: updateHandler,
-                    date: date,
-                  );
-                },
+    return Hero(
+      tag: 'hero-fab',
+      child: Material(
+        color: Colors.transparent,
+        child: BlockBackButton(
+          child: SingleChildScrollView(
+            child: Dialog(
+              alignment: Alignment.center,
+              insetPadding: const EdgeInsets.all(10),
+              child: Padding(
+                padding: const EdgeInsets.all(14.5),
+                child: SizedBox(
+                  height: size.height * 0.8,
+                  child: Consumer<ExpenseProvider>(
+                    builder: (ctx, state, _) {
+                      if (expense == null && state.loading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (expense == null && state.success) {
+                        return const SuccessDialog();
+                      }
+          
+                      return ExpenseHandlerContent(
+                        expense: expense,
+                        updateHandler: updateHandler,
+                        date: date,
+                      );
+                    },
+                  ),
+                ),
+
+
               ),
             ),
           ),

@@ -311,14 +311,6 @@ class _IndividualExpensesByDateListState
                 ),
               ),
 
-            //stats
-            if (showExpenses(showProvider))
-              Column(
-                children: [
-                  Text(
-                      'Gastos de ${getDate()}: ${getTotalOfDate().toStringAsFixed(2)} €')
-                ],
-              ),
             //Add expense to Past Date
             if (!isCurrentDate() && showExpenses(showProvider))
               ElevatedButton(
@@ -487,7 +479,6 @@ class _IndividualExpenseTileState extends State<IndividualExpenseTile> {
                     ? const Color(0xFF000000)
                     : ColorComputation.getShade(
                         color), //isEven ? Colors.blue.shade500 : Colors.orange.shade500,
-
                 strokeAlign: 0.0),
 
             borderRadius: BorderRadius.circular(7)),
