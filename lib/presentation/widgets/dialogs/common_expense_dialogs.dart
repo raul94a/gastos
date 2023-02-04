@@ -20,6 +20,7 @@ class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixi
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
     return Hero(
       tag: 'hero-fab',
       child: Material(
@@ -52,6 +53,8 @@ class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixi
                     },
                   ),
                 ),
+
+
               ),
             ),
           ),

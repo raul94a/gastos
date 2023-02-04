@@ -160,6 +160,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     final width = size.width;
     final categoriesState = context.read<CategoriesProvider>();
 
+
     return Form(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

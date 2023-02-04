@@ -311,7 +311,6 @@ class _IndividualExpensesByDateListState
                 ),
               ),
 
-           
             //Add expense to Past Date
             if (!isCurrentDate() && showExpenses(showProvider))
               ElevatedButton(
@@ -481,6 +480,7 @@ class _IndividualExpenseTileState extends State<IndividualExpenseTile> {
                     : ColorComputation.getShade(
                         color), //isEven ? Colors.blue.shade500 : Colors.orange.shade500,
                 strokeAlign: 0.0),
+
             borderRadius: BorderRadius.circular(7)),
         leading: CircleAvatar(
           radius: 30,

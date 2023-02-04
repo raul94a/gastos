@@ -41,6 +41,7 @@ class Init extends StatelessWidget {
             Consumer<NavigationProvider>(builder: (ctx, state, _) {
           return FloatingActionButton(
             heroTag: 'hero-fab',
+
             onPressed: () {
               switch (state.pageName) {
                 case PageName.individual:
@@ -52,6 +53,7 @@ class Init extends StatelessWidget {
                 case PageName.info:
                   break;
                 case PageName.settings:
+
                   break;
               }
             },
@@ -78,7 +80,9 @@ class Init extends StatelessWidget {
 }
 
 const alpha =
+
     BottomNavigationBarItem(icon: Hero(tag: 'individual',child: Icon(Icons.person)), label: 'Invidivuales');
+
 const a = BottomNavigationBarItem(icon: Icon(Icons.euro), label: 'Gastos');
 const b = BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info');
 const c = BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes');
