@@ -14,8 +14,15 @@ class Settings extends StatelessWidget {
             Text('Categorías', style: GoogleFonts.robotoSerif(fontSize: 28.2)),
             TextButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (ctx) => const ManageCategoriesPage()));
+                const opacity =
+                    Interval(0, 0.75, curve: Curves.fastLinearToSlowEaseIn);
+                Navigator.of(context).push(PageRouteBuilder(
+                  transitionDuration: Duration(milliseconds: 600),
+                    pageBuilder: (ctx, a, b) => AnimatedBuilder(
+                        animation: a,
+                        builder: (ctx, _) => Opacity(
+                            opacity: opacity.transform(a.value),
+                            child: ManageCategoriesPage()))));
               },
               child: const Text('Administrar categorías'),
             )

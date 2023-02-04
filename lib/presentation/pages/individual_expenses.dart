@@ -311,14 +311,7 @@ class _IndividualExpensesByDateListState
                 ),
               ),
 
-            //stats
-            if (showExpenses(showProvider))
-              Column(
-                children: [
-                  Text(
-                      'Gastos de ${getDate()}: ${getTotalOfDate().toStringAsFixed(2)} €')
-                ],
-              ),
+           
             //Add expense to Past Date
             if (!isCurrentDate() && showExpenses(showProvider))
               ElevatedButton(

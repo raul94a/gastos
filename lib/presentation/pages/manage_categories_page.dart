@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/providers/categories_provider.dart';
@@ -17,10 +18,11 @@ class ManageCategoriesPage extends StatelessWidget
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final a = context.read<UserProvider>();
-    print(a.loggedUser);
+    timeDilation = 3.0;
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
+        
           title: Text('Tus categorías',
               textAlign: TextAlign.center,
               style: GoogleFonts.robotoSerif(fontSize: 28.2)),
