@@ -61,7 +61,6 @@ class _ExpenseTileState extends State<ExpenseTile> {
 //    print('Rebuild Expense with ID: ${widget.expense.id}');
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    bool isEven = widget.position % 2 == 0;
     final categories = context.read<CategoriesProvider>().categories;
     Category? cat;
     Color? color;
@@ -72,7 +71,9 @@ class _ExpenseTileState extends State<ExpenseTile> {
       if (!ColorComputation.colorsMatch(color)) {
         textColor = Colors.white;
       }
-    } catch (err) {}
+    } catch (err) {
+      print(err);
+    }
 
     return Container(
       key: Key(widget.expense.id),
@@ -92,7 +93,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
                     ? const Color(0xFF000000)
                     : ColorComputation.getShade(
                         color), //isEven ? Colors.blue.shade500 : Colors.orange.shade500,
-                strokeAlign: StrokeAlign.center),
+                strokeAlign: 0.0),
             borderRadius: BorderRadius.circular(7)),
         leading: CircleAvatar(
           

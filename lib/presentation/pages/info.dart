@@ -3,7 +3,6 @@ import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
 import 'package:gastos/utils/my_text_styles.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class InfoPage extends StatelessWidget {
@@ -29,7 +28,7 @@ class InfoPage extends StatelessWidget {
 
 class _UserInfoContainer extends StatefulWidget {
   const _UserInfoContainer(
-      {super.key, required this.userName, required this.fecha});
+      {required this.userName, required this.fecha});
   final String userName;
   final String fecha;
 
@@ -50,7 +49,6 @@ class _UserInfoContainerState extends State<_UserInfoContainer> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     expenseProvider = context.read<ExpenseProvider>();
     getTotal(widget.userName);

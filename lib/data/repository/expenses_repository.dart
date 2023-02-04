@@ -2,7 +2,6 @@ import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/models/total_expenses.dart';
 import 'package:gastos/data/services/expenses_service.dart';
-import 'package:gastos/utils/date_formatter.dart';
 
 class ExpensesRepository {
   final service = ExpenseService();

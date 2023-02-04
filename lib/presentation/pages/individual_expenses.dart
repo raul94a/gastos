@@ -487,7 +487,7 @@ class _IndividualExpenseTileState extends State<IndividualExpenseTile> {
                     ? const Color(0xFF000000)
                     : ColorComputation.getShade(
                         color), //isEven ? Colors.blue.shade500 : Colors.orange.shade500,
-                strokeAlign: StrokeAlign.center),
+                strokeAlign: 0.0),
             borderRadius: BorderRadius.circular(7)),
         leading: CircleAvatar(
           radius: 30,

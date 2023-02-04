@@ -1,5 +1,6 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/data/models/user.dart';
 import 'package:gastos/data/repository/users_repository.dart';
@@ -155,6 +156,7 @@ class UserProvider with ChangeNotifier {
       print('USER FROM DB: $user');
       await signIn(user);
     } on FirebaseAuthException catch (e) {
+      print(e);
       showErrorDialog(
           context, 'Error', 'Alguna de las credenciales no es correcta');
     } finally {

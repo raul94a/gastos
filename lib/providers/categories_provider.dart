@@ -1,14 +1,15 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/repository/categories_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
-import 'package:gastos/utils/date_formatter.dart';
 
 class CategoriesProvider with ChangeNotifier {
   CategoriesProvider() {
     _initialLoad();
   }
-   List<Category> _categories = [];
+  final List<Category> _categories = [];
   final repository = CategoriesRepository();
   final preferences = SharedPreferencesHelper.instance;
 
@@ -129,7 +130,7 @@ class CategoriesProvider with ChangeNotifier {
     final newEntries = await repository.fetchLastSyncCategories(lastSync);
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
-        final existsId = await _categories.any((cat) => cat.id == entry.id);
+        final existsId = _categories.any((cat) => cat.id == entry.id);
         print('ExistsId ? $existsId ID: ${entry.id}');
         if (!existsId) {
           _categories.add(entry);

@@ -1,11 +1,6 @@
 import 'dart:async';
 import 'dart:math';
-
-import 'package:flutter/material.dart';
-import 'package:gastos/data/firestore_manager.dart';
-import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/data/services/categories_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SqliteManager {

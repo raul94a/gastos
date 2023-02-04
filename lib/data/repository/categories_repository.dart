@@ -1,7 +1,5 @@
-import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/services/categories_service.dart';
-import 'package:gastos/utils/date_formatter.dart';
 
 class CategoriesRepository {
   final service = CategoriesService();
