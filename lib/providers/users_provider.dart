@@ -35,16 +35,12 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> fetchUsers() async {
-    
-
     try {
       await repository.fetchLastSync(preferences.getLastSyncUsers());
     } catch (err) {
-   
       rethrow;
     } finally {
-     
-     // notifyListeners();
+      // notifyListeners();
       //Not really needed to notify loading false because it is gonna be called in get method
     }
   }
@@ -78,12 +74,16 @@ class UserProvider with ChangeNotifier {
     print('Refreshing users');
     final lastSync = preferences.getLastSyncUsers();
     final newEntries = await repository.fetchLastSyncUsers(lastSync);
-    if (newEntries.isNotEmpty) {
-      for (final entry in newEntries) {
-        if (!await repository.existsId(entry.firebaseUID)) {
-          _users.add(entry);
-          notifyListeners();
-        }
+    if(newEntries.isEmpty){
+      return;
+    }
+    
+    for (final entry in newEntries) {
+      bool existsUser =
+          users.any((element) => element.firebaseUID == entry.firebaseUID);
+      if (!existsUser) {
+        _users.add(entry);
+        notifyListeners();
       }
     }
   }

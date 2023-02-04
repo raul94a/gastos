@@ -43,7 +43,7 @@ class AppUser {
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
-      firebaseUID: map['firebaseUID'] as String,
+      firebaseUID: map['firebaseUID'] ?? "",
       email: map['email'] as String,
       name: map['name'] as String,
       createdDate:

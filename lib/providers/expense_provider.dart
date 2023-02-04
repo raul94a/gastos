@@ -145,7 +145,7 @@ class ExpenseProvider with ChangeNotifier {
     }
   }
 
-  void remove({required Expense expense, bool individual = false}) {
+  void remove({required Expense expense, bool individual = false}) async {
     //loading = true;
     //notifyListeners();
     try {
@@ -161,6 +161,7 @@ class ExpenseProvider with ChangeNotifier {
           final index = list.indexWhere((element) => element.id == expense.id);
           print('Expense ${expense.id} is at $index');
           final removedExpense = list.removeAt(index);
+          await repository.remove(expense);
           print('removedExpense: $removedExpense');
           _expenses[date] = [...list];
 
@@ -278,9 +279,13 @@ class ExpenseProvider with ChangeNotifier {
 
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
+        print(entry);
         String date = MyDateFormatter.dateByType(
             dateType, MyDateFormatter.toYYYYMMdd(entry.createdDate));
-        if (!await repository.existsId(entry.id)) {
+        List<Expense> expensesOfDate = expenses[date]!;
+        bool existsDate =
+            expensesOfDate.any((element) => element.id == entry.id);
+        if (!existsDate) {
           //if isCommonExpense is 0, the expense is individual
           bool isIndividual = entry.isCommonExpense == 0;
           _addExpense(isIndividual, entry, date);
@@ -295,6 +300,7 @@ class ExpenseProvider with ChangeNotifier {
           } else {
             update(expense: entry, individual: expense.isCommonExpense == 0);
           }
+          notifyListeners();
         }
       }
       await preferences.saveLastSync(DateTime.now().millisecondsSinceEpoch);
@@ -312,6 +318,5 @@ class ExpenseProvider with ChangeNotifier {
       loading = false;
       notifyListeners();
     }
-   
   }
 }
