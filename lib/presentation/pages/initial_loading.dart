@@ -38,9 +38,7 @@ class _InitialLoadingState extends State<InitialLoading> {
   @override
   Widget build(BuildContext context) {
     print('Building initial Loading');
-    
 
-    //Muy importante!
 
     return const Scaffold(body: Loading());
   }

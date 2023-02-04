@@ -47,8 +47,10 @@ class Init extends StatelessWidget {
                   showExpenseDialog(context);
                   break;
                 case PageName.info:
+
                   break;
                 case PageName.settings:
+
                   break;
               }
             },
