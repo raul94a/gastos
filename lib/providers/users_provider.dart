@@ -8,9 +8,7 @@ import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class UserProvider with ChangeNotifier {
-  UserProvider() {
-    _initialLoad();
-  }
+  UserProvider();
 
   final List<AppUser> _users = [];
   final repository = UserRepository();
@@ -30,23 +28,22 @@ class UserProvider with ChangeNotifier {
 
   //methods
 
-  Future<void> _initialLoad() async {
+  Future<void> initialLoad() async {
     fetchUsers().then((_) async {
       await read();
     });
   }
 
   Future<void> fetchUsers() async {
-    loading = true;
-    //notifyListeners();
+    
 
     try {
       await repository.fetchLastSync(preferences.getLastSyncUsers());
     } catch (err) {
-     // notifyListeners();
+   
       rethrow;
     } finally {
-      loading = false;
+     
      // notifyListeners();
       //Not really needed to notify loading false because it is gonna be called in get method
     }

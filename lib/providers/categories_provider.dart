@@ -6,9 +6,7 @@ import 'package:gastos/data/repository/categories_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 
 class CategoriesProvider with ChangeNotifier {
-  CategoriesProvider() {
-    _initialLoad();
-  }
+  CategoriesProvider();
   final List<Category> _categories = [];
   final repository = CategoriesRepository();
   final preferences = SharedPreferencesHelper.instance;
@@ -22,21 +20,18 @@ class CategoriesProvider with ChangeNotifier {
   List<Category> get categories => _categories;
 
   //methods
-
-  Future<void> _initialLoad() async {
+  Future<void> initialLoad() async {
     await fetchCategories();
     await read();
   }
 
   Future<void> fetchCategories() async {
-    loading = true;
-    notifyListeners();
+    
 
     try {
       await repository.fetchLastSync(preferences.getLastSyncCat());
     } catch (err) {
-      loading = false;
-      notifyListeners();
+      
       rethrow;
     } finally {
       //Not really needed to notify loading false because it is gonna be called in get method
