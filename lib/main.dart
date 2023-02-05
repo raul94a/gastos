@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
@@ -50,6 +51,15 @@ class MyApp extends StatelessWidget {
       child: Builder(builder: (context) {
         return MaterialApp.router(
           title: 'Flutter Demo',
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          locale: Locale('es','ES'),
+          supportedLocales: [
+            Locale('es')
+          ],
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),

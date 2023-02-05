@@ -11,6 +11,27 @@ class ExpensesRepository {
     return result.map(Expense.fromMap).toList();
   }
 
+  ///reads the expenses of a DAY
+  Future<TotalExpenses> readByDate(
+      String date, int offset, String firebaseUID) async {
+    final result = await service.readByDate(date, offset);
+    int length = result.length;
+    final totalExpenses = TotalExpenses();
+    for (int i = 0; i < length; i++) {
+      final expense = result[i];
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(DateType.day, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(DateType.day, expense);
+      }
+    }
+    return totalExpenses;
+  }
+
   Future<TotalExpenses> readAll(
       DateType type, int offset, String firebaseUID) async {
     final result = await service.readAll(offset);

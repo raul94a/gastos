@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/cupertino.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
@@ -15,7 +13,8 @@ class ExpenseProvider with ChangeNotifier {
   Future<void> initialLoad({required String firebaseUID}) async {
     await fetchExpenses();
     _dateType = dateType;
-    await get(firebaseUID);
+    String date = MyDateFormatter.toYYYYMMdd(DateTime.now());
+    await getByDate(date, 0, firebaseUID);
   }
   //sqlite
 
@@ -179,6 +178,7 @@ class ExpenseProvider with ChangeNotifier {
           final index = list.indexWhere((element) => element.id == expense.id);
           print('Expense ${expense.id} is at $index');
           final removedExpense = list.removeAt(index);
+          await repository.remove(removedExpense);
           print('removedExpense: $removedExpense');
           _individualExpenses[date] = [...list];
 
@@ -230,6 +230,31 @@ class ExpenseProvider with ChangeNotifier {
           await repository.readAll(dateType, offset, firebaseUID);
       _expenses.addAll(totalExpenses.commonExpenses);
       _individualExpenses.addAll(totalExpenses.individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    } finally {
+      loading = false;
+      initialFetchFinished = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getByDate(String date, int offset, String firebaseUID) async {
+    print('CALLING GET BY DATE');
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    try {
+      final totalExpenses =
+          await repository.readByDate(date, offset, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      _expenses.addAll(commonExpenses);
+
+      _individualExpenses.addAll(individualExpenses);
     } catch (err) {
       print(err);
       rethrow;
