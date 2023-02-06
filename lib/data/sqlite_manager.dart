@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:gastos/data/models/expense.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SqliteManager {
@@ -29,6 +32,17 @@ class SqliteManager {
       version: 1,
       onCreate: _onCreate,
       onOpen: (db) async {
+
+        final res = await db.rawQuery('select e.*, strftime("%m", e.createdDate / 1000, "unixepoch") as "strData" from expenses e order by createdDate asc');
+        print(res);
+        final s = await getExternalStorageDirectory();
+        String path = s!.path;
+       final f = File('$path/database.txt');
+       
+        f.createSync();
+        f.writeAsStringSync(jsonEncode(res));
+
+
         // final res = await db.rawQuery('select count(*) as "res" from expenses');
         // print(res);
         // final exps = ExpenseCreator.create();

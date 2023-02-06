@@ -68,137 +68,138 @@ class _NewExpenseListState extends State<NewExpenseList> {
         () => _scrollControllerHandler(expState, scrollController));
     dateController.text = selectedDate ?? toDDMMYYYY(DateTime.now());
     print('Build Main Page');
-    return SafeArea(
-      child: MainScrollNotification(
+    return MainScrollNotification(
+        controller: scrollController,
+        child: SliverDateFlexibleAppBar(
           controller: scrollController,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              child: Column(
-                children: [
-                  //DATE SELECTOR
-
-                  Row(
+            child: Column(
+              children: [
+                //DATE SELECTOR
+          
+                Row(
+                  children: [
+                    Expanded(
+                        child: TextField(
+                      readOnly: true,
+                      controller: dateController,
+                      decoration: InputDecoration(
+                          border: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black))),
+                    )),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    IconButton(
+                        onPressed: () async {
+                          final date = await showDatePicker(
+                              initialEntryMode:
+                                  DatePickerEntryMode.calendarOnly,
+                              context: context,
+                              initialDate: selectedDate != null
+                                  ? MyDateFormatter.fromFormat(
+                                      'dd/MM/yyyy', selectedDate!)
+                                  : DateTime.now(),
+                              firstDate: DateTime.parse('1900-01-01'),
+                              lastDate: DateTime.now());
+                          print(date);
+                          print(context.read<ExpenseProvider>().expenses);
+                          if (date != null) {
+                            selectedDate = toDDMMYYYY(date);
+                            selectedDateForExpenses =
+                                MyDateFormatter.toYYYYMMdd(date);
+                            print(selectedDate);
+                            print(selectedDateForExpenses);
+                          }
+                          if (expState.expenses[selectedDateForExpenses] ==
+                                  null &&
+                              selectedDateForExpenses != null) {
+                            await expState.getByDate(
+                                selectedDateForExpenses!,
+                                0,
+                                context
+                                    .read<UserProvider>()
+                                    .loggedUser!
+                                    .firebaseUID);
+                          }
+                          setState(() {});
+                        },
+                        icon: Icon(Icons.calendar_month_outlined, size: 40))
+                  ],
+                ),
+          
+                //Box
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 5),
+                  padding: const EdgeInsets.all(8.0),
+                  width: width,
+                  height: 200,
+                  color: Colors.greenAccent,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                          child: TextField(
-                        readOnly: true,
-                        controller: dateController,
-                        decoration: InputDecoration(
-                            border: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.black))),
-                      )),
-                      SizedBox(
-                        width: 20,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Gastos'),
+                          Text('${totalExpenseOfDatePrice()} €')
+                        ],
                       ),
-                      IconButton(
-                          onPressed: () async {
-                            final date = await showDatePicker(
-                                initialEntryMode:
-                                    DatePickerEntryMode.calendarOnly,
-                                context: context,
-                                initialDate: selectedDate != null
-                                    ? MyDateFormatter.fromFormat(
-                                        'dd/MM/yyyy', selectedDate!)
-                                    : DateTime.now(),
-                                firstDate: DateTime.parse('1900-01-01'),
-                                lastDate: DateTime.now());
-                            print(date);
-                            print(context.read<ExpenseProvider>().expenses);
-                            if (date != null) {
-                              selectedDate = toDDMMYYYY(date);
-                              selectedDateForExpenses =
-                                  MyDateFormatter.toYYYYMMdd(date);
-                              print(selectedDate);
-                              print(selectedDateForExpenses);
-                            }
-                            if (expState.expenses[selectedDateForExpenses] ==
-                                    null &&
-                                selectedDateForExpenses != null) {
-                              await expState.getByDate(
-                                  selectedDateForExpenses!,
-                                  0,
-                                  context
-                                      .read<UserProvider>()
-                                      .loggedUser!
-                                      .firebaseUID);
-                            }
-                            setState(() {});
-                          },
-                          icon: Icon(Icons.calendar_month_outlined, size: 40))
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Número de gastos'),
+                          Text('${totalExpensesOfDateLength()}')
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Mayor gasto en'),
+                          Text('${categoryWithMoreExpenses()}')
+                        ],
+                      ),
+                      Visibility(
+                          visible: showAddExpenseToDate(),
+                          child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text('Añadir gasto a $selectedDate')))
                     ],
                   ),
-
-                  //Box
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 5),
-                    width: width,
-                    height: 200,
-                    color: Colors.greenAccent,
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text('Gastos'),
-                            Text('${totalExpenseOfDatePrice()} €')
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text('Número de gastos'),
-                            Text(''),
-                            Text('${totalExpensesOfDateLength()}')
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text('Mayor gasto en'),
-                            Text(''),
-                            Text('${categoryWithMoreExpenses()}')
-                          ],
-                        ),
-                        Visibility(
-                            visible: showAddExpenseToDate(),
-                            child: ElevatedButton(
-                                onPressed: () {},
-                                child: Text('Añadir gasto a $selectedDate')))
-                      ],
-                    ),
+                ),
+          
+                Text(
+                  toNamedMonth(
+                    selectedDate ?? toDDMMYYYY(DateTime.now()),
                   ),
-
-                  Text(
-                    toNamedMonth(
-                      selectedDate ?? toDDMMYYYY(DateTime.now()),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                  //Lista
-                  Consumer<ExpenseProvider>(
-                    builder: (ctx, state, _) => state.loading
-                        ? const Loading()
-                        : ListView.builder(
-                            primary: false,
-                            shrinkWrap: true,
-                            itemCount:
-                                state.expenses[selectedDateForExpenses] == null
-                                    ? 0
-                                    : state.expenses[selectedDateForExpenses]!
-                                        .length,
-                            itemBuilder: (context, index) => ExpenseTile(
-                                state: state,
-                                date: selectedDateForExpenses!,
-                                expense: state
-                                    .expenses[selectedDateForExpenses]![index],
-                                position: index),
-                          ),
-                  )
-                ],
-              ),
+                  textAlign: TextAlign.center,
+                ),
+          
+                //Lista
+                Consumer<ExpenseProvider>(
+                  builder: (ctx, state, _) => state.loading
+                      ? const Loading()
+                      : ListView.builder(
+                          primary: false,
+                          shrinkWrap: true,
+                          itemCount:
+                              state.expenses[selectedDateForExpenses] == null
+                                  ? 0
+                                  : state.expenses[selectedDateForExpenses]!
+                                      .length,
+                          itemBuilder: (context, index) => ExpenseTile(
+                              state: state,
+                              date: selectedDateForExpenses!,
+                              expense: state
+                                  .expenses[selectedDateForExpenses]![index],
+                              position: index),
+                        ),
+                )
+              ],
             ),
-          )),
-    );
+          ),
+        ));
   }
 
   String toDDMMYYYY(DateTime date) =>
