@@ -31,6 +31,26 @@ class ExpensesRepository {
     }
     return totalExpenses;
   }
+  ///reads the expenses from a month of a year
+  Future<TotalExpenses> readByMonth(
+      String month, int year, String firebaseUID) async {
+    final result = await service.readByMonth(month, year);
+    int length = result.length;
+    final totalExpenses = TotalExpenses();
+    for (int i = 0; i < length; i++) {
+      final expense = result[i];
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(DateType.month, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(DateType.month, expense);
+      }
+    }
+    return totalExpenses;
+  }
 
   Future<TotalExpenses> readAll(
       DateType type, int offset, String firebaseUID) async {

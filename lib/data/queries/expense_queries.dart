@@ -14,8 +14,9 @@ class ExpenseQueries {
   static String readExpensesByWeek(String weekNumber, int year) {
     String sql =
         'select e.*, strftime("%W", e.createdDate / 1000, "unixepoch") as "week", '
-        'strftime("%Y", e.createdDate/1000,"unixepoch") as "year" '
-        'from expenses e where week = "$weekNumber" AND year = "$year" order by createdDate desc';
+        'strftime("%Y", e.createdDate/1000,"unixepoch") as "year", '
+        'date(e.createdDate / 1000 , "unixepoch", "localtime") as "date" '
+        'from expenses e where week = "$weekNumber" AND year = "$year" AND deleted = 0 order by createdDate desc';
 
     return sql;
   }
@@ -23,8 +24,9 @@ class ExpenseQueries {
   static String readExpensesByMonth(String monthNumber, int year) {
     String sql =
         'select e.*, strftime("%m", e.createdDate / 1000, "unixepoch") as "month", '
-        'strftime("%Y", e.createdDate/1000,"unixepoch") as "year" '
-        'from expenses e where month = "$monthNumber" AND year = "$year" order by createdDate desc';
+        'strftime("%Y", e.createdDate/1000,"unixepoch") as "year", '
+        'date(e.createdDate / 1000 , "unixepoch", "localtime") as "date" '
+        'from expenses e where month = "$monthNumber" AND year = "$year" AND deleted = 0 order by createdDate desc';
 
     return sql;
   }
@@ -34,7 +36,7 @@ class ExpenseQueries {
         'select e.*, date(e.createdDate / 1000 , "unixepoch", "localtime") as "date"'
         ',strftime("%m", e.createdDate / 1000, "unixepoch") as "month", '
         'strftime("%Y", e.createdDate/1000,"unixepoch") as "year" '
-        'from expenses e where year = "$year" order by createdDate desc';
+        'from expenses e where year = "$year" AND deleted = 0 order by createdDate desc';
 
     return sql;
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
@@ -10,7 +11,9 @@ import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/show_expenses_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
+import 'package:gastos/utils/months_parser.dart';
 import 'package:intl/intl.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -77,7 +80,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
             child: Column(
               children: [
                 //DATE SELECTOR
-          
+
                 Row(
                   children: [
                     Expanded(
@@ -93,6 +96,38 @@ class _NewExpenseListState extends State<NewExpenseList> {
                     ),
                     IconButton(
                         onPressed: () async {
+                          print(expState.expenses);
+                          final firebaseUID = context
+                              .read<UserProvider>()
+                              .loggedUser!
+                              .firebaseUID;
+                          if (expState.dateType == DateType.month) {
+                            final date = await showMonthYearPicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.parse('1900-01-01'),
+                                lastDate: DateTime.now());
+
+                            if (date != null) {
+                              int monthNumber = date.month - 1;
+                              Month month = months[monthNumber];
+                              print(month);
+                              selectedDateForExpenses =
+                                  MyDateFormatter.dateByType(DateType.month,
+                                      MyDateFormatter.toYYYYMMdd(date));
+
+                              if (expState.expenses[selectedDateForExpenses] ==
+                                  null && selectedDateForExpenses != null) {
+                                await expState.getByMonth(
+                                    month.number, date.year, firebaseUID);
+                              }
+                              setState(() {
+                                
+                              });
+                            }
+
+                            return;
+                          }
                           final date = await showDatePicker(
                               initialEntryMode:
                                   DatePickerEntryMode.calendarOnly,
@@ -116,19 +151,14 @@ class _NewExpenseListState extends State<NewExpenseList> {
                                   null &&
                               selectedDateForExpenses != null) {
                             await expState.getByDate(
-                                selectedDateForExpenses!,
-                                0,
-                                context
-                                    .read<UserProvider>()
-                                    .loggedUser!
-                                    .firebaseUID);
+                                selectedDateForExpenses!, 0, firebaseUID);
                           }
                           setState(() {});
                         },
                         icon: Icon(Icons.calendar_month_outlined, size: 40))
                   ],
                 ),
-          
+
                 //Box
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 5),
@@ -168,14 +198,14 @@ class _NewExpenseListState extends State<NewExpenseList> {
                     ],
                   ),
                 ),
-          
+
                 Text(
                   toNamedMonth(
                     selectedDate ?? toDDMMYYYY(DateTime.now()),
                   ),
                   textAlign: TextAlign.center,
                 ),
-          
+
                 //Lista
                 Consumer<ExpenseProvider>(
                   builder: (ctx, state, _) => state.loading
@@ -183,11 +213,10 @@ class _NewExpenseListState extends State<NewExpenseList> {
                       : ListView.builder(
                           primary: false,
                           shrinkWrap: true,
-                          itemCount:
-                              state.expenses[selectedDateForExpenses] == null
-                                  ? 0
-                                  : state.expenses[selectedDateForExpenses]!
-                                      .length,
+                          itemCount: state.expenses[selectedDateForExpenses] ==
+                                  null
+                              ? 0
+                              : state.expenses[selectedDateForExpenses]!.length,
                           itemBuilder: (context, index) => ExpenseTile(
                               state: state,
                               date: selectedDateForExpenses!,
@@ -248,9 +277,16 @@ class _NewExpenseListState extends State<NewExpenseList> {
         categoryWithMoreExpenses = key;
       }
     });
+    print(categoriesState.categories);
+    
+    try{
+
     return categoriesState.categories
-        .firstWhere((element) => element.id == categoryWithMoreExpenses)
-        .name;
+        .firstWhere((element) => element.id == categoryWithMoreExpenses,).name;
+        
+    }catch(err){
+      return '';
+    }
   }
 
   bool showAddExpenseToDate() {
