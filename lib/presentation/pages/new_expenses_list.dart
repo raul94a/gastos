@@ -6,6 +6,8 @@ import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
 import 'package:gastos/presentation/widgets/shared/loading.dart';
+import 'package:gastos/presentation/widgets/shared/week_picker_dialog.dart';
+import 'package:gastos/presentation/widgets/shared/year_picker_dialog.dart';
 import 'package:gastos/presentation/widgets/slivers/sliver_date_flexible_app_bar.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
@@ -78,7 +80,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
 
         break;
       case DateType.week:
-        selectedDate = MyDateFormatter.toFormat('dd/MM/yyyy',now);
+        selectedDate = MyDateFormatter.toFormat('dd/MM/yyyy', now);
         selectedDateForExpenses = selectedDate;
         break;
     }
@@ -109,20 +111,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
             child: Column(
               children: [
                 //DATE SELECTOR
-                
-                buildWeekDatePicker(
-                    selectedDate != null
-                        ? MyDateFormatter.fromFormat(
-                            'dd/MM/yyyy', selectedDate!)
-                        : DateTime.now(),
-                    DateTime.parse('1900-01-01'),
-                    DateTime.now(), (value) {
-                  print('Start: ${value.start} \nEnd:${value.end}');
-                ;
-                  setState(() {
-                    selectedDate = toDDMMYYYY(value.start);
-                  });
-                }),
+
                 Row(
                   children: [
                     Expanded(
@@ -142,19 +131,67 @@ class _NewExpenseListState extends State<NewExpenseList> {
                               .read<UserProvider>()
                               .loggedUser!
                               .firebaseUID;
-                          if (expState.dateType == DateType.week) {
-                            final date = buildWeekDatePicker(
-                                DateTime.now(),
-                                DateTime.parse('1900-01-01'),
-                                DateTime.now(), (value) {
-                              print(
-                                  'dateperiod: ${value.start} \n${value.end}');
-                            });
-                            showDialog(
+                          if (expState.dateType == DateType.year) {
+                            showYearPickerDialog(
                                 context: context,
-                                builder: (ctx) => Dialog(
-                                      child: date,
-                                    ));
+                                selectedDate: DateTime.now(),
+                                firstDate: DateTime.parse('1900-01-01'),
+                                lastDate: DateTime.now(),
+                                onSelected: (value) async {
+                                  print(
+                                      'Expenses: ${expState.expenses[selectedDateForExpenses]}');
+
+                                  final date = value;
+                                  //week
+
+                                  selectedDate = MyDateFormatter.dateByType(
+                                      DateType.year,
+                                      MyDateFormatter.toYYYYMMdd(date));
+                                  selectedDateForExpenses = selectedDate;
+
+                                  if (expState
+                                          .expenses[selectedDateForExpenses] ==
+                                      null) {
+                                    await expState.getByYear(
+                                        date.year, firebaseUID);
+                                  }
+
+                                  setState(() {});
+                                });
+
+                            return;
+                          }
+                          if (expState.dateType == DateType.week) {
+                            await showWeekPickerDialog(
+                                context: context,
+                                selectedDate: DateTime.now(),
+                                firstDate: DateTime.parse('1900-01-01'),
+                                lastDate: DateTime.now(),
+                                onSelected: (value) async {
+                                  print(
+                                      'Expenses: ${expState.expenses[selectedDateForExpenses]}');
+                                  print(
+                                      'dateperiod: ${value.start} \n${value.end}');
+                                  final date = value.start;
+                                  //week
+                                  final week =
+                                      MyDateFormatter.weekYearString(date);
+                                  print(week);
+                                  selectedDate = MyDateFormatter.dateByType(
+                                      DateType.week,
+                                      MyDateFormatter.toYYYYMMdd(date));
+                                  selectedDateForExpenses = selectedDate;
+
+                                  if (expState
+                                          .expenses[selectedDateForExpenses] ==
+                                      null) {
+                                    await expState.getByWeek(
+                                        week, date.year, firebaseUID);
+                                  }
+
+                                  setState(() {});
+                                });
+
                             return;
                           }
                           if (expState.dateType == DateType.month) {
@@ -259,16 +296,16 @@ class _NewExpenseListState extends State<NewExpenseList> {
                   ),
                 ),
 
-                Consumer<ExpenseProvider>(
-                  builder: (ctx, state, _) => Text(
-                    state.dateType == DateType.month
-                        ? selectedDate!
-                        : toNamedMonth(
-                            selectedDate ?? toDDMMYYYY(DateTime.now()),
-                          ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                // Consumer<ExpenseProvider>(
+                //   builder: (ctx, state, _) => Text(
+                //     state.dateType == DateType.month
+                //         ? selectedDate!
+                //         : toNamedMonth(
+                //             selectedDate ?? toDDMMYYYY(DateTime.now()),
+                //           ),
+                //     textAlign: TextAlign.center,
+                //   ),
+                // ),
 
                 //Lista
                 Consumer<ExpenseProvider>(
@@ -341,7 +378,6 @@ class _NewExpenseListState extends State<NewExpenseList> {
         categoryWithMoreExpenses = key;
       }
     });
-    print(categoriesState.categories);
 
     try {
       return categoriesState.categories
@@ -357,32 +393,5 @@ class _NewExpenseListState extends State<NewExpenseList> {
   bool showAddExpenseToDate() {
     if (selectedDate == null) return false;
     return selectedDate != toDDMMYYYY(DateTime.now());
-  }
-
-  // Create week date picker with passed parameters
-  Widget buildWeekDatePicker(DateTime selectedDate, DateTime firstAllowedDate,
-      DateTime lastAllowedDate, ValueChanged<DatePeriod> onNewSelected) {
-    // add some colors to default settings
-    DatePickerRangeStyles styles = DatePickerRangeStyles(
-      selectedPeriodLastDecoration: BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadiusDirectional.only(
-              topEnd: Radius.circular(10.0), bottomEnd: Radius.circular(10.0))),
-      selectedPeriodStartDecoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadiusDirectional.only(
-            topStart: Radius.circular(10.0),
-            bottomStart: Radius.circular(10.0)),
-      ),
-      selectedPeriodMiddleDecoration:
-          BoxDecoration(color: Colors.yellow, shape: BoxShape.rectangle),
-    );
-
-    return WeekPicker(
-        selectedDate: selectedDate,
-        onChanged: onNewSelected,
-        firstDate: firstAllowedDate,
-        lastDate: lastAllowedDate,
-        datePickerStyles: styles);
   }
 }

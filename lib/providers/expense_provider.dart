@@ -239,6 +239,7 @@ class ExpenseProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
   //get the expenses of a day
   Future<void> getByDate(String date, int offset, String firebaseUID) async {
     print('CALLING GET BY DATE');
@@ -266,7 +267,7 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   ///get the expenses from a month of a year
-   Future<void>   getByMonth(String month, int year, String firebaseUID) async {
+  Future<void> getByMonth(String month, int year, String firebaseUID) async {
     print('CALLING GET BY DATE');
     if (!loading) {
       loading = true;
@@ -276,6 +277,54 @@ class ExpenseProvider with ChangeNotifier {
     try {
       final totalExpenses =
           await repository.readByMonth(month, year, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      _expenses.addAll(commonExpenses);
+      _individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    } finally {
+      loading = false;
+      initialFetchFinished = true;
+      notifyListeners();
+    }
+  }
+  //get expenses by week of year
+  Future<void> getByWeek(String week, int year, String firebaseUID) async {
+    print('CALLING GET BY DATE');
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    try {
+      final totalExpenses =
+          await repository.readByWeek(week, year, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      _expenses.addAll(commonExpenses);
+      _individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    } finally {
+      loading = false;
+      initialFetchFinished = true;
+      notifyListeners();
+    }
+  }
+  //get expenses by year
+  Future<void> getByYear( int year, String firebaseUID) async {
+    print('CALLING GET BY DATE');
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    try {
+      final totalExpenses =
+          await repository.readByYear( year, firebaseUID);
       final commonExpenses = totalExpenses.commonExpenses;
       final individualExpenses = totalExpenses.individualExpenses;
       _expenses.addAll(commonExpenses);

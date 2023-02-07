@@ -123,11 +123,26 @@ class ExpenseService {
   Future<List<Map<String, dynamic>>> readByMonth(String month, int year) async {
     final db = sqliteManager.database;
     List<Map<String, dynamic>> result =
-        await db.rawQuery(ExpenseQueries.readExpensesByMonth(month,year));
+        await db.rawQuery(ExpenseQueries.readExpensesByMonth(month, year));
 
     return result;
   }
 
+  Future<List<Map<String, dynamic>>> readByWeek(String week, int year) async {
+    final db = sqliteManager.database;
+    List<Map<String, dynamic>> result =
+        await db.rawQuery(ExpenseQueries.readExpensesByWeek(week, year));
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> readByYear(int year) async {
+    final db = sqliteManager.database;
+    List<Map<String, dynamic>> result =
+        await db.rawQuery(ExpenseQueries.readExpensesByYear(year));
+
+    return result;
+  }
 
   Future<int> countExpenses() async {
     final db = sqliteManager.database;
