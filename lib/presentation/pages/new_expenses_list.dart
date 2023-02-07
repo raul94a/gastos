@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:gastos/data/enums/date_type.dart';
-import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/logic/expenses_bloc.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
 import 'package:gastos/presentation/widgets/shared/loading.dart';
@@ -11,7 +10,7 @@ import 'package:gastos/presentation/widgets/shared/year_picker_dialog.dart';
 import 'package:gastos/presentation/widgets/slivers/sliver_date_flexible_app_bar.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
-import 'package:gastos/providers/show_expenses_provider.dart';
+import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
 import 'package:gastos/utils/months_parser.dart';
@@ -58,32 +57,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
     expState = context.read<ExpenseProvider>();
     categoriesState = context.read<CategoriesProvider>();
     userProvider = context.read<UserProvider>();
-    final now = DateTime.now();
-    switch (expState.dateType) {
-      case DateType.day:
-        selectedDate = toDDMMYYYY(now);
-        selectedDateForExpenses = MyDateFormatter.toYYYYMMdd(now);
-        expState.getByDate(
-            selectedDateForExpenses!, 0, userProvider.loggedUser!.firebaseUID);
-        break;
-      case DateType.month:
-        selectedDate = MyDateFormatter.dateByType(
-            DateType.month, MyDateFormatter.toYYYYMMdd(now));
-        selectedDateForExpenses = selectedDate;
-        expState.getByMonth(months[now.month - 1].number, now.year,
-            userProvider.loggedUser!.firebaseUID);
-        break;
-      case DateType.year:
-        selectedDate = MyDateFormatter.dateByType(
-            DateType.year, MyDateFormatter.toYYYYMMdd(now));
-        selectedDateForExpenses = selectedDate;
-
-        break;
-      case DateType.week:
-        selectedDate = MyDateFormatter.toFormat('dd/MM/yyyy', now);
-        selectedDateForExpenses = selectedDate;
-        break;
-    }
+    context.read<SelectedDateProvider>().setSelectedDates(expState.dateType);
     print('Init state on main page');
   }
 
@@ -131,126 +105,8 @@ class _NewExpenseListState extends State<NewExpenseList> {
                               .read<UserProvider>()
                               .loggedUser!
                               .firebaseUID;
-                          if (expState.dateType == DateType.year) {
-                            showYearPickerDialog(
-                                context: context,
-                                selectedDate: DateTime.now(),
-                                firstDate: DateTime.parse('1900-01-01'),
-                                lastDate: DateTime.now(),
-                                onSelected: (value) async {
-                                  print(
-                                      'Expenses: ${expState.expenses[selectedDateForExpenses]}');
-
-                                  final date = value;
-                                  //week
-
-                                  selectedDate = MyDateFormatter.dateByType(
-                                      DateType.year,
-                                      MyDateFormatter.toYYYYMMdd(date));
-                                  selectedDateForExpenses = selectedDate;
-
-                                  if (expState
-                                          .expenses[selectedDateForExpenses] ==
-                                      null) {
-                                    await expState.getByYear(
-                                        date.year, firebaseUID);
-                                  }
-
-                                  setState(() {});
-                                });
-
-                            return;
-                          }
-                          if (expState.dateType == DateType.week) {
-                            await showWeekPickerDialog(
-                                context: context,
-                                selectedDate: DateTime.now(),
-                                firstDate: DateTime.parse('1900-01-01'),
-                                lastDate: DateTime.now(),
-                                onSelected: (value) async {
-                                  print(
-                                      'Expenses: ${expState.expenses[selectedDateForExpenses]}');
-                                  print(
-                                      'dateperiod: ${value.start} \n${value.end}');
-                                  final date = value.start;
-                                  //week
-                                  final week =
-                                      MyDateFormatter.weekYearString(date);
-                                  print(week);
-                                  selectedDate = MyDateFormatter.dateByType(
-                                      DateType.week,
-                                      MyDateFormatter.toYYYYMMdd(date));
-                                  selectedDateForExpenses = selectedDate;
-
-                                  if (expState
-                                          .expenses[selectedDateForExpenses] ==
-                                      null) {
-                                    await expState.getByWeek(
-                                        week, date.year, firebaseUID);
-                                  }
-
-                                  setState(() {});
-                                });
-
-                            return;
-                          }
-                          if (expState.dateType == DateType.month) {
-                            final date = await showMonthYearPicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.parse('1900-01-01'),
-                                lastDate: DateTime.now());
-
-                            if (date != null) {
-                              int monthNumber = date.month - 1;
-                              Month month = months[monthNumber];
-                              print(month);
-                              selectedDate = MyDateFormatter.dateByType(
-                                  DateType.month,
-                                  MyDateFormatter.toYYYYMMdd(date));
-                              selectedDateForExpenses =
-                                  MyDateFormatter.dateByType(DateType.month,
-                                      MyDateFormatter.toYYYYMMdd(date));
-
-                              print('Selected Date: $selectedDate');
-
-                              if (expState.expenses[selectedDateForExpenses] ==
-                                      null &&
-                                  selectedDateForExpenses != null) {
-                                await expState.getByMonth(
-                                    month.number, date.year, firebaseUID);
-                              }
-                              setState(() {});
-                            }
-
-                            return;
-                          }
-                          final date = await showDatePicker(
-                              initialEntryMode:
-                                  DatePickerEntryMode.calendarOnly,
-                              context: context,
-                              initialDate: selectedDate != null
-                                  ? MyDateFormatter.fromFormat(
-                                      'dd/MM/yyyy', selectedDate!)
-                                  : DateTime.now(),
-                              firstDate: DateTime.parse('1900-01-01'),
-                              lastDate: DateTime.now());
-                          print(date);
-                          print(context.read<ExpenseProvider>().expenses);
-                          if (date != null) {
-                            selectedDate = toDDMMYYYY(date);
-                            selectedDateForExpenses =
-                                MyDateFormatter.toYYYYMMdd(date);
-                            print(selectedDate);
-                            print(selectedDateForExpenses);
-                          }
-                          if (expState.expenses[selectedDateForExpenses] ==
-                                  null &&
-                              selectedDateForExpenses != null) {
-                            await expState.getByDate(
-                                selectedDateForExpenses!, 0, firebaseUID);
-                          }
-                          setState(() {});
+                          final expenseBloc = ExpensesBloc(context: context);
+                          expenseBloc.fetchExpenses(userUID: firebaseUID);
                         },
                         icon: Icon(Icons.calendar_month_outlined, size: 40))
                   ],
@@ -308,23 +164,23 @@ class _NewExpenseListState extends State<NewExpenseList> {
                 // ),
 
                 //Lista
-                Consumer<ExpenseProvider>(
-                  builder: (ctx, state, _) => state.loading
-                      ? const Loading()
-                      : ListView.builder(
-                          primary: false,
-                          shrinkWrap: true,
-                          itemCount: state.expenses[selectedDateForExpenses] ==
-                                  null
-                              ? 0
-                              : state.expenses[selectedDateForExpenses]!.length,
-                          itemBuilder: (context, index) => ExpenseTile(
-                              state: state,
-                              date: selectedDateForExpenses!,
-                              expense: state
-                                  .expenses[selectedDateForExpenses]![index],
-                              position: index),
-                        ),
+                Consumer<SelectedDateProvider>(
+                  builder: (ctx, state, _) => ListView.builder(
+                    primary: false,
+                    shrinkWrap: true,
+                    itemCount:
+                        expState.expenses[state.selectedDateForExpenses!] ==
+                                null
+                            ? 0
+                            : expState.expenses[state.selectedDateForExpenses!]!
+                                .length,
+                    itemBuilder: (context, index) => ExpenseTile(
+                        state: expState,
+                        date: state.selectedDateForExpenses!,
+                        expense: expState
+                            .expenses[state.selectedDateForExpenses]![index],
+                        position: index),
+                  ),
                 )
               ],
             ),

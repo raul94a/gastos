@@ -83,10 +83,10 @@ class ExpensesRepository {
       final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
       //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
       if (isCommonExpense) {
-        totalExpenses.addCommonExpense(DateType.week, expense);
+        totalExpenses.addCommonExpense(DateType.year, expense);
       }
       if (!isCommonExpense && firebaseUID == personFirebaseUID) {
-        totalExpenses.addIndividualExpense(DateType.week, expense);
+        totalExpenses.addIndividualExpense(DateType.year, expense);
       }
     }
     return totalExpenses;

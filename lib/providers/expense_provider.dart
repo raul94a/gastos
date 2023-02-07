@@ -5,6 +5,7 @@ import 'package:gastos/data/repository/expenses_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/logic/sorter.dart';
 import 'package:gastos/utils/date_formatter.dart';
+import 'package:gastos/utils/months_parser.dart';
 
 class ExpenseProvider with ChangeNotifier {
   //firebase
@@ -268,7 +269,7 @@ class ExpenseProvider with ChangeNotifier {
 
   ///get the expenses from a month of a year
   Future<void> getByMonth(String month, int year, String firebaseUID) async {
-    print('CALLING GET BY DATE');
+    print('CALLING GET BY month');
     if (!loading) {
       loading = true;
       notifyListeners();
@@ -290,9 +291,10 @@ class ExpenseProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
   //get expenses by week of year
   Future<void> getByWeek(String week, int year, String firebaseUID) async {
-    print('CALLING GET BY DATE');
+    print('CALLING GET BY week');
     if (!loading) {
       loading = true;
       notifyListeners();
@@ -314,20 +316,22 @@ class ExpenseProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
   //get expenses by year
-  Future<void> getByYear( int year, String firebaseUID) async {
-    print('CALLING GET BY DATE');
+  Future<void> getByYear(int year, String firebaseUID) async {
+    print('CALLING GET BY year');
     if (!loading) {
       loading = true;
       notifyListeners();
       await Future.delayed(const Duration(milliseconds: 150));
     }
     try {
-      final totalExpenses =
-          await repository.readByYear( year, firebaseUID);
+      final totalExpenses = await repository.readByYear(year, firebaseUID);
+      print(totalExpenses);
       final commonExpenses = totalExpenses.commonExpenses;
       final individualExpenses = totalExpenses.individualExpenses;
       _expenses.addAll(commonExpenses);
+      print(_expenses);
       _individualExpenses.addAll(individualExpenses);
     } catch (err) {
       print(err);
@@ -346,7 +350,26 @@ class ExpenseProvider with ChangeNotifier {
     blockInfiniteScroll = false;
     blockFunction = false;
     _expenses.clear();
-    await get(firebaseUID);
+    final now = DateTime.now();
+    final date = MyDateFormatter.toYYYYMMdd(now);
+
+    switch (type) {
+      case DateType.day:
+        await getByDate(
+            MyDateFormatter.dateByType(type, date), offset, firebaseUID);
+        break;
+      case DateType.month:
+        await getByMonth(months[now.month - 1].number, now.year, firebaseUID);
+        break;
+      case DateType.year:
+        await getByYear(now.year, firebaseUID);
+        break;
+      case DateType.week:
+        final week = MyDateFormatter.weekYearString(now);
+        await getByWeek(week, now.year, firebaseUID);
+        break;
+    }
+    
   }
 
   Future<void> getByScroll() async {

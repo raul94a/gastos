@@ -8,6 +8,7 @@ import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/jump_buttons_provider.dart';
 import 'package:gastos/providers/navigation_provider.dart';
+import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/routes/router.dart';
 import 'package:month_year_picker/month_year_picker.dart';
@@ -47,7 +48,8 @@ class MyApp extends StatelessWidget {
           create: (ctx) => UserProvider(),
           lazy: false,
         ),
-        ChangeNotifierProvider(create: (c) => JumpButtonsProvider())
+        ChangeNotifierProvider(create: (c) => JumpButtonsProvider()),
+        ChangeNotifierProvider(create: (c) => SelectedDateProvider())
       ],
       child: Builder(builder: (context) {
         return MaterialApp.router(
@@ -58,10 +60,8 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
             MonthYearPickerLocalizations.delegate,
           ],
-          locale: Locale('es','ES'),
-          supportedLocales: [
-            Locale('es')
-          ],
+          locale: Locale('es', 'ES'),
+          supportedLocales: [Locale('es')],
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
