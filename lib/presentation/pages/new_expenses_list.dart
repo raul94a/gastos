@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
@@ -29,6 +30,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
   final dateController = TextEditingController();
   late ExpenseProvider expState;
   late CategoriesProvider categoriesState;
+  late UserProvider userProvider;
   String? selectedDate;
   String? selectedDateForExpenses;
 
@@ -53,6 +55,33 @@ class _NewExpenseListState extends State<NewExpenseList> {
     super.initState();
     expState = context.read<ExpenseProvider>();
     categoriesState = context.read<CategoriesProvider>();
+    userProvider = context.read<UserProvider>();
+    final now = DateTime.now();
+    switch (expState.dateType) {
+      case DateType.day:
+        selectedDate = toDDMMYYYY(now);
+        selectedDateForExpenses = MyDateFormatter.toYYYYMMdd(now);
+        expState.getByDate(
+            selectedDateForExpenses!, 0, userProvider.loggedUser!.firebaseUID);
+        break;
+      case DateType.month:
+        selectedDate = MyDateFormatter.dateByType(
+            DateType.month, MyDateFormatter.toYYYYMMdd(now));
+        selectedDateForExpenses = selectedDate;
+        expState.getByMonth(months[now.month - 1].number, now.year,
+            userProvider.loggedUser!.firebaseUID);
+        break;
+      case DateType.year:
+        selectedDate = MyDateFormatter.dateByType(
+            DateType.year, MyDateFormatter.toYYYYMMdd(now));
+        selectedDateForExpenses = selectedDate;
+
+        break;
+      case DateType.week:
+        selectedDate = MyDateFormatter.toFormat('dd/MM/yyyy',now);
+        selectedDateForExpenses = selectedDate;
+        break;
+    }
     print('Init state on main page');
   }
 
@@ -80,7 +109,20 @@ class _NewExpenseListState extends State<NewExpenseList> {
             child: Column(
               children: [
                 //DATE SELECTOR
-
+                
+                buildWeekDatePicker(
+                    selectedDate != null
+                        ? MyDateFormatter.fromFormat(
+                            'dd/MM/yyyy', selectedDate!)
+                        : DateTime.now(),
+                    DateTime.parse('1900-01-01'),
+                    DateTime.now(), (value) {
+                  print('Start: ${value.start} \nEnd:${value.end}');
+                ;
+                  setState(() {
+                    selectedDate = toDDMMYYYY(value.start);
+                  });
+                }),
                 Row(
                   children: [
                     Expanded(
@@ -96,11 +138,25 @@ class _NewExpenseListState extends State<NewExpenseList> {
                     ),
                     IconButton(
                         onPressed: () async {
-                          print(expState.expenses);
                           final firebaseUID = context
                               .read<UserProvider>()
                               .loggedUser!
                               .firebaseUID;
+                          if (expState.dateType == DateType.week) {
+                            final date = buildWeekDatePicker(
+                                DateTime.now(),
+                                DateTime.parse('1900-01-01'),
+                                DateTime.now(), (value) {
+                              print(
+                                  'dateperiod: ${value.start} \n${value.end}');
+                            });
+                            showDialog(
+                                context: context,
+                                builder: (ctx) => Dialog(
+                                      child: date,
+                                    ));
+                            return;
+                          }
                           if (expState.dateType == DateType.month) {
                             final date = await showMonthYearPicker(
                                 context: context,
@@ -112,18 +168,22 @@ class _NewExpenseListState extends State<NewExpenseList> {
                               int monthNumber = date.month - 1;
                               Month month = months[monthNumber];
                               print(month);
+                              selectedDate = MyDateFormatter.dateByType(
+                                  DateType.month,
+                                  MyDateFormatter.toYYYYMMdd(date));
                               selectedDateForExpenses =
                                   MyDateFormatter.dateByType(DateType.month,
                                       MyDateFormatter.toYYYYMMdd(date));
 
+                              print('Selected Date: $selectedDate');
+
                               if (expState.expenses[selectedDateForExpenses] ==
-                                  null && selectedDateForExpenses != null) {
+                                      null &&
+                                  selectedDateForExpenses != null) {
                                 await expState.getByMonth(
                                     month.number, date.year, firebaseUID);
                               }
-                              setState(() {
-                                
-                              });
+                              setState(() {});
                             }
 
                             return;
@@ -199,11 +259,15 @@ class _NewExpenseListState extends State<NewExpenseList> {
                   ),
                 ),
 
-                Text(
-                  toNamedMonth(
-                    selectedDate ?? toDDMMYYYY(DateTime.now()),
+                Consumer<ExpenseProvider>(
+                  builder: (ctx, state, _) => Text(
+                    state.dateType == DateType.month
+                        ? selectedDate!
+                        : toNamedMonth(
+                            selectedDate ?? toDDMMYYYY(DateTime.now()),
+                          ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
 
                 //Lista
@@ -278,13 +342,14 @@ class _NewExpenseListState extends State<NewExpenseList> {
       }
     });
     print(categoriesState.categories);
-    
-    try{
 
-    return categoriesState.categories
-        .firstWhere((element) => element.id == categoryWithMoreExpenses,).name;
-        
-    }catch(err){
+    try {
+      return categoriesState.categories
+          .firstWhere(
+            (element) => element.id == categoryWithMoreExpenses,
+          )
+          .name;
+    } catch (err) {
       return '';
     }
   }
@@ -292,5 +357,32 @@ class _NewExpenseListState extends State<NewExpenseList> {
   bool showAddExpenseToDate() {
     if (selectedDate == null) return false;
     return selectedDate != toDDMMYYYY(DateTime.now());
+  }
+
+  // Create week date picker with passed parameters
+  Widget buildWeekDatePicker(DateTime selectedDate, DateTime firstAllowedDate,
+      DateTime lastAllowedDate, ValueChanged<DatePeriod> onNewSelected) {
+    // add some colors to default settings
+    DatePickerRangeStyles styles = DatePickerRangeStyles(
+      selectedPeriodLastDecoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadiusDirectional.only(
+              topEnd: Radius.circular(10.0), bottomEnd: Radius.circular(10.0))),
+      selectedPeriodStartDecoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadiusDirectional.only(
+            topStart: Radius.circular(10.0),
+            bottomStart: Radius.circular(10.0)),
+      ),
+      selectedPeriodMiddleDecoration:
+          BoxDecoration(color: Colors.yellow, shape: BoxShape.rectangle),
+    );
+
+    return WeekPicker(
+        selectedDate: selectedDate,
+        onChanged: onNewSelected,
+        firstDate: firstAllowedDate,
+        lastDate: lastAllowedDate,
+        datePickerStyles: styles);
   }
 }

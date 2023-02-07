@@ -266,7 +266,7 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   ///get the expenses from a month of a year
-   Future<void> getByMonth(String month, int year, String firebaseUID) async {
+   Future<void>   getByMonth(String month, int year, String firebaseUID) async {
     print('CALLING GET BY DATE');
     if (!loading) {
       loading = true;
@@ -279,7 +279,6 @@ class ExpenseProvider with ChangeNotifier {
       final commonExpenses = totalExpenses.commonExpenses;
       final individualExpenses = totalExpenses.individualExpenses;
       _expenses.addAll(commonExpenses);
-
       _individualExpenses.addAll(individualExpenses);
     } catch (err) {
       print(err);
