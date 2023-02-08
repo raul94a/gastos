@@ -84,7 +84,8 @@ class ExpenseService {
         // 2. The record doesn't exists, so it should be inserted
         final results = await countIdEntries(object['id']);
         if (results > 0) {
-          await db.update(table, object, where: 'id = ?' ,whereArgs: [object['id']]);
+          await db.update(table, object,
+              where: 'id = ?', whereArgs: [object['id']]);
         } else {
           await db.insert(table, object);
         }
@@ -111,9 +112,42 @@ class ExpenseService {
     return result;
   }
 
+  Future<List<Map<String, dynamic>>> readByDate(String date, int offset) async {
+    final db = sqliteManager.database;
+    List<Map<String, dynamic>> result =
+        await db.rawQuery(ExpenseQueries.readExpensesByDate(date, offset));
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> readByMonth(String month, int year) async {
+    final db = sqliteManager.database;
+    List<Map<String, dynamic>> result =
+        await db.rawQuery(ExpenseQueries.readExpensesByMonth(month, year));
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> readByWeek(String week, int year) async {
+    final db = sqliteManager.database;
+    List<Map<String, dynamic>> result =
+        await db.rawQuery(ExpenseQueries.readExpensesByWeek(week, year));
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> readByYear(int year) async {
+    final db = sqliteManager.database;
+    List<Map<String, dynamic>> result =
+        await db.rawQuery(ExpenseQueries.readExpensesByYear(year));
+
+    return result;
+  }
+
   Future<int> countExpenses() async {
     final db = sqliteManager.database;
-    final res = await db.rawQuery("select count(*) as 'res' from expenses where isCommonExpense = 1");
+    final res = await db.rawQuery(
+        "select count(*) as 'res' from expenses where isCommonExpense = 1");
     return res.first['res'] as int;
   }
 
@@ -126,7 +160,8 @@ class ExpenseService {
 
   Future<num> sumExpensesOfUser(String name) async {
     final db = sqliteManager.database;
-    final res = await db.rawQuery(ExpenseQueries.readExpensesOfUserByDate(name));
+    final res =
+        await db.rawQuery(ExpenseQueries.readExpensesOfUserByDate(name));
     print(res);
     return res.first['total'] as num;
   }

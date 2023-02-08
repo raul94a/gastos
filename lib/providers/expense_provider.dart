@@ -7,6 +7,7 @@ import 'package:gastos/data/repository/expenses_repository.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/logic/sorter.dart';
 import 'package:gastos/utils/date_formatter.dart';
+import 'package:gastos/utils/months_parser.dart';
 
 class ExpenseProvider with ChangeNotifier {
   //firebase
@@ -15,7 +16,8 @@ class ExpenseProvider with ChangeNotifier {
   Future<void> initialLoad({required String firebaseUID}) async {
     await fetchExpenses();
     _dateType = dateType;
-    await get(firebaseUID);
+    String date = MyDateFormatter.toYYYYMMdd(DateTime.now());
+    await getByDate(date, 0, firebaseUID);
   }
   //sqlite
 
@@ -179,6 +181,7 @@ class ExpenseProvider with ChangeNotifier {
           final index = list.indexWhere((element) => element.id == expense.id);
           print('Expense ${expense.id} is at $index');
           final removedExpense = list.removeAt(index);
+          await repository.remove(removedExpense);
           print('removedExpense: $removedExpense');
           _individualExpenses[date] = [...list];
 
@@ -240,6 +243,108 @@ class ExpenseProvider with ChangeNotifier {
     }
   }
 
+  //get the expenses of a day
+  Future<void> getByDate(String date, int offset, String firebaseUID) async {
+    print('CALLING GET BY DATE');
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    try {
+      final totalExpenses =
+          await repository.readByDate(date, offset, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      _expenses.addAll(commonExpenses);
+
+      _individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    } finally {
+      loading = false;
+      initialFetchFinished = true;
+      notifyListeners();
+    }
+  }
+
+  ///get the expenses from a month of a year
+  Future<void> getByMonth(String month, int year, String firebaseUID) async {
+    print('CALLING GET BY month');
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    try {
+      final totalExpenses =
+          await repository.readByMonth(month, year, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      _expenses.addAll(commonExpenses);
+      _individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    } finally {
+      loading = false;
+      initialFetchFinished = true;
+      notifyListeners();
+    }
+  }
+
+  //get expenses by week of year
+  Future<void> getByWeek(String week, int year, String firebaseUID) async {
+    print('CALLING GET BY week');
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    try {
+      final totalExpenses =
+          await repository.readByWeek(week, year, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      _expenses.addAll(commonExpenses);
+      _individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    } finally {
+      loading = false;
+      initialFetchFinished = true;
+      notifyListeners();
+    }
+  }
+
+  //get expenses by year
+  Future<void> getByYear(int year, String firebaseUID) async {
+    print('CALLING GET BY year');
+    if (!loading) {
+      loading = true;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    try {
+      final totalExpenses = await repository.readByYear(year, firebaseUID);
+      print(totalExpenses);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      _expenses.addAll(commonExpenses);
+      print(_expenses);
+      _individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    } finally {
+      loading = false;
+      initialFetchFinished = true;
+      notifyListeners();
+    }
+  }
+
   Future<void> getByDateType(
       {required DateType type, required String firebaseUID}) async {
     offset = 0;
@@ -247,7 +352,26 @@ class ExpenseProvider with ChangeNotifier {
     blockInfiniteScroll = false;
     blockFunction = false;
     _expenses.clear();
-    await get(firebaseUID);
+    final now = DateTime.now();
+    final date = MyDateFormatter.toYYYYMMdd(now);
+
+    switch (type) {
+      case DateType.day:
+        await getByDate(
+            MyDateFormatter.dateByType(type, date), offset, firebaseUID);
+        break;
+      case DateType.month:
+        await getByMonth(months[now.month - 1].number, now.year, firebaseUID);
+        break;
+      case DateType.year:
+        await getByYear(now.year, firebaseUID);
+        break;
+      case DateType.week:
+        final week = MyDateFormatter.weekYearString(now);
+        await getByWeek(week, now.year, firebaseUID);
+        break;
+    }
+    
   }
 
   Future<void> getByScroll() async {

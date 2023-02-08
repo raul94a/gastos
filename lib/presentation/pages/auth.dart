@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';

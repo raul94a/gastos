@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:gastos/presentation/pages/individual_expenses.dart';
+import 'package:gastos/presentation/pages/new_expenses_list.dart';
 import 'package:gastos/presentation/pages/settings.dart';
 import 'package:gastos/presentation/pages/info.dart';
 import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
@@ -95,7 +96,7 @@ class _PageSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (index == 0) return const IndividualExpensesPage();
-    if (index == 1) return const ExpenseList();
+    if (index == 1) return const NewExpenseList();
     if (index == 2) return const InfoPage();
 
     return const Settings();

@@ -19,7 +19,13 @@ class MyDateFormatter {
   static DateTime fromFormat(String format, String date) {
     return DateFormat(format).parse(date);
   }
-
+  static String weekYearString(DateTime date){
+    int week = weekYear(date);
+    if(week < 10){
+      return '0$week';
+    }
+    return '$week';
+  }
   static int weekYear(DateTime date) =>
       ((date.difference(DateTime(date.year, 1, 1, 0, 0)).inDays + 1) ~/ 7 + 1);
 
