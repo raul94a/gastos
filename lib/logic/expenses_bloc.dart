@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/presentation/widgets/shared/week_picker_dialog.dart';
@@ -8,7 +10,6 @@ import 'package:gastos/utils/date_formatter.dart';
 import 'package:gastos/utils/months_parser.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:provider/provider.dart';
-
 
 //logic that doesn't need to be notified
 class ExpensesBloc {
@@ -72,11 +73,12 @@ class ExpensesBloc {
   }
 
   Future<void> _fetchExpensesByYear(String userUID) async {
-    String? selectedDate;
-    String? selectedDateForExpenses;
+    final datesProvider = context.read<SelectedDateProvider>();
+    String selectedDate = datesProvider.selectedDate;
+    String selectedDateForExpenses = datesProvider.selectedDateForExpenses;
     showYearPickerDialog(
         context: context,
-        selectedDate: DateTime.now(),
+        selectedDate: datesProvider.dateTime,
         firstDate: DateTime.parse('1900-01-01'),
         lastDate: DateTime.now(),
         onSelected: (value) async {
@@ -93,23 +95,20 @@ class ExpensesBloc {
             await state.getByYear(date.year, userUID);
           }
 
-          if (selectedDateForExpenses != null) {
-            context
-                .read<SelectedDateProvider>()
-                .setDates(selectedDate!, selectedDateForExpenses!);
-          }
+          context
+              .read<SelectedDateProvider>()
+              .setDates(selectedDate, selectedDateForExpenses, date);
         });
   }
 
   Future<void> _fetchExpensesByDay(String userUID) async {
-    String? selectedDate;
-    String? selectedDateForExpenses;
+    final datesProvider = context.read<SelectedDateProvider>();
+    String selectedDate = datesProvider.selectedDate;
+    String selectedDateForExpenses = datesProvider.selectedDateForExpenses;
     final date = await showDatePicker(
         initialEntryMode: DatePickerEntryMode.calendarOnly,
         context: context,
-        initialDate: selectedDate != null
-            ? MyDateFormatter.fromFormat('dd/MM/yyyy', selectedDate)
-            : DateTime.now(),
+        initialDate: datesProvider.dateTime,
         firstDate: DateTime.parse('1900-01-01'),
         lastDate: DateTime.now());
     print(date);
@@ -119,24 +118,23 @@ class ExpensesBloc {
       selectedDateForExpenses = MyDateFormatter.toYYYYMMdd(date);
       print(selectedDate);
       print(selectedDateForExpenses);
-    }
-    if (state.expenses[selectedDateForExpenses] == null &&
-        selectedDateForExpenses != null) {
-      await state.getByDate(selectedDateForExpenses, 0, userUID);
-    }
-    if (selectedDateForExpenses != null) {
+      if (state.expenses[selectedDateForExpenses] == null) {
+        await state.getByDate(selectedDateForExpenses, 0, userUID);
+      }
+
       context
           .read<SelectedDateProvider>()
-          .setDates(selectedDate!, selectedDateForExpenses);
+          .setDates(selectedDate, selectedDateForExpenses, date);
     }
   }
 
   Future<void> _fetchExpensesByMonth(String userUID) async {
-    String? selectedDate;
-    String? selectedDateForExpenses;
+    final datesProvider = context.read<SelectedDateProvider>();
+    String selectedDate = datesProvider.selectedDate;
+    String selectedDateForExpenses = datesProvider.selectedDateForExpenses;
     final date = await showMonthYearPicker(
         context: context,
-        initialDate: DateTime.now(),
+        initialDate: datesProvider.dateTime,
         firstDate: DateTime.parse('1900-01-01'),
         lastDate: DateTime.now());
 
@@ -151,24 +149,23 @@ class ExpensesBloc {
 
       print('Selected Date: $selectedDate');
 
-      if (state.expenses[selectedDateForExpenses] == null &&
-          selectedDateForExpenses != null) {
+      if (state.expenses[selectedDateForExpenses] == null) {
         await state.getByMonth(month.number, date.year, userUID);
       }
-    }
-    if (selectedDateForExpenses != null) {
+
       context
           .read<SelectedDateProvider>()
-          .setDates(selectedDate!, selectedDateForExpenses);
+          .setDates(selectedDate, selectedDateForExpenses, date);
     }
   }
 
   Future<void> _fetchExpenseByWeek(String userUID) async {
-    String? selectedDate;
-    String? selectedDateForExpenses;
+    final datesProvider = context.read<SelectedDateProvider>();
+    String selectedDate = datesProvider.selectedDate;
+    String selectedDateForExpenses = datesProvider.selectedDateForExpenses;
     await showWeekPickerDialog(
         context: context,
-        selectedDate: DateTime.now(),
+        selectedDate: datesProvider.dateTime,
         firstDate: DateTime.parse('1900-01-01'),
         lastDate: DateTime.now(),
         onSelected: (value) async {
@@ -181,15 +178,13 @@ class ExpensesBloc {
               DateType.week, MyDateFormatter.toYYYYMMdd(date));
           selectedDateForExpenses = selectedDate;
 
-          if (state.expenses[selectedDateForExpenses] == null &&
-              selectedDateForExpenses != null) {
+          if (state.expenses[selectedDateForExpenses] == null) {
             await state.getByWeek(week, date.year, userUID);
           }
-          if (selectedDateForExpenses != null) {
-            context
-                .read<SelectedDateProvider>()
-                .setDates(selectedDate!, selectedDateForExpenses!);
-          }
+
+          context
+              .read<SelectedDateProvider>()
+              .setDates(selectedDate, selectedDateForExpenses, date);
         });
   }
 

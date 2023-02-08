@@ -13,9 +13,10 @@ class SelectedDateProvider with ChangeNotifier {
   String selectedDateForExpenses = '';
   DateTime dateTime = DateTime.now();
 
-  setDates(String selectedDate, String selectedDateForExpenses) {
+  setDates(String selectedDate, String selectedDateForExpenses,DateTime dateTime) {
     this.selectedDate = selectedDate;
     this.selectedDateForExpenses = selectedDateForExpenses;
+    this.dateTime = dateTime;
     print('Calling selectedDateProvider');
     notifyListeners();
   }
@@ -51,6 +52,6 @@ class SelectedDateProvider with ChangeNotifier {
     }
     print(
         'SELECTED DATE: $selectedDate\nSelectedDateFroExpenses:$selectedDateForExpenses');
-    setDates(selectedDate, selectedDateForExpenses);
+    setDates(selectedDate, selectedDateForExpenses,now);
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/logic/expenses_bloc.dart';
@@ -30,7 +32,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
   String? selectedDateForExpenses;
   bool loading = false;
 
-  void changeLoadingStatus()=>setState(()=> loading = !loading);
+  void changeLoadingStatus() => setState(() => loading = !loading);
 
   void _scrollControllerHandler(
       ExpenseProvider state, AutoScrollController controller) async {
@@ -56,8 +58,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
     userProvider = context.read<UserProvider>();
     //changeLoadingStatus();
     ExpensesBloc(context: context)
-        .fetchExpensesOnInit(userUID: userProvider.loggedUser!.firebaseUID)
-        ;
+        .fetchExpensesOnInit(userUID: userProvider.loggedUser!.firebaseUID);
     print('Init state on main page');
   }
 
@@ -164,26 +165,23 @@ class _NewExpenseListState extends State<NewExpenseList> {
                 // ),
 
                 //Lista
-                Visibility(
-                  visible: !loading,
-                  replacement: const CircularProgressIndicator(),
-                  child: Consumer<SelectedDateProvider>(
-                    builder: (ctx, state, _) => ListView.builder(
-                      primary: false,
-                      shrinkWrap: true,
-                      itemCount:
-                          expState.expenses[state.selectedDateForExpenses!] ==
-                                  null
-                              ? 0
-                              : expState.expenses[state.selectedDateForExpenses!]!
-                                  .length,
-                      itemBuilder: (context, index) => ExpenseTile(
-                          state: expState,
-                          date: state.selectedDateForExpenses!,
-                          expense: expState
-                              .expenses[state.selectedDateForExpenses]![index],
-                          position: index),
-                    ),
+                Consumer<SelectedDateProvider>(
+                  builder: (ctx, state, _) => ListView.builder(
+                    primary: false,
+                    shrinkWrap: true,
+                    itemCount:
+                        expState.expenses[state.selectedDateForExpenses] ==
+                                null
+                            ? 0
+                            : expState.expenses[state.selectedDateForExpenses]!
+                                .length,
+                    itemBuilder: (context, index) => ExpenseTile(
+                        key: UniqueKey(),
+                        state: expState,
+                        date: state.selectedDateForExpenses,
+                        expense: expState
+                            .expenses[state.selectedDateForExpenses]![index],
+                        position: index),
                   ),
                 )
               ],

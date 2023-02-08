@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/foundation.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
