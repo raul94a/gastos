@@ -1,7 +1,7 @@
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/data/models/total_expenses.dart';
 import 'package:gastos/data/services/expenses_service.dart';
-import 'package:gastos/utils/date_formatter.dart';
 
 class ExpensesRepository {
   final service = ExpenseService();
@@ -11,26 +11,105 @@ class ExpensesRepository {
     return result.map(Expense.fromMap).toList();
   }
 
-  Future<Map<String, List<Expense>>> readAll(DateType type, int offset) async {
-    final result = await service.readAll(offset);
-    Map<String, List<Expense>> expensesByDateType = {};
+  ///reads the expenses of a DAY
+  Future<TotalExpenses> readByDate(
+      String date, int offset, String firebaseUID) async {
+    final result = await service.readByDate(date, offset);
     int length = result.length;
+    final totalExpenses = TotalExpenses();
     for (int i = 0; i < length; i++) {
       final expense = result[i];
-      String date = MyDateFormatter.dateByType(type, expense['date']);
-      if (!expensesByDateType.containsKey(date)) {
-        expensesByDateType.addAll({
-          date.toString(): [Expense.fromMap(expense)]
-        });
-      } else {
-        final list = expensesByDateType[date];
-        list?.add(Expense.fromMap(expense));
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(DateType.day, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(DateType.day, expense);
       }
     }
+    return totalExpenses;
+  }
+  ///reads the expenses from a month of a year
+  Future<TotalExpenses> readByMonth(
+      String month, int year, String firebaseUID) async {
+    final result = await service.readByMonth(month, year);
+    int length = result.length;
+    final totalExpenses = TotalExpenses();
+    for (int i = 0; i < length; i++) {
+      final expense = result[i];
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(DateType.month, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(DateType.month, expense);
+      }
+    }
+    return totalExpenses;
+  }
 
-    //print(expensesByDateType);
+   ///reads the expenses from a month of a year
+  Future<TotalExpenses> readByWeek(
+      String week, int year, String firebaseUID) async {
+    final result = await service.readByWeek(week, year);
+    int length = result.length;
+    final totalExpenses = TotalExpenses();
+    for (int i = 0; i < length; i++) {
+      final expense = result[i];
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(DateType.week, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(DateType.week, expense);
+      }
+    }
+    return totalExpenses;
+  }
+   ///reads the expenses by year
+  Future<TotalExpenses> readByYear( int year, String firebaseUID) async {
+    final result = await service.readByYear(year);
+    int length = result.length;
+    final totalExpenses = TotalExpenses();
+    for (int i = 0; i < length; i++) {
+      final expense = result[i];
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(DateType.year, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(DateType.year, expense);
+      }
+    }
+    return totalExpenses;
+  }
 
-    return expensesByDateType;
+  Future<TotalExpenses> readAll(
+      DateType type, int offset, String firebaseUID) async {
+    final result = await service.readAll(offset);
+    int length = result.length;
+    final totalExpenses = TotalExpenses();
+    for (int i = 0; i < length; i++) {
+      final expense = result[i];
+      final bool isCommonExpense = (expense['isCommonExpense'] ?? 0) == 1;
+      final String personFirebaseUID = expense['personFirebaseUID'] ?? '';
+      //two requirements to be an individual expense: it must be marked has isCommonExpense = 1 AND it must bear the user firebaseUID
+      if (isCommonExpense) {
+        totalExpenses.addCommonExpense(type, expense);
+      }
+      if (!isCommonExpense && firebaseUID == personFirebaseUID) {
+        totalExpenses.addIndividualExpense(type, expense);
+      }
+    }
+    return totalExpenses;
   }
 
   Future<Expense> readOne(String id) async {
@@ -67,4 +146,7 @@ class ExpensesRepository {
 
   Future<bool> existsId(String id) async =>
       await service.countIdEntries(id) > 0;
+
+  Future<num> sumUserExpenses(String name) async =>
+      await service.sumExpensesOfUser(name);
 }

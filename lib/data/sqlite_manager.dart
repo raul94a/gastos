@@ -1,11 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
-
-import 'package:flutter/material.dart';
-import 'package:gastos/data/firestore_manager.dart';
-import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/data/services/categories_service.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SqliteManager {
@@ -23,8 +21,10 @@ class SqliteManager {
   //tables
   final String _expensesTable = "expenses";
   final String _categoriesTable = "categories";
+  final String _usersTable = "users";
   String get expensesTable => _expensesTable;
   String get categoriesTable => _categoriesTable;
+  String get usersTable => _usersTable;
 
   Future<void> open() async {
     _database = await openDatabase(
@@ -32,6 +32,17 @@ class SqliteManager {
       version: 1,
       onCreate: _onCreate,
       onOpen: (db) async {
+
+        final res = await db.rawQuery('select e.*, strftime("%m", e.createdDate / 1000, "unixepoch") as "strData" from expenses e order by createdDate asc');
+        print(res);
+        final s = await getExternalStorageDirectory();
+        String path = s!.path;
+       final f = File('$path/database.txt');
+       
+        f.createSync();
+        f.writeAsStringSync(jsonEncode(res));
+
+
         // final res = await db.rawQuery('select count(*) as "res" from expenses');
         // print(res);
         // final exps = ExpenseCreator.create();
@@ -49,8 +60,11 @@ class SqliteManager {
 
   FutureOr<void> _onCreate(Database db, int descriptor) async {
     await db.execute('CREATE TABLE expenses (id varchar(255) primary key,'
-        'person varchar(255), description TEXT, picture TEXT, price REAL,'
+        'person varchar(255), description TEXT, picture TEXT, price REAL, personFirebaseUID varchar(255) DEFAULT "", isCommonExpense int DEFAULT 1, '
         'createdDate int, updatedDate int, deleted BOOLEAN, category varchar(255))');
+    await db.execute('CREATE TABLE users (firebaseUID varchar(255) primary key,'
+        'name varchar(255), email varchar(255),'
+        'createdDate int, updatedDate int)');
     final batch = db.batch();
     batch.execute('CREATE TABLE categories (id varchar(255) primary key,'
         'name varchar(255), r int, g int, b int,'
@@ -110,6 +124,7 @@ class ExpenseCreator {
       final id = randomId(50);
       exp.add(Expense(
           id: id,
+          
           person: 'Raul',
           description: 'Random${Random.secure().nextInt(555555555)}',
           price: Random().nextDouble() * 15,

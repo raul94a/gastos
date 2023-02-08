@@ -1,7 +1,9 @@
-import 'package:flutter/foundation.dart' as f;
+// ignore_for_file: avoid_print
+
 import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/queries/categories_queries.dart';
+import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 
 class CategoriesService {
@@ -55,15 +57,24 @@ class CategoriesService {
           .where('updatedDate', isGreaterThanOrEqualTo: lastSync)
           .get();
 
+      print('lastSync: $lastSync fetching cats!!!!!!!!! $docs');
+
       final d = docs.docs;
+      print('cats list $d');
+      print('${docs.docChanges}');
       for (final query in d) {
         final data = query.data();
-        data.update('id', (value) => query.id);
+        print(data);
+        data.addAll({'id': query.id});
         firestoreData.add(data);
       }
-
-      _insertSynchronizedData(firestoreData);
+      if (firestoreData.isNotEmpty) {
+        await SharedPreferencesHelper.instance
+            .saveLastSyncCat(DateTime.now().millisecondsSinceEpoch);
+        await _insertSynchronizedData(firestoreData);
+      }
     } catch (err) {
+      print(err);
       rethrow;
     }
 
@@ -88,18 +99,16 @@ class CategoriesService {
     final db = sqliteManager.database;
     try {
       for (final object in data) {
+        print('Cateogry obejct $object');
         final results = await countIdEntries(object['id']);
         if (results > 0) {
-          await db.update(table, object);
+          await db.update(table, object, where: 'id = ?', whereArgs: [object['id']]);
         } else {
           await db.insert(table, object);
         }
-        await db.insert(table, object);
       }
     } catch (err) {
-      if (f.kDebugMode) {
-        print(err);
-      }
+      print(err);
     }
   }
 
@@ -114,7 +123,7 @@ class CategoriesService {
   Future<Map<String, dynamic>> readOne(String id) async {
     final db = sqliteManager.database;
     final res = await db.rawQuery(
-        'SELECT * from ${sqliteManager.categoriesTable} where id = $id LIMIT 1');
+        'SELECT * from ${sqliteManager.categoriesTable} where id = "$id" LIMIT 1');
     return res.first;
   }
 
@@ -126,6 +135,7 @@ class CategoriesService {
 
   Future<int> countIdEntries(String id) async {
     final db = sqliteManager.database;
+    //print(await db.rawQuery('SELECT * FROM categories where id = "$id"'));
     final res = await db
         .rawQuery("select count(*) as 'res' from categories where id = '$id'");
     return res.first['res'] as int;

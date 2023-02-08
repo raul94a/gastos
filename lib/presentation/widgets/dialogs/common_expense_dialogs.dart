@@ -6,11 +6,12 @@ import 'package:gastos/presentation/widgets/dialogs/expense_dialog_widgets/categ
 import 'package:gastos/presentation/widgets/shared/block_back_button.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
-class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
-  const ExpenseDialog({Key? key, this.expense, this.updateHandler, this.date})
+class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
+  const CommonExpenseDialog({Key? key, this.expense, this.updateHandler, this.date})
       : super(key: key);
   final Expense? expense;
   final String? date;
@@ -19,32 +20,41 @@ class ExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return BlockBackButton(
-      child: SingleChildScrollView(
-        child: Dialog(
-          alignment: Alignment.center,
-          insetPadding: const EdgeInsets.all(10),
-          child: Padding(
-            padding: const EdgeInsets.all(14.5),
-            child: SizedBox(
-              height: size.height * 0.8,
-              child: Consumer<ExpenseProvider>(
-                builder: (ctx, state, _) {
-                  if (expense == null && state.loading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (expense == null && state.success) {
-                    return const SuccessDialog();
-                  }
 
-                  return ExpenseHandlerContent(
-                    expense: expense,
-                    updateHandler: updateHandler,
-                    date: date,
-                  );
-                },
+    return Hero(
+      tag: 'hero-fab',
+      child: Material(
+        color: Colors.transparent,
+        child: BlockBackButton(
+          child: SingleChildScrollView(
+            child: Dialog(
+              alignment: Alignment.center,
+              insetPadding: const EdgeInsets.all(10),
+              child: Padding(
+                padding: const EdgeInsets.all(14.5),
+                child: SizedBox(
+                  height: size.height * 0.8,
+                  child: Consumer<ExpenseProvider>(
+                    builder: (ctx, state, _) {
+                      if (expense == null && state.loading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (expense == null && state.success) {
+                        return const SuccessDialog();
+                      }
+          
+                      return ExpenseHandlerContent(
+                        expense: expense,
+                        updateHandler: updateHandler,
+                        date: date,
+                      );
+                    },
+                  ),
+                ),
+
+
               ),
             ),
           ),
@@ -132,7 +142,11 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       descriptionController.text = widget.expense!.description;
       priceController.text = widget.expense!.price.toString();
     }
-    selectedCategory = context.read<CategoriesProvider>().categories.first.id;
+    if (widget.expense != null && widget.expense!.category.isNotEmpty) {
+      selectedCategory = widget.expense!.category;
+    } else {
+      selectedCategory = context.read<CategoriesProvider>().categories.first.id;
+    }
   }
 
   @override
@@ -152,24 +166,26 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final categoriesState = context.read<CategoriesProvider>();
+    final userStte = context.read<UserProvider>();
+    print(userStte.loggedUser);
     return Form(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Nombre'),
-          Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                keyboardType: TextInputType.name,
-                textInputAction: TextInputAction.next,
-                focusNode: nameNode,
-                decoration: basisFormDecoration(),
-                controller: nameController,
-                // onFieldSubmitted: (value) => nameNode.nextFocus(),
-              )),
-          const SizedBox(
-            height: 20,
-          ),
+          // const Text('Nombre'),
+          // Padding(
+          //     padding: const EdgeInsets.all(8.0),
+          //     child: TextFormField(
+          //       keyboardType: TextInputType.name,
+          //       textInputAction: TextInputAction.next,
+          //       focusNode: nameNode,
+          //       decoration: basisFormDecoration(),
+          //       controller: nameController,
+          //       // onFieldSubmitted: (value) => nameNode.nextFocus(),
+          //     )),
+          // const SizedBox(
+          //   height: 20,
+          // ),
           const Text('Descripción del gasto'),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -181,7 +197,9 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
               controller: descriptionController,
             ),
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(
+            height: 20,
+          ),
           const Text('Categoría del gasto'),
           CategoriesDropdown(
               categoriesState: categoriesState,
@@ -191,7 +209,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                   selectedCategory = str!;
                 });
               }),
-         
+
           const SizedBox(
             height: 20,
           ),
@@ -277,6 +295,8 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String category,
       required String description,
       required num price}) async {
+    final userId = context.read<UserProvider>().loggedUser!.firebaseUID;
+
     //if Date is not null, the creation is being triggered through the add button for past dates.
     //so, the only thing needed to be done is to fetch an expense from that date and borrow its createdDate
     final createdDate = widget.date != null
@@ -284,15 +304,17 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
         : DateTime.now().toLocal();
     final updatedDate = createdDate;
     final expense = Expense(
-        person: name,
+        person: context.read<UserProvider>().loggedUser!.name,
         description: description,
         price: price,
+        isCommonExpense: 1,
+        personFirebaseUID: userId,
         category: category,
         createdDate: createdDate,
         updatedDate: updatedDate);
 
     try {
-      await state.add(expense);
+      await state.add(expense:expense, individual: false);
     } catch (err) {
       if (kDebugMode) {
         print(err);
@@ -307,16 +329,20 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String category,
       required String description,
       required num price}) async {
+
+    final userId = context.read<UserProvider>().loggedUser!.firebaseUID;
     final newExpense = widget.expense!.copyWith(
-        person: name,
+        person: context.read<UserProvider>().loggedUser!.name,
         description: description,
         price: price,
+        isCommonExpense: 1,
+        personFirebaseUID: userId,
         category: category,
         updatedDate: DateTime.now().toLocal());
     try {
       //We're not going to update the Expense with the provider.
       widget.updateHandler!(newExpense);
-      await state.update(newExpense);
+      await state.update(expense: newExpense,individual: false);
       Navigator.of(context).pop();
     } catch (err) {
       if (kDebugMode) {

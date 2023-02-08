@@ -37,6 +37,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
       expense = expense.copyWith(
           updatedDate: exp.updatedDate,
           person: exp.person,
+          category: exp.category,
           price: exp.price,
           description: exp.description);
     });
@@ -60,24 +61,25 @@ class _ExpenseTileState extends State<ExpenseTile> {
 //    print('Rebuild Expense with ID: ${widget.expense.id}');
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    bool isEven = widget.position % 2 == 0;
     final categories = context.read<CategoriesProvider>().categories;
-    final tag = widget.expense.category;
     Category? cat;
     Color? color;
     Color textColor = Colors.black;
     try {
-      cat = categories.firstWhere((element) => element.id == tag);
+      cat = categories.firstWhere((element) => element.id == expense.category);
       color = Color.fromARGB(190,cat.r, cat.g, cat.b);
       if (!ColorComputation.colorsMatch(color)) {
         textColor = Colors.white;
       }
-    } catch (err) {}
+    } catch (err) {
+      print(err);
+    }
 
     return Container(
       key: Key(widget.expense.id),
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: ListTile(
+        isThreeLine: true,
         onLongPress: showOptionDialog,
         contentPadding: const EdgeInsets.all(8),
         tileColor: color ??
@@ -91,7 +93,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
                     ? const Color(0xFF000000)
                     : ColorComputation.getShade(
                         color), //isEven ? Colors.blue.shade500 : Colors.orange.shade500,
-                strokeAlign: StrokeAlign.center),
+                strokeAlign: 0.0),
             borderRadius: BorderRadius.circular(7)),
         leading: CircleAvatar(
           
@@ -110,11 +112,12 @@ class _ExpenseTileState extends State<ExpenseTile> {
           ),
         ),
         title: Text(
-          expense.description,
+          expense.description + getCategoryName(cat),
           style: GoogleFonts.raleway(fontSize: 16, color: textColor),
         ),
         subtitle: Text(
           expense.person,
+          maxLines: 2,
           style: GoogleFonts.raleway(fontSize: 16, color: textColor),
         ),
         trailing: SizedBox(
@@ -128,6 +131,10 @@ class _ExpenseTileState extends State<ExpenseTile> {
         ),
       ),
     );
+  }
+   String getCategoryName(Category? cat){
+    if(cat == null) return '';
+    return ' (${cat.name})';
   }
 }
 
@@ -155,7 +162,7 @@ class ColorComputation {
     final backgroundIndex = (299 * r + 587 * g + 114 * b) / 1000;
     final textIndex = (299 * r2 + 587 * g2 + 114 * b2) / 1000;
     final result = (textIndex - backgroundIndex).abs();
-    print('Brightness diff: $result');
+    // print('Brightness diff: $result');
     return result >= _brightnessLimit;
   }
 
@@ -169,7 +176,7 @@ class ColorComputation {
     final b2 = _textColor.blue;
 
     final result = (r - r2).abs() + (g - g2).abs() + (b - b2).abs();
-    print('Color diff: $result');
+    // print('Color diff: $result');
     return result >= _colorDifferenceLimit;
   }
 
@@ -179,4 +186,6 @@ class ColorComputation {
     final b = color.blue * (1 - _shadeFactor);
     return Color.fromRGBO(r.toInt(), g.toInt(), b.toInt(), 1);
   }
+
+ 
 }
