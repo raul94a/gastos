@@ -29,6 +29,7 @@ class _InitialLoadingState extends State<InitialLoading> {
     if (context.read<UserProvider>().loggedUser == null) {
       context.read<UserProvider>().setLoggedUser(userUID);
     }
+    await Future.delayed(const Duration(milliseconds: 50));
     goToExpenseList(context);
   }
 

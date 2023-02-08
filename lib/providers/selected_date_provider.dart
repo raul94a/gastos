@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
+import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/utils/date_formatter.dart';
 
 class SelectedDateProvider with ChangeNotifier {
-  String? selectedDate;
-  String? selectedDateForExpenses;
+  SelectedDateProvider() {
+    final dateType = SharedPreferencesHelper.instance.getDateType();
+    setSelectedDates(dateType);
+  }
+
+  String selectedDate = '';
+  String selectedDateForExpenses = '';
+  DateTime dateTime = DateTime.now();
 
   setDates(String selectedDate, String selectedDateForExpenses) {
     this.selectedDate = selectedDate;
@@ -15,6 +22,7 @@ class SelectedDateProvider with ChangeNotifier {
 
   void setSelectedDates(DateType type) {
     final now = DateTime.now();
+    dateTime = now;
     String selectedDate = '';
     String selectedDateForExpenses = '';
 

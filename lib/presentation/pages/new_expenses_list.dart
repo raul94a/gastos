@@ -1,21 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/logic/expenses_bloc.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
-import 'package:gastos/presentation/widgets/shared/loading.dart';
-import 'package:gastos/presentation/widgets/shared/week_picker_dialog.dart';
-import 'package:gastos/presentation/widgets/shared/year_picker_dialog.dart';
 import 'package:gastos/presentation/widgets/slivers/sliver_date_flexible_app_bar.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
-import 'package:gastos/utils/months_parser.dart';
 import 'package:intl/intl.dart';
-import 'package:month_year_picker/month_year_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -34,6 +28,9 @@ class _NewExpenseListState extends State<NewExpenseList> {
   late UserProvider userProvider;
   String? selectedDate;
   String? selectedDateForExpenses;
+  bool loading = false;
+
+  void changeLoadingStatus()=>setState(()=> loading = !loading);
 
   void _scrollControllerHandler(
       ExpenseProvider state, AutoScrollController controller) async {
@@ -57,7 +54,10 @@ class _NewExpenseListState extends State<NewExpenseList> {
     expState = context.read<ExpenseProvider>();
     categoriesState = context.read<CategoriesProvider>();
     userProvider = context.read<UserProvider>();
-    context.read<SelectedDateProvider>().setSelectedDates(expState.dateType);
+    //changeLoadingStatus();
+    ExpensesBloc(context: context)
+        .fetchExpensesOnInit(userUID: userProvider.loggedUser!.firebaseUID)
+        ;
     print('Init state on main page');
   }
 
@@ -164,22 +164,26 @@ class _NewExpenseListState extends State<NewExpenseList> {
                 // ),
 
                 //Lista
-                Consumer<SelectedDateProvider>(
-                  builder: (ctx, state, _) => ListView.builder(
-                    primary: false,
-                    shrinkWrap: true,
-                    itemCount:
-                        expState.expenses[state.selectedDateForExpenses!] ==
-                                null
-                            ? 0
-                            : expState.expenses[state.selectedDateForExpenses!]!
-                                .length,
-                    itemBuilder: (context, index) => ExpenseTile(
-                        state: expState,
-                        date: state.selectedDateForExpenses!,
-                        expense: expState
-                            .expenses[state.selectedDateForExpenses]![index],
-                        position: index),
+                Visibility(
+                  visible: !loading,
+                  replacement: const CircularProgressIndicator(),
+                  child: Consumer<SelectedDateProvider>(
+                    builder: (ctx, state, _) => ListView.builder(
+                      primary: false,
+                      shrinkWrap: true,
+                      itemCount:
+                          expState.expenses[state.selectedDateForExpenses!] ==
+                                  null
+                              ? 0
+                              : expState.expenses[state.selectedDateForExpenses!]!
+                                  .length,
+                      itemBuilder: (context, index) => ExpenseTile(
+                          state: expState,
+                          date: state.selectedDateForExpenses!,
+                          expense: expState
+                              .expenses[state.selectedDateForExpenses]![index],
+                          position: index),
+                    ),
                   ),
                 )
               ],

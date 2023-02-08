@@ -9,6 +9,8 @@ import 'package:gastos/utils/months_parser.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:provider/provider.dart';
 
+
+//logic that doesn't need to be notified
 class ExpensesBloc {
   final BuildContext context;
   ExpensesBloc({required this.context}) {
@@ -21,6 +23,36 @@ class ExpensesBloc {
   ExpenseProvider get state => _expenseProvider;
 
   //logic
+
+  ///Fetch expenses when app starts
+  Future<void> fetchExpensesOnInit({required String userUID}) async {
+    final dateType = state.dateType;
+    final selectedDatesProvider = context.read<SelectedDateProvider>();
+    final selectedDateForExpenses =
+        selectedDatesProvider.selectedDateForExpenses;
+    final now = selectedDatesProvider.dateTime;
+    switch (dateType) {
+      case DateType.day:
+        await getByDate(selectedDateForExpenses, 0, userUID);
+        break;
+      case DateType.month:
+        final monthNumber = months[now.month - 1].number;
+        await getByMonth(monthNumber, now.year, userUID);
+
+        break;
+      case DateType.year:
+        await getByYear(now.year, userUID);
+
+        break;
+      case DateType.week:
+        final week = MyDateFormatter.weekYearString(now);
+        await getByWeek(week, now.year, userUID);
+
+        break;
+    }
+  }
+
+  ///Fetch the expenses with the date pickers
   Future<void> fetchExpenses({required String userUID}) async {
     final dateType = state.dateType;
     switch (dateType) {
@@ -159,5 +191,75 @@ class ExpensesBloc {
                 .setDates(selectedDate!, selectedDateForExpenses!);
           }
         });
+  }
+
+  Future<void> getByDate(String date, int offset, String firebaseUID) async {
+    print('CALLING GET BY DATE');
+
+    try {
+      final totalExpenses =
+          await state.repository.readByDate(date, offset, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      state.expenses.addAll(commonExpenses);
+
+      state.individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    }
+  }
+
+  ///get the expenses from a month of a year
+  Future<void> getByMonth(String month, int year, String firebaseUID) async {
+    try {
+      final totalExpenses =
+          await state.repository.readByMonth(month, year, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      state.expenses.addAll(commonExpenses);
+
+      state.individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    }
+  }
+
+  //get expenses by week of year
+  Future<void> getByWeek(String week, int year, String firebaseUID) async {
+    print('CALLING GET BY week');
+
+    try {
+      final totalExpenses =
+          await state.repository.readByWeek(week, year, firebaseUID);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      state.expenses.addAll(commonExpenses);
+
+      state.individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    }
+  }
+
+  //get expenses by year
+  Future<void> getByYear(int year, String firebaseUID) async {
+    print('CALLING GET BY year');
+
+    try {
+      final totalExpenses =
+          await state.repository.readByYear(year, firebaseUID);
+      print(totalExpenses);
+      final commonExpenses = totalExpenses.commonExpenses;
+      final individualExpenses = totalExpenses.individualExpenses;
+      state.expenses.addAll(commonExpenses);
+
+      state.individualExpenses.addAll(individualExpenses);
+    } catch (err) {
+      print(err);
+      rethrow;
+    }
   }
 }
