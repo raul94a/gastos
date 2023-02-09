@@ -6,6 +6,7 @@ import 'package:gastos/presentation/widgets/dialogs/expense_dialog_widgets/categ
 import 'package:gastos/presentation/widgets/shared/block_back_button.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
@@ -104,6 +105,7 @@ class SuccessDialog extends StatelessWidget with MaterialStatePropertyMixin {
             onPressed: () {
               Navigator.of(context).pop();
               context.read<ExpenseProvider>().clear();
+              context.read<SelectedDateProvider>().notify();
             },
             child: const Text('Continuar'))
       ],
@@ -255,6 +257,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                               category: selectedCategory,
                               description: description,
                               price: price);
+                          
                         } else {
                           await updateExpense(
                               context: context,

@@ -13,6 +13,7 @@ environment:
 dependencies:
   path_provider:
   flutter_date_pickers: ^0.4.1
+  fl_chart:
   month_year_picker:
     git:
       url: https://github.com/raul94a/month-year-picker

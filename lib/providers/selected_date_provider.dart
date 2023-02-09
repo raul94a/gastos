@@ -13,6 +13,8 @@ class SelectedDateProvider with ChangeNotifier {
   String selectedDateForExpenses = '';
   DateTime dateTime = DateTime.now();
 
+  void notify() => notifyListeners();
+
   setDates(String selectedDate, String selectedDateForExpenses,DateTime dateTime) {
     this.selectedDate = selectedDate;
     this.selectedDateForExpenses = selectedDateForExpenses;
