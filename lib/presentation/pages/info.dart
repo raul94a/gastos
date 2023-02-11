@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gastos/data/models/chart_models/date_expenses.dart';
 import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/data/repository/chart_info_repository.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/logic/sorter.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart.dart';
@@ -45,7 +46,25 @@ class CurrentWeekInfo extends StatefulWidget {
 class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
   @override
   void initState() {
+    currentWeekDataByDate();
     super.initState();
+  }
+
+  void currentWeekDataByDate() async {
+    final data = await ChartInfoRepository().currentWeekExpensesGroupedByDate();
+    double mY = 0.0;
+    List<BarChartGroupData> chartData = [];
+
+    for (int i = 0; i < data.length; ++i) {
+      chartData.add(data[i].generateBarcharData(_barsGradient));
+      if (data[i].price > mY) {
+        mY = data[i].price.toDouble();
+      }
+    }
+    setState(() {
+      myData = chartData;
+      maxY = mY;
+    });
   }
 
   List<BarChartGroupData> myData = [];
@@ -58,7 +77,7 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
     return Column(
       children: [
         Container(
-            padding: EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(border: Border.all(color: Colors.black)),
             width: width * 0.7,
             height: size.height * 0.3,
@@ -66,70 +85,7 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
               data: myData,
               maxY: maxY + 100,
             )),
-            //TODO: REFACTORIZAR EL ON PRESSED!
-        ElevatedButton(
-            onPressed: () async {
-              final now = DateTime.now();
-              //i.e 4
-              //left = 4 - 1 = 3
-              //rigth 7 - 4 = 3
-              final weekDay = now.weekday;
-              int pastDays = weekDay - 1;
-              int futureDays = 7 - weekDay;
-              DateTime firstDate = now;
-              DateTime lastDate = now;
-              if (pastDays != 0) {
-                firstDate = firstDate.subtract(Duration(days: pastDays));
-              }
-              if (futureDays != 0) {
-                lastDate = lastDate.add(Duration(days: futureDays));
-              }
-              List<String> fullDates = [];
-              for (int i = 0; i < 7; i++) {
-                final date = MyDateFormatter.toYYYYMMdd(
-                    firstDate.add(Duration(days: i)));
-                fullDates.add(date);
-              }
-              final initialDate =
-                  DateTime(firstDate.year, firstDate.month, firstDate.day);
-              final endDate =
-                  DateTime(lastDate.year, lastDate.month, lastDate.day);
-              //gastos comunes
-              String sql =
-                  'SELECT date(e.createdDate / 1000 , "unixepoch", "localtime") as "date",  SUM(price) as "price" '
-                  'from expenses e '
-                  'where deleted = 0 '
-                  'AND isCommonExpense = 1 '
-                  'AND ( createdDate > ${initialDate.millisecondsSinceEpoch} '
-                  'AND createdDate < ${endDate.millisecondsSinceEpoch} ) '
-                  'GROUP BY date '
-                  '';
-
-              List<Map<String, dynamic>> result = [
-                ...await SqliteManager.instance.database.rawQuery(sql)
-              ];
-
-              //rellenamos los que no están
-              for (final date in fullDates) {
-                if (!result.any((element) => element['date'] == date)) {
-                  result.add({'date': date, 'price': 0.0});
-                }
-              }
-              print(result);
-              print(result.length);
-              List<BarChartGroupData> barcharData = [];
-              for (final res in result) {
-                final dateExpense = DateExpenses.fromMap(res);
-                if (dateExpense.price > maxY) {
-                  maxY = dateExpense.price.toDouble();
-                }
-                barcharData.add(dateExpense.generateBarcharData(_barsGradient));
-              }
-              setState(() {
-                myData = barcharData..sort((a, b) => a.x.compareTo(b.x));
-              });
-            },
-            child: const Text('load ultima semana')),
+      
       ],
     );
   }
