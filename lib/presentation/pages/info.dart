@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gastos/data/models/chart_models/date_expenses.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/repository/chart_info_repository.dart';
+import 'package:gastos/data/services/chart_info_service.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/logic/sorter.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart.dart';
@@ -30,9 +31,70 @@ class InfoPage extends StatelessWidget {
                 fecha: MyDateFormatter.toFormat('dd/MM/yyyy', DateTime.now())))
             .toList(),
         const SizedBox(height: 20),
-        CurrentWeekInfo()
+        CurrentWeekInfo(),
+        CurrentMonthInfo(),
+        ElevatedButton(
+            onPressed: () async {
+              try {
+                await ChartInfoService().getCurrentMonthExpensesByDay();
+              } catch (err) {
+                print(err);
+              }
+            },
+            child: Text('hola'))
       ],
     );
+  }
+}
+
+class CurrentMonthInfo extends StatefulWidget {
+  const CurrentMonthInfo({super.key});
+
+  @override
+  State<CurrentMonthInfo> createState() => _CurrentMonthInfoState();
+}
+
+class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
+  @override
+  void initState() {
+    currentMonthDataByDate();
+    super.initState();
+  }
+
+  void currentMonthDataByDate() async {
+    final data = await ChartInfoRepository().currentMonthExpensesGroupedByDate();
+    double mY = 0.0;
+    List<BarChartGroupData> chartData = [];
+
+    for (int i = 0; i < data.length; ++i) {
+      chartData.add(data[i].generateBarcharDataMonthDay(_barsGradient));
+      if (data[i].price > mY) {
+        mY = data[i].price.toDouble();
+      }
+    }
+    setState(() {
+      myData = chartData..sort((a,b) => a.x.compareTo(b.x));
+      maxY = mY;
+    });
+  }
+
+  List<BarChartGroupData> myData = [];
+  double maxY = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    return Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+        
+        height: size.height * 0.3,
+        child: MyBarChart(
+          barChartType: BarChartType.monthDay,
+          data: myData,
+          maxY: maxY + 100,
+        ));
   }
 }
 
@@ -56,13 +118,13 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
     List<BarChartGroupData> chartData = [];
 
     for (int i = 0; i < data.length; ++i) {
-      chartData.add(data[i].generateBarcharData(_barsGradient));
+      chartData.add(data[i].generateBarcharDataWeekDay(_barsGradient));
       if (data[i].price > mY) {
         mY = data[i].price.toDouble();
       }
     }
     setState(() {
-      myData = chartData;
+      myData = chartData..sort((a,b) => a.x.compareTo(b.x));
       maxY = mY;
     });
   }
@@ -82,23 +144,23 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
             width: width * 0.7,
             height: size.height * 0.3,
             child: MyBarChart(
+              barChartType: BarChartType.weekDay,
               data: myData,
               maxY: maxY + 100,
             )),
-      
       ],
     );
   }
-
-  LinearGradient get _barsGradient => const LinearGradient(
-        colors: [
-          Color(0xFF2196F3),
-          Color(0xFF50E4FF),
-        ],
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
-      );
 }
+
+LinearGradient get _barsGradient => const LinearGradient(
+      colors: [
+        Color(0xFF2196F3),
+        Color(0xFF50E4FF),
+      ],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    );
 
 class _UserInfoContainer extends StatefulWidget {
   const _UserInfoContainer({required this.userName, required this.fecha});

@@ -1,18 +1,20 @@
 import 'package:gastos/data/queries/chart_info_queries.dart';
 import 'package:gastos/data/sqlite_manager.dart';
 import 'package:gastos/utils/date_formatter.dart';
+import 'package:gastos/utils/months_parser.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ChartInfoService {
   ChartInfoService() {
-    _db = sqliteManager.database;
+
   }
 
   SqliteManager sqliteManager = SqliteManager.instance;
-  late Database _db;
+ 
 
   ///Current week expenses by date
   Future<List<Map<String, dynamic>>> getCurrentWeekExpensesByDate() async {
+     final _db = sqliteManager.database;
     final now = DateTime.now();
     //i.e 4
     //left = 4 - 1 = 3
@@ -52,5 +54,44 @@ class ChartInfoService {
   }
 
   ///Current week expenses by category
-  Future<void> getCurrentWeekExpensesByCategory() async {}
+  Future<List<Map<String, dynamic>>> getCurrentMonthExpensesByDay() async {
+     final _db = sqliteManager.database;
+    final now = DateTime.now();
+    //i.e 4
+    //left = 4 - 1 = 3
+    //rigth 7 - 4 = 3
+    int month = now.month;
+    final year = now.year;
+
+    int monthDays = days(month: month, year: year);
+
+    List<String> fullDates = [];
+    for (int i = 1; i <= monthDays; i++) {
+      final date =
+          '$year-${month < 10 ? "0$month" : month}-${i < 10 ? "0$i" : i}';
+      fullDates.add(date);
+    }
+    print(fullDates);
+   
+    final monthNumber = month < 10 ? '0$month' : month.toString();
+    String sql =
+        ChartInfoQueries.currentMonthExpensesGroupedByDay(monthNumber, year);
+    List<Map<String, dynamic>> result = [];
+
+    try {
+      result = [...await _db.rawQuery(sql)];
+     
+    } catch (err) {
+     
+      return [];
+    }
+  
+    //rellenamos los que no están
+    for (final date in fullDates) {
+      if (!result.any((element) => element['date'] == date)) {
+        result.add({'date': date, 'price': 0.0});
+      }
+    }
+    return result;
+  }
 }

@@ -23,13 +23,27 @@ class DateExpenses {
   }
 
   int get weekDay => dateTime.weekday;
+  int get monthDay => dateTime.day;
 
 
 
-  BarChartGroupData generateBarcharData(Gradient? gradient){
-
+  BarChartGroupData generateBarcharDataWeekDay(Gradient? gradient){
       return  BarChartGroupData(
           x: weekDay,
+          barRods: [
+            BarChartRodData(
+              toY: price.toDouble(),
+              gradient: gradient,
+            )
+          ],
+          showingTooltipIndicators: [0],
+        );
+  }
+
+  
+  BarChartGroupData generateBarcharDataMonthDay(Gradient? gradient){
+      return  BarChartGroupData(
+          x: monthDay,
           barRods: [
             BarChartRodData(
               toY: price.toDouble(),

@@ -1,3 +1,5 @@
+
+
 enum Month {
   enero(number: "01"),
   febrero(number: "02"),
@@ -31,3 +33,23 @@ const months = <Month>[
   Month.noviembre,
   Month.diciembre
 ];
+
+int days({required int month, required int year}) {
+  switch (month) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 10:
+    case 12:
+      return 31;
+    case 4:
+    case 6:
+    case 11:
+      return 30;
+    default:
+      bool isLeapYear = ((year % 4 == 0 && year % 100 == 0) || year % 400 == 0);
+      return isLeapYear ? 29 : 28;
+  }
+}

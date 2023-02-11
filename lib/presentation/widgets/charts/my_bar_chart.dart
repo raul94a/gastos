@@ -1,25 +1,70 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+enum BarChartType { weekDay, weekCategory, monthDay, monthCategory }
+
 class MyBarChart extends StatelessWidget {
-  const MyBarChart({required this.data, this.maxY});
+  const MyBarChart({required this.data, required this.barChartType, this.maxY});
 
   final List<BarChartGroupData> data;
   final double? maxY;
+  final BarChartType barChartType;
 
   @override
   Widget build(BuildContext context) {
+    late FlTitlesData mTitlesData;
+    if (barChartType == BarChartType.weekDay) {
+      mTitlesData = titlesData;
+    } else if (barChartType == BarChartType.monthDay) {
+      mTitlesData = _monthDaysTitleData;
+    } else {
+      mTitlesData = titlesData;
+    }
     return BarChart(
       BarChartData(
         barTouchData: barTouchData,
-        titlesData: titlesData,
+        titlesData: mTitlesData,
         borderData: borderData,
-        barGroups:  data,
+        barGroups: data,
         maxY: maxY,
         gridData: FlGridData(show: false),
         alignment: BarChartAlignment.spaceAround,
-       
       ),
+    );
+  }
+
+  FlTitlesData get _monthDaysTitleData => FlTitlesData(
+        show: true,
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 30 / 2,
+            getTitlesWidget: getTitlesMonthDays,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+      );
+
+  Widget getTitlesMonthDays(double value, TitleMeta meta) {
+    final style = TextStyle(
+      color: Colors.red,
+      fontWeight: FontWeight.bold,
+      fontSize: 8,
+    );
+    String text = value.toInt().toString();
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 4,
+      child: Text(text, style: style),
     );
   }
 
@@ -54,7 +99,6 @@ class MyBarChart extends StatelessWidget {
     );
     String text;
     switch (value.toInt()) {
-      
       case 2:
         text = 'M';
         break;
@@ -190,6 +234,3 @@ class MyBarChart extends StatelessWidget {
         ),
       ];
 }
-
-
-

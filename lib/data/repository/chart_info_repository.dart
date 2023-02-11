@@ -9,6 +9,10 @@ class ChartInfoRepository {
 
   Future<List<DateExpenses>> currentWeekExpensesGroupedByDate() async {
     final results = await service.getCurrentWeekExpensesByDate();
+        return results.map(DateExpenses.fromMap).toList();
+  }
+   Future<List<DateExpenses>> currentMonthExpensesGroupedByDate() async {
+    final results = await service.getCurrentMonthExpensesByDay();
     return results.map(DateExpenses.fromMap).toList();
   }
 }
