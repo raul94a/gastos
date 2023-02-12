@@ -29,6 +29,7 @@ class DateExpenses {
       x: weekDay,
       barRods: [
         BarChartRodData(
+          width: 20,
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: maxY,
@@ -46,8 +47,10 @@ class DateExpenses {
       {Gradient? gradient, double? maxY}) {
     return BarChartGroupData(
       x: monthDay,
+      barsSpace: 12,
       barRods: [
         BarChartRodData(
+          
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: maxY,

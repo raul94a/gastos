@@ -47,11 +47,13 @@ class YearExpenses {
       month: map['month'] as String,
     );
   }
-  BarChartGroupData generateBarcharDataWeekDay({Gradient? gradient, double? maxY}) {
+  BarChartGroupData generateBarcharDataYearMonth({Gradient? gradient, double? maxY}) {
     return BarChartGroupData(
       x: dateTime.month,
+      
       barRods: [
         BarChartRodData(
+          width: 20,
             backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: maxY,

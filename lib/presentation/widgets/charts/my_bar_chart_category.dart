@@ -1,45 +1,38 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:gastos/data/models/chart_models/category_expenses.dart';
 import 'package:gastos/utils/date_formatter.dart';
 
-enum BarChartType { weekDay, weekCategory, monthDay, monthCategory, yearMonth }
+enum BarChartCategoryType { weekCategory, monthCategory, yearCategory }
 
-class MyBarChart extends StatelessWidget {
-  const MyBarChart(
+class MyBarChartCategory extends StatelessWidget {
+  const MyBarChartCategory(
       {required this.data,
       required this.barChartType,
       this.maxY,
       this.xAxisWidgetLabel,
       this.yAxisWidgetLabel,
+      required this.categoriesExpenses,
       required this.xAxisTextStyle,
       required this.yAxisTextStyle});
 
   final List<BarChartGroupData> data;
   final double? maxY;
-  final BarChartType barChartType;
+  final BarChartCategoryType barChartType;
   final TextStyle xAxisTextStyle;
   final TextStyle yAxisTextStyle;
   final Widget? xAxisWidgetLabel;
   final Widget? yAxisWidgetLabel;
+  final List<CategoryExpenses> categoriesExpenses;
 
   @override
   Widget build(BuildContext context) {
-    late FlTitlesData mTitlesData;
     BarChartAlignment alignment = BarChartAlignment.spaceEvenly;
-    if (barChartType == BarChartType.weekDay) {
-      mTitlesData = titlesData;
-    } else if (barChartType == BarChartType.monthDay) {
-      mTitlesData = _monthDaysTitleData;
-    } else if (barChartType == BarChartType.yearMonth) {
-      mTitlesData = _yearMonthsTitleData;
-      // alignment = BarChartAlignment.spaceBetween;
-    } else {
-      mTitlesData = titlesData;
-    }
+
     return BarChart(
       BarChartData(
         barTouchData: barTouchData,
-        titlesData: mTitlesData,
+        titlesData: titlesData,
         borderData: borderData,
         barGroups: data,
         maxY: maxY,
@@ -48,6 +41,43 @@ class MyBarChart extends StatelessWidget {
       ),
     );
   }
+
+  Widget getTitles(double value, TitleMeta meta) {
+    final style = xAxisTextStyle;
+    int val = value.toInt();
+    print('categories expenses: $categoriesExpenses');
+    String text = categoriesExpenses
+        .firstWhere((element) => element.index == val)
+        .name!;
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 4,
+      child: Text(text, style: style),
+    );
+  }
+
+  FlTitlesData get titlesData => FlTitlesData(
+        show: true,
+        bottomTitles: AxisTitles(
+          axisNameWidget: xAxisWidgetLabel,
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 30,
+            getTitlesWidget: getTitles,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          axisNameWidget: yAxisWidgetLabel,
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+      );
 
   FlTitlesData get _yearMonthsTitleData => FlTitlesData(
         show: true,
@@ -127,7 +157,6 @@ class MyBarChart extends StatelessWidget {
           tooltipPadding: EdgeInsets.zero,
           tooltipMargin: 20.0,
           fitInsideVertically: true,
-          
           direction: TooltipDirection.top,
           getTooltipItem: (
             BarChartGroupData group,
@@ -137,62 +166,6 @@ class MyBarChart extends StatelessWidget {
           ) {
             return BarTooltipItem(rod.toY.round().toString(), yAxisTextStyle);
           },
-        ),
-      );
-
-  Widget getTitles(double value, TitleMeta meta) {
-    final style = xAxisTextStyle;
-    String text;
-    switch (value.toInt()) {
-      case 2:
-        text = 'M';
-        break;
-      case 3:
-        text = 'X';
-        break;
-      case 4:
-        text = 'J';
-        break;
-      case 5:
-        text = 'V';
-        break;
-      case 6:
-        text = 'S';
-        break;
-      case 7:
-        text = 'D';
-        break;
-      default:
-        text = 'L';
-        break;
-    }
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 4,
-      child: Text(text, style: style),
-    );
-  }
-
-  FlTitlesData get titlesData => FlTitlesData(
-        show: true,
-        bottomTitles: AxisTitles(
-          axisNameWidget: xAxisWidgetLabel,
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: getTitles,
-          ),
-        ),
-        leftTitles: AxisTitles(
-        
-          axisNameWidget: yAxisWidgetLabel,
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
         ),
       );
 

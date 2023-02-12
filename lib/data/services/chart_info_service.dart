@@ -102,12 +102,81 @@ class ChartInfoService {
       final date = '${i < 10 ? "0$i" : i}';
       fullDates.add(date);
     }
-     for (final date in fullDates) {
+    for (final date in fullDates) {
       if (!results.any((element) => element['month'] == date)) {
-        results.add({'month': date, 'price': 0.0, 'year': now.year, 'date': '$year-$date-01'});
+        results.add({
+          'month': date,
+          'price': 0.0,
+          'year': now.year,
+          'date': '$year-$date-01'
+        });
       }
     }
     return results;
+  }
 
+  ///categories
+  ///
+
+  Future<List<Map<String, dynamic>>> getCurrentWeekExpensesByCategory() async {
+    final db = sqliteManager.database;
+    final now = DateTime.now();
+    //i.e 4
+    //left = 4 - 1 = 3
+    //rigth 7 - 4 = 3
+    final weekDay = now.weekday;
+    int pastDays = weekDay - 1;
+    int futureDays = 7 - weekDay;
+    DateTime firstDate = now;
+    DateTime lastDate = now;
+    if (pastDays != 0) {
+      firstDate = firstDate.subtract(Duration(days: pastDays));
+    }
+    if (futureDays != 0) {
+      lastDate = lastDate.add(Duration(days: futureDays));
+    }
+
+    final initialDate =
+        DateTime(firstDate.year, firstDate.month, firstDate.day);
+    final endDate = DateTime(lastDate.year, lastDate.month, lastDate.day);
+
+    String sql = ChartInfoQueries.currentWeekExpensesGroupedByCategory(
+        initialDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch);
+    final List<Map<String, dynamic>> results = [...await db.rawQuery(sql)];
+
+    return results;
+  }
+
+  Future<List<Map<String, dynamic>>> getCurrentMonthExpensesByCategory() async {
+    final _db = sqliteManager.database;
+    final now = DateTime.now();
+    //i.e 4
+    //left = 4 - 1 = 3
+    //rigth 7 - 4 = 3
+    int month = now.month;
+    final year = now.year;
+
+    final monthNumber = month < 10 ? '0$month' : month.toString();
+    String sql = ChartInfoQueries.currentMonthExpensesGroupedByCategory(
+        monthNumber, year);
+    List<Map<String, dynamic>> result = [];
+
+    try {
+      result = [...await _db.rawQuery(sql)];
+    } catch (err) {
+      return [];
+    }
+
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>>
+      getCurrentYearExpensesGroupedByCategory() async {
+    final db = sqliteManager.database;
+    final now = DateTime.now();
+    final year = now.year;
+    String sql = ChartInfoQueries.currentYearExpensesGroupedByCategory(year);
+    final results = [...await db.rawQuery(sql)];
+    return results;
   }
 }
