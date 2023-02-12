@@ -57,10 +57,10 @@ class CategoriesService {
           .where('updatedDate', isGreaterThanOrEqualTo: lastSync)
           .get();
 
-      print('lastSync: $lastSync fetching cats!!!!!!!!! $docs');
+      // print('lastSync: $lastSync fetching cats!!!!!!!!! $docs');
 
       final d = docs.docs;
-      print('cats list $d');
+      // print('cats list $d');
       print('${docs.docChanges}');
       for (final query in d) {
         final data = query.data();
@@ -99,7 +99,7 @@ class CategoriesService {
     final db = sqliteManager.database;
     try {
       for (final object in data) {
-        print('Cateogry obejct $object');
+        // print('Cateogry obejct $object');
         final results = await countIdEntries(object['id']);
         if (results > 0) {
           await db.update(table, object, where: 'id = ?', whereArgs: [object['id']]);

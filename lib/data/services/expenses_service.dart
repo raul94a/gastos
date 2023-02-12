@@ -49,6 +49,7 @@ class ExpenseService {
         data.update('id', (value) => query.id);
         firestoreData.add(data);
       }
+      print('Documents to be updated: ${firestoreData.length}');
       if (firestoreData.isNotEmpty) {
         await SharedPreferencesHelper.instance
             .saveLastSync(DateTime.now().millisecondsSinceEpoch);
@@ -84,6 +85,7 @@ class ExpenseService {
         // 2. The record doesn't exists, so it should be inserted
         final results = await countIdEntries(object['id']);
         if (results > 0) {
+          print('UPDATING EXPENSES DB');
           await db.update(table, object,
               where: 'id = ?', whereArgs: [object['id']]);
         } else {

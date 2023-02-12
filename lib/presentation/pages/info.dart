@@ -189,7 +189,7 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
     }
     for (int i = 0; i < data.length; ++i) {
       chartData.add(data[i]
-          .generateBarcharDataWeekDay(gradient: _barsGradient, maxY: mY));
+          .generateBarcharDataWeekDay(gradient: _barsGradient, maxY: mY ));
     }
     setState(() {
       myData = chartData..sort((a, b) => a.x.compareTo(b.x));

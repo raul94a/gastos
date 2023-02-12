@@ -123,7 +123,7 @@ class ExpensesRepository {
   }
 
   Future<Expense?> remove(Expense expense) async {
-    final newExpense = expense.copyWith(deleted: 1);
+    final newExpense = expense.copyWith(deleted: 1,updatedDate: DateTime.now());
     try {
       await service.update(newExpense.toMap());
       return newExpense;

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/selected_date_provider.dart';
+import 'package:provider/provider.dart';
 
 class ExpenseOptionsDialog extends StatelessWidget {
   const ExpenseOptionsDialog(
@@ -41,6 +43,7 @@ class ExpenseOptionsDialog extends StatelessWidget {
         TextButton.icon(
             onPressed: () => {
                   state.remove(expense: state.expenses[date]![index]),
+                  context.read<SelectedDateProvider>().notify(),
                   Navigator.of(context).pop()
                 },
             icon: const Icon(Icons.update, color: Colors.blue),

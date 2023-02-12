@@ -371,7 +371,6 @@ class ExpenseProvider with ChangeNotifier {
         await getByWeek(week, now.year, firebaseUID);
         break;
     }
-    
   }
 
   Future<void> getByScroll() async {
@@ -397,34 +396,43 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   Future<void> refreshData() async {
-    print('refreshing expenses');
-    final newEntries =
-        await repository.fetchLastSyncExpenses(preferences.getLastSync());
-
+    int lastSync = preferences.getLastSync();
+    print(
+        'refreshing expenses with last sync ${DateTime.fromMillisecondsSinceEpoch(lastSync)}');
+    final newEntries = await repository.fetchLastSyncExpenses(lastSync);
+    print('New entries: $newEntries');
     if (newEntries.isNotEmpty) {
       for (final entry in newEntries) {
         print(entry);
         String date = MyDateFormatter.dateByType(
             dateType, MyDateFormatter.toYYYYMMdd(entry.createdDate));
-        List<Expense> expensesOfDate = expenses[date]!;
-        bool existsDate =
-            expensesOfDate.any((element) => element.id == entry.id);
-        if (!existsDate) {
-          //if isCommonExpense is 0, the expense is individual
-          bool isIndividual = entry.isCommonExpense == 0;
-          _addExpense(isIndividual, entry, date);
-          notifyListeners();
-        } else {
-          //two situations:
-          //  1. Update the expense
-          //  2. Delete the expense
-          Expense expense = await repository.readOne(entry.id);
-          if (entry.deleted == 1) {
-            remove(expense: expense, individual: expense.isCommonExpense == 0);
+        List<Expense>? expensesOfDate = expenses[date];
+
+        if (expensesOfDate != null) {
+          print('list of expenses is not null');
+          bool existsExpense =
+              expensesOfDate.any((element) => element.id == entry.id);
+          if (!existsExpense && entry.deleted == 0) {
+            print('ADDING');
+            //if isCommonExpense is 0, the expense is individual
+            bool isIndividual = entry.isCommonExpense == 0;
+            _addExpense(isIndividual, entry, date);
+            notifyListeners();
           } else {
-            update(expense: entry, individual: expense.isCommonExpense == 0);
+            //two situations:
+            //  1. Update the expense
+            //  2. Delete the expense
+            Expense expense = await repository.readOne(entry.id);
+            if (entry.deleted == 1) {
+              print('REMOVING');
+              remove(
+                  expense: expense, individual: expense.isCommonExpense == 0);
+            } else {
+              print('UPDATING');
+              update(expense: entry, individual: expense.isCommonExpense == 0);
+            }
+            notifyListeners();
           }
-          notifyListeners();
         }
       }
       await preferences.saveLastSync(DateTime.now().millisecondsSinceEpoch);
