@@ -15,28 +15,77 @@ class InfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final users = context.read<UserProvider>().users;
     print('users $users');
-    return ListView(
-      children: [
-        Text('Usuarios de la aplicación',
-            textAlign: TextAlign.center, style: titleStyle(28.2)),
-        ...users
-            .map((e) => _UserInfoContainer(
-                userName: e.name,
-                fecha: MyDateFormatter.toFormat('dd/MM/yyyy', DateTime.now())))
-            .toList(),
-        const SizedBox(height: 20),
-        Title(
-            color: Colors.white,
-            child: Text(
-              'Gastos comunes ${DateTime.now().year}',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            )),
-        Text('Gastos de la semana actual', style: TextStyle(fontSize: 24)),
-        
-        const CurrentWeekInfo(),
-        const CurrentMonthInfo(),
-        const CurrentYearInfo()
-      ],
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Usuarios de la aplicación',
+                textAlign: TextAlign.center, style: titleStyle(28.2)),
+            ...users
+                .map((e) => _UserInfoContainer(
+                    userName: e.name,
+                    fecha:
+                        MyDateFormatter.toFormat('dd/MM/yyyy', DateTime.now())))
+                .toList(),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Title(
+                  color: Colors.white,
+                  child: Text(
+                    'Gastos comunes ${DateTime.now().year}',
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  )),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Gastos de la semana actual',
+                  style: TextStyle(fontSize: 24)),
+            ),
+            const SizedBox(
+              height: 7,
+            ),
+            Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    side: BorderSide(color: Colors.black,width: 1.75)),
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: const CurrentWeekInfo(),
+                )),
+            const SizedBox(
+              height: 7,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child:
+                  Text('Gastos del mes actual', style: TextStyle(fontSize: 24)),
+            ),
+            const SizedBox(
+              height: 7,
+            ),
+            const CurrentMonthInfo(),
+            const SizedBox(
+              height: 7,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child:
+                  Text('Gastos del año actual', style: TextStyle(fontSize: 24)),
+            ),
+            const SizedBox(
+              height: 7,
+            ),
+            const CurrentYearInfo()
+          ],
+        ),
+      ),
     );
   }
 }

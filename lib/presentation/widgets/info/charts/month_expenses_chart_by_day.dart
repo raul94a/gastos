@@ -6,6 +6,7 @@ import 'package:gastos/presentation/style/chart_styles.dart';
 import 'package:gastos/presentation/widgets/charts/chart_card_wrapper.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart_category.dart';
+import 'package:gastos/presentation/widgets/shared/double_material_button.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -87,63 +88,13 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
     final width = size.width;
     return Column(
       children: [
-        Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 5.0),
-              width: 150,
-              height: 50,
-              child: MaterialButton(
-                padding: const EdgeInsets.all(5),
-                color: showByDay
-                    ? Color.fromARGB(235, 35, 39, 61)
-                    : Color.fromARGB(255, 182, 194, 252),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomLeft: Radius.circular(20))),
-                onPressed: () {
-                  if (showByDay) {
-                    return;
-                  }
-                  currentMonthDataByDate();
-                },
-                child: Text(
-                  'Por días',
-                  style: TextStyle(
-                      color: showByDay ? Colors.white : Colors.black,
-                      fontSize: 16),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 150,
-              height: 50,
-              child: MaterialButton(
-                color: !showByDay
-                    ? Color.fromARGB(235, 35, 39, 61)
-                    : Color.fromARGB(255, 182, 194, 252),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20))),
-                onPressed: () async {
-                  if (!showByDay) {
-                    return;
-                  }
-                  await currentMonthDataByCategory(context);
-                },
-                child: Text(
-                  'Por categoría',
-                  style: TextStyle(
-                      color: !showByDay ? Colors.white : Colors.black,
-                      fontSize: 16),
-                ),
-              ),
-            )
-          ],
-        ),
-       
+        DoubleMaterialButton(
+            leftSelected: showByDay,
+            onPressedLeft: currentMonthDataByDate,
+            onPressedRight: () async =>
+                await currentMonthDataByCategory(context),
+            leftText: 'Por días',
+            rightText: 'Por categoría'),
         if (!showByDay)
           ChartCard(
             child: Container(

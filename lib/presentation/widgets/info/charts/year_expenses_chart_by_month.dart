@@ -6,6 +6,7 @@ import 'package:gastos/presentation/style/chart_styles.dart';
 import 'package:gastos/presentation/widgets/charts/chart_card_wrapper.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart_category.dart';
+import 'package:gastos/presentation/widgets/shared/double_material_button.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -63,13 +64,12 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
       }
     }
     for (final expense in data) {
-      try{
-
-      mExpenses.add(expense.copyWith(
-          name: categories
-              .firstWhere((element) => element.id == expense.category)
-              .name));
-      }catch(err){
+      try {
+        mExpenses.add(expense.copyWith(
+            name: categories
+                .firstWhere((element) => element.id == expense.category)
+                .name));
+      } catch (err) {
         mExpenses.add(expense.copyWith(name: 'Otros'));
       }
       charData.add(
@@ -78,7 +78,7 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
     setState(() {
       expenses = mExpenses;
       myData = charData;
-            maxY = mY;
+      maxY = mY;
 
       showByDay = false;
     });
@@ -89,63 +89,16 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 5.0),
-              width: 150,
-              height: 50,
-              child: MaterialButton(
-                padding: const EdgeInsets.all(5),
-                color: showByDay
-                    ? Color.fromARGB(235, 35, 39, 61)
-                    : Color.fromARGB(255, 182, 194, 252),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomLeft: Radius.circular(20))),
-                onPressed: () {
-                  if (showByDay) {
-                    return;
-                  }
-                  currentYearDataByDate();
-                },
-                child: Text(
-                  'Por días',
-                  style: TextStyle(
-                      color: showByDay ? Colors.white : Colors.black,
-                      fontSize: 16),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 150,
-              height: 50,
-              child: MaterialButton(
-                color: !showByDay
-                    ? Color.fromARGB(235, 35, 39, 61)
-                    : Color.fromARGB(255, 182, 194, 252),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20))),
-                onPressed: () async {
-                  if (!showByDay) {
-                    return;
-                  }
-                  await currentYearDataByCategory(context);
-                },
-                child: Text(
-                  'Por categoría',
-                  style: TextStyle(
-                      color: !showByDay ? Colors.white : Colors.black,
-                      fontSize: 16),
-                ),
-              ),
-            )
-          ],
-        ),
+        DoubleMaterialButton(
+            leftSelected: showByDay,
+            onPressedLeft: currentYearDataByDate,
+            onPressedRight: () async =>
+                await currentYearDataByCategory(context),
+            leftText: 'Por días',
+            rightText: 'Por categoría'),
+       
         if (!showByDay)
           ChartCard(
             child: Container(

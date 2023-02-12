@@ -6,6 +6,7 @@ import 'package:gastos/presentation/style/chart_styles.dart';
 import 'package:gastos/presentation/widgets/charts/chart_card_wrapper.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart.dart';
 import 'package:gastos/presentation/widgets/charts/my_bar_chart_category.dart';
+import 'package:gastos/presentation/widgets/shared/double_material_button.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -75,8 +76,7 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
       expenses = mExpenses;
       myData = charData;
       showByDay = false;
-            maxY = mY;
-
+      maxY = mY;
     });
   }
 
@@ -87,62 +87,24 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
     final width = size.width;
     return Column(
       children: [
-        Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 5.0),
-              width: 150,
-              height: 50,
-              child: MaterialButton(
-                padding: const EdgeInsets.all(5),
-                color: showByDay
-                    ? Color.fromARGB(235, 35, 39, 61)
-                    : Color.fromARGB(255, 182, 194, 252),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomLeft: Radius.circular(20))),
-                onPressed: () {
-                  if (showByDay) {
-                    return;
-                  }
-                  currentWeekDataByDate();
-                },
-                child: Text(
-                  'Por días',
-                  style: TextStyle(
-                      color: showByDay ? Colors.white : Colors.black,
-                      fontSize: 16),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 150,
-              height: 50,
-              child: MaterialButton(
-                color: !showByDay
-                    ? Color.fromARGB(235, 35, 39, 61)
-                    : Color.fromARGB(255, 182, 194, 252),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20))),
-                onPressed: () async {
-                  if (!showByDay) {
-                    return;
-                  }
-                  await currentWeekDataByCategory(context);
-                },
-                child: Text(
-                  'Por categoría',
-                  style: TextStyle(
-                      color: !showByDay ? Colors.white : Colors.black,
-                      fontSize: 16),
-                ),
-              ),
-            )
-          ],
+        DoubleMaterialButton(
+          leftText: 'Por días',
+          rightText: 'Por categoría',
+          leftSelected: showByDay,
+          onPressedLeft: () {
+            if (showByDay) {
+              return;
+            }
+            currentWeekDataByDate();
+          },
+          onPressedRight: () async {
+            if (!showByDay) {
+              return;
+            }
+            await currentWeekDataByCategory(context);
+          },
         ),
+       
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
