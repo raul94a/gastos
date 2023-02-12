@@ -1,22 +1,36 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:gastos/utils/date_formatter.dart';
 
-enum BarChartType { weekDay, weekCategory, monthDay, monthCategory }
+enum BarChartType { weekDay, weekCategory, monthDay, monthCategory, yearMonth }
 
 class MyBarChart extends StatelessWidget {
-  const MyBarChart({required this.data, required this.barChartType, this.maxY});
+  const MyBarChart(
+      {required this.data,
+      required this.barChartType,
+      this.maxY,
+      required this.xAxisTextStyle,
+      required this.yAxisTextStyle});
 
   final List<BarChartGroupData> data;
   final double? maxY;
   final BarChartType barChartType;
+  final TextStyle xAxisTextStyle;
+  final TextStyle yAxisTextStyle;
 
   @override
   Widget build(BuildContext context) {
     late FlTitlesData mTitlesData;
+    BarChartAlignment alignment = BarChartAlignment.spaceEvenly;
     if (barChartType == BarChartType.weekDay) {
       mTitlesData = titlesData;
+      
     } else if (barChartType == BarChartType.monthDay) {
       mTitlesData = _monthDaysTitleData;
+      
+    } else if (barChartType == BarChartType.yearMonth) {
+      mTitlesData = _yearMonthsTitleData;
+      alignment = BarChartAlignment.spaceBetween;
     } else {
       mTitlesData = titlesData;
     }
@@ -28,18 +42,18 @@ class MyBarChart extends StatelessWidget {
         barGroups: data,
         maxY: maxY,
         gridData: FlGridData(show: false),
-        alignment: BarChartAlignment.spaceAround,
+        alignment: alignment,
       ),
     );
   }
 
-  FlTitlesData get _monthDaysTitleData => FlTitlesData(
+  FlTitlesData get _yearMonthsTitleData => FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 30 / 2,
-            getTitlesWidget: getTitlesMonthDays,
+            reservedSize: 30,
+            getTitlesWidget: getTitlesYearMonths,
           ),
         ),
         leftTitles: AxisTitles(
@@ -53,13 +67,10 @@ class MyBarChart extends StatelessWidget {
         ),
       );
 
-  Widget getTitlesMonthDays(double value, TitleMeta meta) {
-    final style = TextStyle(
-      color: Colors.red,
-      fontWeight: FontWeight.bold,
-      fontSize: 8,
-    );
-    String text = value.toInt().toString();
+  Widget getTitlesYearMonths(double value, TitleMeta meta) {
+    final style = xAxisTextStyle;
+    String text = MyDateFormatter.monthThreeLetters(
+        value.toInt() < 10 ? "0${value.toInt()}" : "${value.toInt()}");
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
@@ -68,35 +79,64 @@ class MyBarChart extends StatelessWidget {
     );
   }
 
+  FlTitlesData get _monthDaysTitleData => FlTitlesData(
+        show: true,
+        bottomTitles: AxisTitles(
+          axisNameWidget: Text('Day!'),
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 5,
+             reservedSize: 20,
+            getTitlesWidget: getTitlesMonthDays,
+            
+          ),
+        ),
+        leftTitles: AxisTitles(
+        sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+      );
+
+  Widget getTitlesMonthDays(double value, TitleMeta meta) {
+    final style = xAxisTextStyle;
+    int val = value.toInt();
+    bool isMultipleOfTwo= val % 2 == 0;
+    String text = isMultipleOfTwo ? '' : val.toString();
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 5,
+      // angle: 0.5,
+      child: Text(text, style: style),
+    );
+  }
+
   BarTouchData get barTouchData => BarTouchData(
-        enabled: false,
+        enabled: true,
         touchTooltipData: BarTouchTooltipData(
           tooltipBgColor: Colors.transparent,
           tooltipPadding: EdgeInsets.zero,
-          tooltipMargin: 8,
+          tooltipMargin: 20.0,
+          fitInsideVertically: true,
+          direction: TooltipDirection.top,
           getTooltipItem: (
             BarChartGroupData group,
             int groupIndex,
             BarChartRodData rod,
             int rodIndex,
           ) {
-            return BarTooltipItem(
-              rod.toY.round().toString(),
-              const TextStyle(
-                color: Colors.cyan,
-                fontWeight: FontWeight.bold,
-              ),
-            );
+            return BarTooltipItem(rod.toY.round().toString(), yAxisTextStyle);
           },
         ),
       );
 
   Widget getTitles(double value, TitleMeta meta) {
-    final style = TextStyle(
-      color: Colors.red,
-      fontWeight: FontWeight.bold,
-      fontSize: 14,
-    );
+    final style = xAxisTextStyle;
     String text;
     switch (value.toInt()) {
       case 2:
@@ -151,86 +191,4 @@ class MyBarChart extends StatelessWidget {
   FlBorderData get borderData => FlBorderData(
         show: false,
       );
-
-  LinearGradient get _barsGradient => const LinearGradient(
-        colors: [
-          Color(0xFF2196F3),
-          Color(0xFF50E4FF),
-        ],
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
-      );
-
-  List<BarChartGroupData> get barGroups => [
-        BarChartGroupData(
-          x: 0,
-          barRods: [
-            BarChartRodData(
-              toY: 8,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 1,
-          barRods: [
-            BarChartRodData(
-              toY: 10,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 2,
-          barRods: [
-            BarChartRodData(
-              toY: 14,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 3,
-          barRods: [
-            BarChartRodData(
-              toY: 15,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 4,
-          barRods: [
-            BarChartRodData(
-              toY: 13,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 5,
-          barRods: [
-            BarChartRodData(
-              toY: 10,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-        BarChartGroupData(
-          x: 6,
-          barRods: [
-            BarChartRodData(
-              toY: 16,
-              gradient: _barsGradient,
-            )
-          ],
-          showingTooltipIndicators: [0],
-        ),
-      ];
 }

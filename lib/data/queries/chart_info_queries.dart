@@ -24,8 +24,20 @@ class ChartInfoQueries {
         'AND year = "$year" '
         'GROUP BY date ';
 
-   
- 
+    return sql;
+  }
+
+  static String currentYearExpensesGroupedByMonth(int year) {
+    String sql =
+        'SELECT ROUND(SUM(price),2) as "price", '
+        'date(e.createdDate / 1000 , "unixepoch", "localtime") as "date", '
+        'strftime("%m", e.createdDate / 1000, "unixepoch") as "month", '
+        'strftime("%Y", e.createdDate / 1000,"unixepoch") as "year" '
+        'from expenses e '
+        'where deleted = 0 '
+        'AND isCommonExpense = 1 '
+        'AND year = "$year" '
+        'GROUP BY month ';
     return sql;
   }
 }

@@ -1,11 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:gastos/data/models/chart_models/date_expenses.dart';
-import 'package:gastos/data/models/expense.dart';
+
 import 'package:gastos/data/repository/chart_info_repository.dart';
-import 'package:gastos/data/services/chart_info_service.dart';
-import 'package:gastos/data/sqlite_manager.dart';
-import 'package:gastos/logic/sorter.dart';
+import 'package:gastos/presentation/widgets/charts/chart_card_wrapper.dart';
+
 import 'package:gastos/presentation/widgets/charts/my_bar_chart.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
@@ -31,18 +29,73 @@ class InfoPage extends StatelessWidget {
                 fecha: MyDateFormatter.toFormat('dd/MM/yyyy', DateTime.now())))
             .toList(),
         const SizedBox(height: 20),
-        CurrentWeekInfo(),
-        CurrentMonthInfo(),
-        ElevatedButton(
-            onPressed: () async {
-              try {
-                await ChartInfoService().getCurrentMonthExpensesByDay();
-              } catch (err) {
-                print(err);
-              }
-            },
-            child: Text('hola'))
+        const CurrentWeekInfo(),
+        const CurrentMonthInfo(),
+        const CurrentYearInfo()
       ],
+    );
+  }
+}
+
+class CurrentYearInfo extends StatefulWidget {
+  const CurrentYearInfo({super.key});
+
+  @override
+  State<CurrentYearInfo> createState() => _CurrentYearInfoState();
+}
+
+class _CurrentYearInfoState extends State<CurrentYearInfo> {
+  @override
+  void initState() {
+    currentMonthDataByDate();
+    super.initState();
+  }
+
+  void currentMonthDataByDate() async {
+    final data =
+        await ChartInfoRepository().currentYearExpensesGroupedByMonth();
+    double mY = 0.0;
+    List<BarChartGroupData> chartData = [];
+    //first it needed to know the yMax for drawing the background of the chart bars
+    for (int i = 0; i < data.length; ++i) {
+      if (data[i].price > mY) {
+        mY = data[i].price.toDouble();
+      }
+    }
+
+    for (int i = 0; i < data.length; ++i) {
+      chartData.add(data[i]
+          .generateBarcharDataWeekDay(gradient: _barsGradient, maxY: mY));
+    }
+    setState(() {
+      myData = chartData..sort((a, b) => a.x.compareTo(b.x));
+      maxY = mY;
+    });
+  }
+
+  List<BarChartGroupData> myData = [];
+  double maxY = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    return ChartCard(
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        //decoration: BoxDecoration( borderRadius: BorderRadius.circular(10), color: Colors.indigo),
+        height: size.height * 0.3,
+        margin: const EdgeInsets.all(4),
+        child: MyBarChart(
+          barChartType: BarChartType.yearMonth,
+          data: myData,
+          maxY: maxY + 100,
+          xAxisTextStyle: TextStyle(
+              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          yAxisTextStyle: TextStyle(
+              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }
@@ -62,18 +115,25 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
   }
 
   void currentMonthDataByDate() async {
-    final data = await ChartInfoRepository().currentMonthExpensesGroupedByDate();
+    final data =
+        await ChartInfoRepository().currentMonthExpensesGroupedByDate();
     double mY = 0.0;
     List<BarChartGroupData> chartData = [];
 
+    //first it needed to know the yMax for drawing the background of the chart bars
     for (int i = 0; i < data.length; ++i) {
-      chartData.add(data[i].generateBarcharDataMonthDay(_barsGradient));
       if (data[i].price > mY) {
         mY = data[i].price.toDouble();
       }
     }
+    //then, we can create the list of bars
+    for (int i = 0; i < data.length; ++i) {
+      chartData.add(data[i]
+          .generateBarcharDataMonthDay(gradient: _barsGradient, maxY: mY));
+    }
+
     setState(() {
-      myData = chartData..sort((a,b) => a.x.compareTo(b.x));
+      myData = chartData..sort((a, b) => a.x.compareTo(b.x));
       maxY = mY;
     });
   }
@@ -85,16 +145,21 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    return Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-        
-        height: size.height * 0.3,
-        child: MyBarChart(
-          barChartType: BarChartType.monthDay,
-          data: myData,
-          maxY: maxY + 100,
-        ));
+    return ChartCard(
+      child: Container(
+          padding: const EdgeInsets.all(5),
+          margin: const EdgeInsets.all(4),
+          height: size.height * 0.3,
+          child: MyBarChart(
+            barChartType: BarChartType.monthDay,
+            data: myData,
+            maxY: maxY + 50,
+            xAxisTextStyle: TextStyle(
+                color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+            yAxisTextStyle: TextStyle(
+                color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          )),
+    );
   }
 }
 
@@ -116,15 +181,18 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
     final data = await ChartInfoRepository().currentWeekExpensesGroupedByDate();
     double mY = 0.0;
     List<BarChartGroupData> chartData = [];
-
+    //first it needed to know the yMax for drawing the background of the chart bars
     for (int i = 0; i < data.length; ++i) {
-      chartData.add(data[i].generateBarcharDataWeekDay(_barsGradient));
       if (data[i].price > mY) {
         mY = data[i].price.toDouble();
       }
     }
+    for (int i = 0; i < data.length; ++i) {
+      chartData.add(data[i]
+          .generateBarcharDataWeekDay(gradient: _barsGradient, maxY: mY));
+    }
     setState(() {
-      myData = chartData..sort((a,b) => a.x.compareTo(b.x));
+      myData = chartData..sort((a, b) => a.x.compareTo(b.x));
       maxY = mY;
     });
   }
@@ -136,18 +204,27 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    return Column(
+    return Row(
       children: [
-        Container(
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-            width: width * 0.7,
-            height: size.height * 0.3,
-            child: MyBarChart(
-              barChartType: BarChartType.weekDay,
-              data: myData,
-              maxY: maxY + 100,
-            )),
+        ChartCard(
+          child: Container(
+              padding: const EdgeInsets.all(5),
+              width: width * 0.7,
+              height: size.height * 0.3,
+              child: MyBarChart(
+                barChartType: BarChartType.weekDay,
+                data: myData,
+                maxY: maxY + 100,
+                xAxisTextStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+                yAxisTextStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+              )),
+        ),
       ],
     );
   }
