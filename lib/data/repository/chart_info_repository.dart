@@ -27,11 +27,15 @@ class ChartInfoRepository {
   //categories
   Future<List<CategoryExpenses>> currentWeekExpensesGroupedByCategory() async {
     final results = await service.getCurrentWeekExpensesByCategory();
-    final list = <CategoryExpenses>[];
+    List<CategoryExpenses> list = <CategoryExpenses>[];
     for (int i = 0; i < results.length; i++) {
       final categoryExpense = CategoryExpenses.fromMap(results[i]);
 
       list.add(categoryExpense.copyWith(index: i));
+    }
+    print('WEEK CAT: $list');
+    if(list.isEmpty){
+      list = List.generate(5, (index) => CategoryExpenses(category: '', index: index, price: 0.0));
     }
     return list;
   }

@@ -47,6 +47,7 @@ class ChartInfoService {
         result.add({'date': date, 'price': 0.0});
       }
     }
+    print('RESULT(week): $result');
     return result;
   }
 
@@ -68,7 +69,7 @@ class ChartInfoService {
           '$year-${month < 10 ? "0$month" : month}-${i < 10 ? "0$i" : i}';
       fullDates.add(date);
     }
-    print(fullDates);
+    print('Full dates $fullDates');
 
     final monthNumber = month < 10 ? '0$month' : month.toString();
     String sql =
@@ -87,6 +88,7 @@ class ChartInfoService {
         result.add({'date': date, 'price': 0.0});
       }
     }
+    print('RESULT: $result');
     return result;
   }
 

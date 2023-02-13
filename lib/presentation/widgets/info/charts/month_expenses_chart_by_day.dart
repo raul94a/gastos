@@ -43,12 +43,12 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
     //then, we can create the list of bars
     for (int i = 0; i < data.length; ++i) {
       chartData.add(data[i]
-          .generateBarcharDataMonthDay(gradient: barsGradient, maxY: mY));
+          .generateBarcharDataMonthDay(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
     }
 
     setState(() {
       myData = chartData..sort((a, b) => a.x.compareTo(b.x));
-      maxY = mY;
+      maxY =  mY.toInt() == 0 ? 300 : mY;
       showByDay = true;
     });
   }
@@ -56,7 +56,7 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
   Future<void> currentMonthDataByCategory(BuildContext context) async {
     final categories = context.read<CategoriesProvider>().categories;
     final data =
-        await ChartInfoRepository().currentWeekExpensesGroupedByCategory();
+        await ChartInfoRepository().currentMonthExpensesGroupedByCategory();
     List<CategoryExpenses> mExpenses = [];
     List<BarChartGroupData> charData = [];
     double mY = 0.0;
@@ -71,12 +71,12 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
               .firstWhere((element) => element.id == expense.category)
               .name));
       charData.add(
-          expense.generateBarcharDataWeekDay(gradient: barsGradient, maxY: mY));
+          expense.generateBarcharDataWeekDay(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
     }
     setState(() {
       print('mExpenses,$expenses');
       expenses = mExpenses;
-      maxY = mY;
+      maxY =  mY.toInt() == 0 ? 300 : mY;
       myData = charData;
       showByDay = false;
     });

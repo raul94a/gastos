@@ -42,11 +42,11 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
     }
     for (int i = 0; i < data.length; ++i) {
       chartData.add(
-          data[i].generateBarcharDataWeekDay(gradient: barsGradient, maxY: mY));
+          data[i].generateBarcharDataWeekDay(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
     }
     setState(() {
       myData = chartData..sort((a, b) => a.x.compareTo(b.x));
-      maxY = mY;
+      maxY = mY.toInt() == 0 ? 300 : mY;
       showByDay = true;
     });
   }
@@ -69,14 +69,14 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
               .firstWhere((element) => element.id == expense.category)
               .name));
       charData.add(
-          expense.generateBarcharDataWeekDay(gradient: barsGradient, maxY: mY));
+          expense.generateBarcharDataWeekDay(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
     }
     setState(() {
       print('mExpenses,$expenses');
       expenses = mExpenses;
       myData = charData;
       showByDay = false;
-      maxY = mY;
+      maxY =  mY.toInt() == 0 ? 300 : mY;
     });
   }
 

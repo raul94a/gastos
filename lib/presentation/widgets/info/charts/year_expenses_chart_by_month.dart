@@ -42,11 +42,11 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
 
     for (int i = 0; i < data.length; ++i) {
       chartData.add(data[i]
-          .generateBarcharDataYearMonth(gradient: barsGradient, maxY: mY));
+          .generateBarcharDataYearMonth(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
     }
     setState(() {
       myData = chartData..sort((a, b) => a.x.compareTo(b.x));
-      maxY = mY;
+      maxY =  mY.toInt() == 0 ? 300 : mY;
       showByDay = true;
     });
   }
@@ -73,12 +73,12 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
         mExpenses.add(expense.copyWith(name: 'Otros'));
       }
       charData.add(
-          expense.generateBarcharDataWeekDay(gradient: barsGradient, maxY: mY));
+          expense.generateBarcharDataWeekDay(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
     }
     setState(() {
       expenses = mExpenses;
       myData = charData;
-      maxY = mY;
+      maxY =  mY.toInt() == 0 ? 300 : mY;;
 
       showByDay = false;
     });

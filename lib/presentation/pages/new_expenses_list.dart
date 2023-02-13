@@ -124,44 +124,44 @@ class _NewExpenseListState extends State<NewExpenseList> {
                   ),
 
                   //Box
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 5),
-                    padding: const EdgeInsets.all(8.0),
-                    width: width,
-                    height: 200,
-                    color: Colors.greenAccent,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Gastos'),
-                            Text('${totalExpenseOfDatePrice()} €')
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Número de gastos'),
-                            Text('${totalExpensesOfDateLength()}')
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Mayor gasto en'),
-                            Text('${categoryWithMoreExpenses()}')
-                          ],
-                        ),
-                        Visibility(
-                            visible: showAddExpenseToDate(),
-                            child: ElevatedButton(
-                                onPressed: () {},
-                                child: Text('Añadir gasto a $selectedDate')))
-                      ],
-                    ),
-                  ),
+                  // Container(
+                  //   margin: EdgeInsets.symmetric(vertical: 5),
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   width: width,
+                  //   height: 200,
+                  //   color: Colors.greenAccent,
+                  //   child: Column(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text('Gastos'),
+                  //           Text('${totalExpenseOfDatePrice()} €')
+                  //         ],
+                  //       ),
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text('Número de gastos'),
+                  //           Text('${totalExpensesOfDateLength()}')
+                  //         ],
+                  //       ),
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text('Mayor gasto en'),
+                  //           Text('${categoryWithMoreExpenses()}')
+                  //         ],
+                  //       ),
+                  //       Visibility(
+                  //           visible: showAddExpenseToDate(),
+                  //           child: ElevatedButton(
+                  //               onPressed: () {},
+                  //               child: Text('Añadir gasto a $selectedDate')))
+                  //     ],
+                  //   ),
+                  // ),
 
                   // Consumer<ExpenseProvider>(
                   //   builder: (ctx, state, _) => Text(
