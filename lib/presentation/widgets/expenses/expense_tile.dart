@@ -67,73 +67,88 @@ class _ExpenseTileState extends State<ExpenseTile> {
     Color textColor = Colors.black;
     try {
       cat = categories.firstWhere((element) => element.id == expense.category);
-      color = Color.fromARGB(190,cat.r, cat.g, cat.b);
+      color = Color.fromARGB(190, cat.r, cat.g, cat.b);
       if (!ColorComputation.colorsMatch(color)) {
         textColor = Colors.white;
       }
     } catch (err) {
       print(err);
     }
-
+    Color avatarColor = color ?? Colors.white;
+    avatarColor = avatarColor.withOpacity(0.55).withAlpha(20);
     return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.transparent,
+          width: 0.75,
+        ),
+      ),
       key: Key(widget.expense.id),
       margin: const EdgeInsets.symmetric(vertical: 4.0),
-      child: ListTile(
-        isThreeLine: true,
-        onLongPress: showOptionDialog,
-        contentPadding: const EdgeInsets.all(8),
-        tileColor: color ??
-            Colors
-                .white, //isEven ? Colors.blue.shade100 : Colors.orange.shade100,
-        style: ListTileStyle.list,
-        shape: RoundedRectangleBorder(
-            side: BorderSide(
-                width: 2.8,
-                color: color == null
-                    ? const Color(0xFF000000)
-                    : ColorComputation.getShade(
-                        color), //isEven ? Colors.blue.shade500 : Colors.orange.shade500,
-                strokeAlign: 0.0),
-            borderRadius: BorderRadius.circular(7)),
-        leading: CircleAvatar(
-          
-          radius: 30,
-          child: Padding(
-            padding: const EdgeInsets.all(6),
-            child: FittedBox(
-                child: Column(
-              children: [
-                Text(
-                  '${expense.price} €',
-                  style: GoogleFonts.raleway(fontSize: 16),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+              Colors.white,
+              color ?? Colors.white,
+            ], begin: Alignment.topLeft, end: Alignment.bottomCenter)),
+            child: ListTile(
+              isThreeLine: true,
+              onLongPress: showOptionDialog,
+              contentPadding: const EdgeInsets.all(8),
+              style: ListTileStyle.list,
+              leading: CircleAvatar(
+                
+                backgroundColor: avatarColor,
+                radius: 35,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.2),
+                  child: FittedBox(
+                      child: Column(
+                    children: [
+                      Text(
+                        '${expense.price} €',
+                        style:
+                            GoogleFonts.raleway(fontSize: 16, color: textColor),
+                      ),
+                    ],
+                  )),
                 ),
-              ],
-            )),
+              ),
+              title: Text(
+                expense.description + getCategoryName(cat),
+                overflow: TextOverflow.fade,
+                style: GoogleFonts.raleway(
+                  fontSize: 18.2,
+                ),
+              ),
+              subtitle: Text(
+                expense.person,
+                maxLines: 2,
+                style: GoogleFonts.raleway(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500),
+              ),
+              trailing: SizedBox(
+                width: width * 0.2,
+                child: IconButton(
+                    onPressed: showOptionDialog,
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: textColor,
+                    )),
+              ),
+            ),
           ),
-        ),
-        title: Text(
-          expense.description + getCategoryName(cat),
-          style: GoogleFonts.raleway(fontSize: 16, color: textColor),
-        ),
-        subtitle: Text(
-          expense.person,
-          maxLines: 2,
-          style: GoogleFonts.raleway(fontSize: 16, color: textColor),
-        ),
-        trailing: SizedBox(
-          width: width * 0.2,
-          child: IconButton(
-              onPressed: showOptionDialog,
-              icon: Icon(
-                Icons.more_vert,
-                color: textColor,
-              )),
-        ),
+        ],
       ),
     );
   }
-   String getCategoryName(Category? cat){
-    if(cat == null) return '';
+
+  String getCategoryName(Category? cat) {
+    if (cat == null) return '';
     return ' (${cat.name})';
   }
 }
@@ -186,6 +201,4 @@ class ColorComputation {
     final b = color.blue * (1 - _shadeFactor);
     return Color.fromRGBO(r.toInt(), g.toInt(), b.toInt(), 1);
   }
-
- 
 }
