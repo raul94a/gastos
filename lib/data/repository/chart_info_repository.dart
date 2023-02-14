@@ -35,7 +35,7 @@ class ChartInfoRepository {
     }
     print('WEEK CAT: $list');
     if(list.isEmpty){
-      list = List.generate(5, (index) => CategoryExpenses(category: '', index: index, price: 0.0));
+      list = List.generate(5, (index) => CategoryExpenses(category: '', index: index, price: 0.0, name: ''));
     }
     return list;
   }

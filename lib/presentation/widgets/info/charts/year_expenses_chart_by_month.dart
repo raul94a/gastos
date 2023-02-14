@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/chart_models/category_expenses.dart';
 import 'package:gastos/data/repository/chart_info_repository.dart';
 import 'package:gastos/presentation/style/chart_styles.dart';
@@ -41,12 +42,12 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
     }
 
     for (int i = 0; i < data.length; ++i) {
-      chartData.add(data[i]
-          .generateBarcharDataYearMonth(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
+      chartData.add(data[i].generateBarcharDataYearMonth(
+          gradient: barsGradient, maxY: mY.toInt() == 0 ? 300 : mY));
     }
     setState(() {
       myData = chartData..sort((a, b) => a.x.compareTo(b.x));
-      maxY =  mY.toInt() == 0 ? 300 : mY;
+      maxY = mY.toInt() == 0 ? 300 : mY;
       showByDay = true;
     });
   }
@@ -67,18 +68,26 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
       try {
         mExpenses.add(expense.copyWith(
             name: categories
-                .firstWhere((element) => element.id == expense.category)
+                .firstWhere((element) => element.id == expense.category,
+                    orElse: () => Category(
+                        name: '',
+                        r: 0,
+                        g: 0,
+                        b: 0,
+                        createdDate: DateTime.now(),
+                        updatedDate: DateTime.now()))
                 .name));
       } catch (err) {
         mExpenses.add(expense.copyWith(name: 'Otros'));
       }
-      charData.add(
-          expense.generateBarcharDataWeekDay(gradient: barsGradient, maxY:  mY.toInt() == 0 ? 300 : mY));
+      charData.add(expense.generateBarcharDataWeekDay(
+          gradient: barsGradient, maxY: mY.toInt() == 0 ? 300 : mY));
     }
     setState(() {
       expenses = mExpenses;
       myData = charData;
-      maxY =  mY.toInt() == 0 ? 300 : mY;;
+      maxY = mY.toInt() == 0 ? 300 : mY;
+      ;
 
       showByDay = false;
     });
@@ -98,7 +107,6 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
                 await currentYearDataByCategory(context),
             leftText: 'Por días',
             rightText: 'Por categoría'),
-       
         if (!showByDay)
           ChartCard(
             child: Container(
