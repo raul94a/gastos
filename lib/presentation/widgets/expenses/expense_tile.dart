@@ -82,24 +82,30 @@ class _ExpenseTileState extends State<ExpenseTile> {
     Color avatarColor = color ?? Colors.white;
     avatarColor = avatarColor.withOpacity(0.55).withAlpha(20);
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.transparent,
-          width: 0.75,
-        ),
+      
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow:  [
+          BoxShadow(
+              color: Colors.black, blurRadius: 5, offset: Offset(0.5, 1.25))
+        ],
+       
       ),
       key: Key(widget.expense.id),
-      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         children: [
           Container(
-            height: tileHeight,
+            height: 15,
             decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
-              Colors.white,
-              // Colors.white,
+              (color ?? Colors.white).withOpacity(0.5),
               color ?? Colors.white,
             ], begin: Alignment.topLeft, end: Alignment.bottomCenter)),
+          ),
+          Container(
+            color: Colors.white,
+            height: tileHeight,
             child: ListTile(
               isThreeLine: true,
               onLongPress: showOptionDialog,
@@ -110,27 +116,25 @@ class _ExpenseTileState extends State<ExpenseTile> {
                 expense.description + getCategoryName(cat),
                 overflow: TextOverflow.fade,
                 style: GoogleFonts.raleway(
-                  fontSize: titleFontSize,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black),
               ),
               subtitle: Text(
                 expense.person,
                 maxLines: 2,
                 style: GoogleFonts.raleway(
                     fontSize: subTitleFontSize,
-                    color: textColor,
-                    
+                    color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
               trailing: SizedBox(
                 width: width * 0.2,
                 child: IconButton(
                     onPressed: showOptionDialog,
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.more_vert,
-                      color: textColor,
+                      color: Colors.black,
                     )),
               ),
             ),
@@ -165,7 +169,10 @@ class AvatarPrice extends StatelessWidget {
         child: Text(
           '${price.toStringAsFixed(2)} €',
           textAlign: TextAlign.center,
-          style: GoogleFonts.raleway(fontSize: fontSize, color: textColor,fontWeight: FontWeight.w600),
+          style: GoogleFonts.raleway(
+              fontSize: fontSize,
+              color: textColor,
+              fontWeight: FontWeight.w600),
         ),
       ),
     );
