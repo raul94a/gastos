@@ -25,7 +25,13 @@ class ExpenseTile extends StatefulWidget {
 }
 
 class _ExpenseTileState extends State<ExpenseTile> {
+
+  static const titleFontSize = 18.2;
+  static const subTitleFontSize = 16.0;
+  static const tileHeight = 105.0;
+  
   late Expense expense;
+
   @override
   void initState() {
     super.initState();
@@ -88,6 +94,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
       child: Column(
         children: [
           Container(
+            height: tileHeight,
             decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
               Colors.white,
@@ -98,36 +105,19 @@ class _ExpenseTileState extends State<ExpenseTile> {
               onLongPress: showOptionDialog,
               contentPadding: const EdgeInsets.all(8),
               style: ListTileStyle.list,
-              leading: CircleAvatar(
-                
-                backgroundColor: avatarColor,
-                radius: 35,
-                child: Padding(
-                  padding: const EdgeInsets.all(12.2),
-                  child: FittedBox(
-                      child: Column(
-                    children: [
-                      Text(
-                        '${expense.price} €',
-                        style:
-                            GoogleFonts.raleway(fontSize: 16, color: textColor),
-                      ),
-                    ],
-                  )),
-                ),
-              ),
+              leading: AvatarPrice(price: expense.price),
               title: Text(
                 expense.description + getCategoryName(cat),
                 overflow: TextOverflow.fade,
                 style: GoogleFonts.raleway(
-                  fontSize: 18.2,
+                  fontSize: titleFontSize,
                 ),
               ),
               subtitle: Text(
                 expense.person,
                 maxLines: 2,
                 style: GoogleFonts.raleway(
-                    fontSize: 16,
+                    fontSize: subTitleFontSize,
                     color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
@@ -150,6 +140,41 @@ class _ExpenseTileState extends State<ExpenseTile> {
   String getCategoryName(Category? cat) {
     if (cat == null) return '';
     return ' (${cat.name})';
+  }
+}
+
+class AvatarPrice extends StatelessWidget {
+  const AvatarPrice({super.key, required this.price});
+  final num price;
+
+  static const backgroundColor = Color.fromARGB(219, 0, 0, 0);
+  static const borderColor = Colors.black;
+  static const textColor = Colors.white;
+  static const circleRadius = 70.0;
+  static const padding = EdgeInsets.all(5.0);
+  static const fontSize = 16.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipOval(
+      // clipBehavior: Clip.hardEdge,
+      child: Container(
+        width: circleRadius , 
+        height: circleRadius,
+        padding: padding,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: backgroundColor,
+            border: Border.all(color: borderColor)),
+        child: FittedBox(
+          alignment: Alignment.center,
+            // fit: BoxFit.scaleDown,
+            child: Text(
+              '${price.toStringAsFixed(2)} €',
+              style: GoogleFonts.raleway(fontSize: fontSize, color: textColor),
+            )),
+      ),
+    );
   }
 }
 
