@@ -4,7 +4,9 @@ import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/selected_date_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SliverDateFlexibleAppBar extends StatefulWidget {
   const SliverDateFlexibleAppBar(
@@ -19,6 +21,26 @@ class SliverDateFlexibleAppBar extends StatefulWidget {
 }
 
 class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
+  //constants
+
+  static const _logoSize = 100.0;
+
+  static const _titleSize = 35.0;
+  static const _textColor = Colors.black;
+  static const _titleColor = Colors.white;
+
+  static const _fontSize = 18.2;
+
+  static const _sliverShapeBorderRadius = 3.0;
+  static const _sliverShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(_sliverShapeBorderRadius),
+          bottomRight: Radius.circular(_sliverShapeBorderRadius)));
+
+  final _infoBorderRadius = BorderRadius.circular(9.0);
+
+  static const _logo = 'assets/treasure.svg';
+
   late SelectedDateProvider selectedDateProvider;
   late ExpenseProvider expenseProvider;
   late CategoriesProvider categoriesProvider;
@@ -48,23 +70,57 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverAppBar(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(5),
-                      bottomRight: Radius.circular(5))),
+              backgroundColor: Colors.indigo,
+              shape: _sliverShape,
               automaticallyImplyLeading: false,
-              expandedHeight: size.height * 0.25,
+              expandedHeight: size.height * 0.35,
               floating: true,
               flexibleSpace: FlexibleSpaceBar(
                 stretchModes: const [StretchMode.blurBackground],
                 background: Column(
                   children: [
-                    Text('Mis gastos'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0)
+                          .copyWith(top: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: width * 0.6,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Mis gastos',
+                                    style: GoogleFonts.robotoSerif(
+                                        fontSize: _titleSize,
+                                        color: _titleColor)),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text('Controla donde gastas tu dinero. Ahorra.',
+                                    maxLines: 2,
+                                    style: GoogleFonts.robotoSerif(
+                                        fontSize: _titleSize / 2.5,
+                                        color: _titleColor)),
+                              ],
+                            ),
+                          ),
+                          SvgPicture.asset(
+                            _logo,
+                            height: _logoSize,
+                            width: _logoSize,
+                          ),
+                        ],
+                      ),
+                    ),
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 5),
+                        margin: EdgeInsets.symmetric(vertical: 5,horizontal: 6),
                         padding: const EdgeInsets.all(8.0),
                         width: width,
+                        decoration: BoxDecoration(
+                                color: Colors.lightBlue.shade200,
+                                borderRadius: _infoBorderRadius),
 
                         //color: Colors.greenAccent,
                         child: Consumer<SelectedDateProvider>(
@@ -75,25 +131,55 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Gastos'),
+                                  Text('Fecha',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: _textColor)),
                                   Text(
-                                      '${controller.totalExpenseOfDatePrice()} €')
+                                      selectedDateProvider.selectedDate,
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: _textColor))
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Número de gastos'),
+                                  Text('Gastos',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: _textColor)),
                                   Text(
-                                      '${controller.totalExpensesOfDateLength()}')
+                                      '${controller.totalExpenseOfDatePrice()} €',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: _textColor))
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Mayor gasto en'),
+                                  Text('Número de gastos',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: _textColor)),
+                                  Text(
+                                      '${controller.totalExpensesOfDateLength()}',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: _textColor))
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Mayor gasto en',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: _textColor)),
                                   Text(controller.categoryWithMoreExpenses())
                                 ],
                               ),
@@ -102,7 +188,10 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                                   child: ElevatedButton(
                                       onPressed: () {},
                                       child: Text(
-                                          'Añadir gasto a ${selectedDateProvider.selectedDate}')))
+                                          'Añadir gasto a ${selectedDateProvider.selectedDate}',
+                                          style: GoogleFonts.raleway(
+                                              fontSize: _fontSize,
+                                              color: _textColor))))
                             ],
                           ),
                         ),
@@ -215,7 +304,8 @@ class SliverDateAppBarController {
         categoriesWithNumberOfExpenses.update(
             expense.category, (value) => reps);
       } else {
-        categoriesWithNumberOfExpenses.addAll({expense.category: expense.price});
+        categoriesWithNumberOfExpenses
+            .addAll({expense.category: expense.price});
       }
     }
     String categoryWithMoreExpenses = '';

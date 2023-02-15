@@ -48,7 +48,7 @@ class SelectedDateProvider with ChangeNotifier {
 
         break;
       case DateType.week:
-        selectedDate = MyDateFormatter.toFormat('dd/MM/yyyy', now);
+        selectedDate = MyDateFormatter.dateByType(type, MyDateFormatter.toYYYYMMdd(now));
         selectedDateForExpenses = selectedDate;
         break;
     }

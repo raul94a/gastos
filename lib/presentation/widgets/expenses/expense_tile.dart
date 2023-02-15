@@ -25,11 +25,10 @@ class ExpenseTile extends StatefulWidget {
 }
 
 class _ExpenseTileState extends State<ExpenseTile> {
-
   static const titleFontSize = 18.2;
   static const subTitleFontSize = 16.0;
   static const tileHeight = 105.0;
-  
+
   late Expense expense;
 
   @override
@@ -98,6 +97,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
             decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
               Colors.white,
+              // Colors.white,
               color ?? Colors.white,
             ], begin: Alignment.topLeft, end: Alignment.bottomCenter)),
             child: ListTile(
@@ -111,6 +111,8 @@ class _ExpenseTileState extends State<ExpenseTile> {
                 overflow: TextOverflow.fade,
                 style: GoogleFonts.raleway(
                   fontSize: titleFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
               subtitle: Text(
@@ -118,7 +120,8 @@ class _ExpenseTileState extends State<ExpenseTile> {
                 maxLines: 2,
                 style: GoogleFonts.raleway(
                     fontSize: subTitleFontSize,
-                    color: Colors.black,
+                    color: textColor,
+                    
                     fontWeight: FontWeight.w500),
               ),
               trailing: SizedBox(
@@ -149,30 +152,21 @@ class AvatarPrice extends StatelessWidget {
 
   static const backgroundColor = Color.fromARGB(219, 0, 0, 0);
   static const borderColor = Colors.black;
-  static const textColor = Colors.white;
+  static const textColor = Colors.black;
   static const circleRadius = 70.0;
   static const padding = EdgeInsets.all(5.0);
-  static const fontSize = 16.0;
+  static const fontSize = 18.0;
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
-      // clipBehavior: Clip.hardEdge,
-      child: Container(
-        width: circleRadius , 
-        height: circleRadius,
-        padding: padding,
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: backgroundColor,
-            border: Border.all(color: borderColor)),
-        child: FittedBox(
-          alignment: Alignment.center,
-            // fit: BoxFit.scaleDown,
-            child: Text(
-              '${price.toStringAsFixed(2)} €',
-              style: GoogleFonts.raleway(fontSize: fontSize, color: textColor),
-            )),
+    return SizedBox(
+      width: circleRadius,
+      child: Center(
+        child: Text(
+          '${price.toStringAsFixed(2)} €',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.raleway(fontSize: fontSize, color: textColor,fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }
