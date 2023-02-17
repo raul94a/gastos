@@ -11,8 +11,10 @@ import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
-class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixin {
-  const CommonExpenseDialog({Key? key, this.expense, this.updateHandler, this.date})
+class CommonExpenseDialog extends StatelessWidget
+    with MaterialStatePropertyMixin {
+  const CommonExpenseDialog(
+      {Key? key, this.expense, this.updateHandler, this.date})
       : super(key: key);
   final Expense? expense;
   final String? date;
@@ -45,7 +47,7 @@ class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixi
                       if (expense == null && state.success) {
                         return const SuccessDialog();
                       }
-          
+
                       return ExpenseHandlerContent(
                         expense: expense,
                         updateHandler: updateHandler,
@@ -54,8 +56,6 @@ class CommonExpenseDialog extends StatelessWidget with MaterialStatePropertyMixi
                     },
                   ),
                 ),
-
-
               ),
             ),
           ),
@@ -257,7 +257,6 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                               category: selectedCategory,
                               description: description,
                               price: price);
-                          
                         } else {
                           await updateExpense(
                               context: context,
@@ -274,7 +273,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                       )
                     : Text(widget.expense != null
                         ? 'Actualizar gasto'
-                        : 'Añadir gasto')),
+                        : 'Añadir gasto',style:Theme.of(context).textTheme.labelLarge)),
           ),
           const SizedBox(
             height: 10,
@@ -284,7 +283,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
                 style:
                     ButtonStyle(fixedSize: widget.getProperty(Size(width, 50))),
                 onPressed: state.loading ? null : Navigator.of(context).pop,
-                child: const Text('Cancelar')),
+                child:  Text('Cancelar',style:Theme.of(context).textTheme.labelLarge)),
           )
         ],
       ),
@@ -317,7 +316,8 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
         updatedDate: updatedDate);
 
     try {
-      await state.add(expense:expense, individual: false);
+      await state.add(expense: expense, individual: false);
+      context.read<SelectedDateProvider>().notify();
     } catch (err) {
       if (kDebugMode) {
         print(err);
@@ -332,7 +332,6 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       required String category,
       required String description,
       required num price}) async {
-
     final userId = context.read<UserProvider>().loggedUser!.firebaseUID;
     final newExpense = widget.expense!.copyWith(
         person: context.read<UserProvider>().loggedUser!.name,
@@ -345,8 +344,9 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     try {
       //We're not going to update the Expense with the provider.
       widget.updateHandler!(newExpense);
-      await state.update(expense: newExpense,individual: false);
+      await state.update(expense: newExpense, individual: false);
       Navigator.of(context).pop();
+      context.read<SelectedDateProvider>().notify();
     } catch (err) {
       if (kDebugMode) {
         print(err);

@@ -69,13 +69,10 @@ class _ExpenseTileState extends State<ExpenseTile> {
     final categories = context.read<CategoriesProvider>().categories;
     Category? cat;
     Color? color;
-    Color textColor = Colors.black;
     try {
       cat = categories.firstWhere((element) => element.id == expense.category);
       color = Color.fromARGB(190, cat.r, cat.g, cat.b);
-      if (!ColorComputation.colorsMatch(color)) {
-        textColor = Colors.white;
-      }
+    
     } catch (err) {
       print(err);
     }
@@ -85,9 +82,10 @@ class _ExpenseTileState extends State<ExpenseTile> {
       
       decoration: const BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(6.5)),
         boxShadow:  [
           BoxShadow(
-              color: Colors.black, blurRadius: 5, offset: Offset(0.5, 1.25))
+              color: Color.fromARGB(181, 119, 118, 118), blurRadius: 5, offset: Offset(0.5, 1.25))
         ],
        
       ),
@@ -99,15 +97,16 @@ class _ExpenseTileState extends State<ExpenseTile> {
             height: 15,
             decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
-              (color ?? Colors.white).withOpacity(0.5),
+              (color ?? Colors.white).withOpacity(0.35),
               color ?? Colors.white,
             ], begin: Alignment.topLeft, end: Alignment.bottomCenter)),
           ),
-          Container(
-            color: Colors.white,
+          SizedBox(
             height: tileHeight,
             child: ListTile(
               isThreeLine: true,
+                          tileColor: Colors.white,
+
               onLongPress: showOptionDialog,
               contentPadding: const EdgeInsets.all(8),
               style: ListTileStyle.list,

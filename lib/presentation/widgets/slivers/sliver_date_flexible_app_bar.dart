@@ -62,6 +62,8 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
         selectedDateProvider: selectedDateProvider,
         expenseProvider: expenseProvider,
         categoriesProvider: categoriesProvider);
+
+    final containerTextColor = Theme.of(context).textTheme.displayLarge!.color;
     return SafeArea(
       child: DefaultTabController(
         length: 4,
@@ -73,7 +75,7 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
               backgroundColor: Colors.indigo,
               shape: _sliverShape,
               automaticallyImplyLeading: false,
-              expandedHeight: size.height * 0.35,
+              expandedHeight: size.height * 0.38,
               floating: true,
               flexibleSpace: FlexibleSpaceBar(
                 stretchModes: const [StretchMode.blurBackground],
@@ -115,12 +117,13 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                     ),
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 5,horizontal: 6),
+                        margin:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 6),
                         padding: const EdgeInsets.all(8.0),
                         width: width,
                         decoration: BoxDecoration(
-                                color: Colors.lightBlue.shade200,
-                                borderRadius: _infoBorderRadius),
+                            color: Colors.lightBlue.shade200,
+                            borderRadius: _infoBorderRadius),
 
                         //color: Colors.greenAccent,
                         child: Consumer<SelectedDateProvider>(
@@ -134,12 +137,11 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                                   Text('Fecha',
                                       style: GoogleFonts.raleway(
                                           fontSize: _fontSize,
-                                          color: _textColor)),
-                                  Text(
-                                      selectedDateProvider.selectedDate,
+                                          color: containerTextColor)),
+                                  Text(selectedDateProvider.selectedDate,
                                       style: GoogleFonts.raleway(
                                           fontSize: _fontSize,
-                                          color: _textColor))
+                                          color: containerTextColor))
                                 ],
                               ),
                               Row(
@@ -149,12 +151,12 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                                   Text('Gastos',
                                       style: GoogleFonts.raleway(
                                           fontSize: _fontSize,
-                                          color: _textColor)),
+                                          color: containerTextColor)),
                                   Text(
-                                      '${controller.totalExpenseOfDatePrice()} €',
+                                      '${controller.totalExpenseOfDatePrice().toStringAsFixed(2)} €',
                                       style: GoogleFonts.raleway(
                                           fontSize: _fontSize,
-                                          color: _textColor))
+                                          color: containerTextColor))
                                 ],
                               ),
                               Row(
@@ -164,12 +166,12 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                                   Text('Número de gastos',
                                       style: GoogleFonts.raleway(
                                           fontSize: _fontSize,
-                                          color: _textColor)),
+                                          color: containerTextColor)),
                                   Text(
                                       '${controller.totalExpensesOfDateLength()}',
                                       style: GoogleFonts.raleway(
                                           fontSize: _fontSize,
-                                          color: _textColor))
+                                          color: containerTextColor))
                                 ],
                               ),
                               Row(
@@ -179,8 +181,10 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                                   Text('Mayor gasto en',
                                       style: GoogleFonts.raleway(
                                           fontSize: _fontSize,
-                                          color: _textColor)),
-                                  Text(controller.categoryWithMoreExpenses())
+                                          color: containerTextColor)),
+                                  Text(controller.categoryWithMoreExpenses(),style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor),)
                                 ],
                               ),
                               Visibility(
@@ -191,7 +195,7 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                                           'Añadir gasto a ${selectedDateProvider.selectedDate}',
                                           style: GoogleFonts.raleway(
                                               fontSize: _fontSize,
-                                              color: _textColor))))
+                                              color: containerTextColor))))
                             ],
                           ),
                         ),

@@ -18,8 +18,7 @@ class ShouldAbandonApp extends StatelessWidget with MaterialStatePropertyMixin {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-            side: BorderSide(
-                color: Colors.transparent, strokeAlign: 0.0)),
+            side: BorderSide(color: Colors.transparent, strokeAlign: 0.0)),
         context: context,
         builder: (ctx) {
           return Column(
@@ -27,8 +26,9 @@ class ShouldAbandonApp extends StatelessWidget with MaterialStatePropertyMixin {
               SizedBox(
                 height: size.height * 0.05,
               ),
-              const Center(
-                child: Text('¿Salir de la aplicación?'),
+              Center(
+                child: Text('¿Salir de la aplicación?',
+                    style: Theme.of(context).textTheme.titleSmall),
               ),
               SizedBox(
                 height: size.height * 0.03,
@@ -41,7 +41,10 @@ class ShouldAbandonApp extends StatelessWidget with MaterialStatePropertyMixin {
                       style: ButtonStyle(
                           fixedSize: getProperty(Size(size.width * 0.3, 50))),
                       onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('No')),
+                      child: Text(
+                        'No',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      )),
                   const SizedBox(
                     width: 15,
                   ),
@@ -49,7 +52,10 @@ class ShouldAbandonApp extends StatelessWidget with MaterialStatePropertyMixin {
                       style: ButtonStyle(
                           fixedSize: getProperty(Size(size.width * 0.3, 50))),
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Sí')),
+                      child: Text(
+                        'Sí',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      )),
                 ],
               )
             ],
