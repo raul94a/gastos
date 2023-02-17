@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
+import 'package:gastos/providers/scroll_provider.dart';
 import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -64,171 +65,188 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
         categoriesProvider: categoriesProvider);
 
     final containerTextColor = Theme.of(context).textTheme.displayLarge!.color;
-    return SafeArea(
-      child: DefaultTabController(
-        length: 4,
-        child: CustomScrollView(
-          controller: widget.controller,
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              backgroundColor: Colors.indigo,
-              shape: _sliverShape,
-              automaticallyImplyLeading: false,
-              expandedHeight: size.height * 0.38,
-              floating: true,
-              flexibleSpace: FlexibleSpaceBar(
-                stretchModes: const [StretchMode.blurBackground],
-                background: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0)
-                          .copyWith(top: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: width * 0.6,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Mis gastos',
-                                    style: GoogleFonts.robotoSerif(
-                                        fontSize: _titleSize,
-                                        color: _titleColor)),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text('Controla donde gastas tu dinero. Ahorra.',
-                                    maxLines: 2,
-                                    style: GoogleFonts.robotoSerif(
-                                        fontSize: _titleSize / 2.5,
-                                        color: _titleColor)),
-                              ],
-                            ),
-                          ),
-                          SvgPicture.asset(
-                            _logo,
-                            height: _logoSize,
-                            width: _logoSize,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 6),
-                        padding: const EdgeInsets.all(8.0),
-                        width: width,
-                        decoration: BoxDecoration(
-                            color: Colors.lightBlue.shade200,
-                            borderRadius: _infoBorderRadius),
 
-                        //color: Colors.greenAccent,
-                        child: Consumer<SelectedDateProvider>(
-                          builder: (ctx, _, __) => Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return DefaultTabController(
+      length: 4,
+      child: CustomScrollView(
+        controller: widget.controller,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.indigo,
+            shape: _sliverShape,
+            automaticallyImplyLeading: false,
+            expandedHeight: size.height * 0.38,
+            floating: true,
+            flexibleSpace: FlexibleSpaceBar(
+              stretchModes: const [StretchMode.blurBackground],
+              background: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0)
+                        .copyWith(top: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: width * 0.6,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Fecha',
-                                      style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor)),
-                                  Text(selectedDateProvider.selectedDate,
-                                      style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor))
-                                ],
+                              Text('Mis gastos',
+                                  style: GoogleFonts.robotoSerif(
+                                      fontSize: _titleSize,
+                                      color: _titleColor)),
+                              const SizedBox(
+                                height: 5,
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Gastos',
-                                      style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor)),
-                                  Text(
-                                      '${controller.totalExpenseOfDatePrice().toStringAsFixed(2)} €',
-                                      style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor))
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Número de gastos',
-                                      style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor)),
-                                  Text(
-                                      '${controller.totalExpensesOfDateLength()}',
-                                      style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor))
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Mayor gasto en',
-                                      style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor)),
-                                  Text(controller.categoryWithMoreExpenses(),style: GoogleFonts.raleway(
-                                          fontSize: _fontSize,
-                                          color: containerTextColor),)
-                                ],
-                              ),
-                              Visibility(
-                                  visible: false,
-                                  child: ElevatedButton(
-                                      onPressed: () {},
-                                      child: Text(
-                                          'Añadir gasto a ${selectedDateProvider.selectedDate}',
-                                          style: GoogleFonts.raleway(
-                                              fontSize: _fontSize,
-                                              color: containerTextColor))))
+                              Text('Controla donde gastas tu dinero. Ahorra.',
+                                  maxLines: 2,
+                                  style: GoogleFonts.robotoSerif(
+                                      fontSize: _titleSize / 2.5,
+                                      color: _titleColor)),
                             ],
                           ),
                         ),
+                        SvgPicture.asset(
+                          _logo,
+                          height: _logoSize,
+                          width: _logoSize,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+                      padding: const EdgeInsets.all(8.0),
+                      width: width,
+                      decoration: BoxDecoration(
+                          color: Colors.lightBlue.shade200,
+                          borderRadius: _infoBorderRadius),
+
+                      //color: Colors.greenAccent,
+                      child: Consumer<SelectedDateProvider>(
+                        builder: (ctx, _, __) => Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Fecha',
+                                    style: GoogleFonts.raleway(
+                                        fontSize: _fontSize,
+                                        color: containerTextColor)),
+                                Text(selectedDateProvider.selectedDate,
+                                    style: GoogleFonts.raleway(
+                                        fontSize: _fontSize,
+                                        color: containerTextColor))
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Gastos',
+                                    style: GoogleFonts.raleway(
+                                        fontSize: _fontSize,
+                                        color: containerTextColor)),
+                                Text(
+                                    '${controller.totalExpenseOfDatePrice().toStringAsFixed(2)} €',
+                                    style: GoogleFonts.raleway(
+                                        fontSize: _fontSize,
+                                        color: containerTextColor))
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Número de gastos',
+                                    style: GoogleFonts.raleway(
+                                        fontSize: _fontSize,
+                                        color: containerTextColor)),
+                                Text(
+                                    '${controller.totalExpensesOfDateLength()}',
+                                    style: GoogleFonts.raleway(
+                                        fontSize: _fontSize,
+                                        color: containerTextColor))
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Mayor gasto en',
+                                    style: GoogleFonts.raleway(
+                                        fontSize: _fontSize,
+                                        color: containerTextColor)),
+                                Text(
+                                  controller.categoryWithMoreExpenses(),
+                                  style: GoogleFonts.raleway(
+                                      fontSize: _fontSize,
+                                      color: containerTextColor),
+                                )
+                              ],
+                            ),
+                            Visibility(
+                                visible: false,
+                                child: ElevatedButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                        'Añadir gasto a ${selectedDateProvider.selectedDate}',
+                                        style: GoogleFonts.raleway(
+                                            fontSize: _fontSize,
+                                            color: containerTextColor))))
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 50,
-                    )
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  )
+                ],
               ),
-              bottom: TabBar(
-                  onTap: (a) => controller.changeDateType(a, context),
-                  tabs: const [
-                    Tab(
-                      text: 'Día',
-                    ),
-                    Tab(
-                      text: 'Semana',
-                    ),
-                    Tab(
-                      text: 'Mes',
-                    ),
-                    Tab(
-                      text: 'Año',
-                    )
-                  ]),
             ),
-            SliverList(delegate: SliverChildListDelegate.fixed([widget.child]))
-            //This results in rebuilding the entire page, so for this case is not good
-            //  SliverList(delegate: SliverChildBuilderDelegate((ctx, i) => child))
-          ],
-        ),
+            bottom: TabBar(
+                onTap: (a) => controller.changeDateType(a, context),
+                tabs: [
+                  Consumer<ScrollProvider>(
+                    builder: (ctx, state, _) => Visibility(
+                      visible: !state.isScrolling,
+                      child: Tab(
+                        text: 'Día',
+                      ),
+                    ),
+                  ),
+                  Consumer<ScrollProvider>(
+                    builder: (ctx, state, _) => Visibility(
+                      visible: !state.isScrolling,
+                      child: Tab(
+                        text: 'Semana',
+                      ),
+                    ),
+                  ),
+                  Consumer<ScrollProvider>(
+                    builder: (ctx, state, _) => Visibility(
+                      visible: !state.isScrolling,
+                      child: Tab(
+                        text: 'Mes',
+                      ),
+                    ),
+                  ),
+                  Consumer<ScrollProvider>(
+                    builder: (ctx, state, _) => Visibility(
+                      visible: !state.isScrolling,
+                      child: Tab(
+                        text: 'Año',
+                      ),
+                    ),
+                  ),
+                ]),
+          ),
+          SliverList(delegate: SliverChildListDelegate.fixed([widget.child]))
+          //This results in rebuilding the entire page, so for this case is not good
+          //  SliverList(delegate: SliverChildBuilderDelegate((ctx, i) => child))
+        ],
       ),
     );
   }

@@ -31,59 +31,70 @@ class Init extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle().copyWith(
-        systemNavigationBarDividerColor: Color.fromARGB(255, 230, 60, 117),
-        statusBarColor: Colors.black, systemNavigationBarColor: Colors.black));
-  
-    return ShouldAbandonApp(
-      child: Scaffold(
-        floatingActionButton:
-            Consumer<NavigationProvider>(builder: (ctx, state, _) {
-          return FloatingActionButton(
-            heroTag: 'hero-fab',
+    // SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle().copyWith(
+    //     systemNavigationBarDividerColor: Colors.indigo,
+    //     statusBarBrightness: Brightness.light,
+    //     statusBarIconBrightness: Brightness.light,
+    //     systemStatusBarContrastEnforced: false,
+    //     statusBarColor: Colors.transparent,
+    //     systemNavigationBarColor: Colors.transparent));
+SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-            onPressed: () {
-              switch (state.pageName) {
-                case PageName.individual:
-                  showIndividualExpenseDialog(context);
-                  break;
-                case PageName.common:
-                  showExpenseDialog(context);
-                  break;
-                case PageName.info:
-                  break;
-                case PageName.settings:
+SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(label: 'Mis gastos',primaryColor: 100));
 
-                  break;
-              }
-            },
-            child: const Icon(Icons.add_rounded),
-          );
-        }),
-        body: Consumer<NavigationProvider>(
-            builder: (ctx, state, _) => _PageSelector(index: state.page)),
-        bottomNavigationBar: Consumer<NavigationProvider>(
-          builder: (ctx, state, _) => BottomNavigationBar(
-              backgroundColor: Colors.black,
-              type: BottomNavigationBarType.fixed,
-              selectedItemColor: Colors.blueAccent.shade100,
-              unselectedItemColor: Colors.white,
-              unselectedLabelStyle: const TextStyle(color: Colors.white),
-              selectedLabelStyle: TextStyle(color: Colors.blueAccent.shade100),
-              currentIndex: state.page,
-              onTap: state.goTo,
-              items: const [alpha, a, b, c]),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+          
+          systemNavigationBarDividerColor: Colors.indigo,
+          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.light,
+          systemStatusBarContrastEnforced: false,
+          systemNavigationBarContrastEnforced: true,
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: Colors.indigo),
+      child: ShouldAbandonApp(
+        child: Scaffold(
+          floatingActionButton:
+              Consumer<NavigationProvider>(builder: (ctx, state, _) {
+            return FloatingActionButton(
+              heroTag: 'hero-fab',
+              onPressed: () {
+                switch (state.pageName) {
+                  case PageName.individual:
+                    showIndividualExpenseDialog(context);
+                    break;
+                  case PageName.common:
+                    showExpenseDialog(context);
+                    break;
+                  case PageName.info:
+                    break;
+                  case PageName.settings:
+                    break;
+                }
+              },
+              child: const Icon(Icons.add_rounded),
+            );
+          }),
+          body: Consumer<NavigationProvider>(
+              builder: (ctx, state, _) => _PageSelector(index: state.page)),
+          bottomNavigationBar: Consumer<NavigationProvider>(
+            builder: (ctx, state, _) => BottomNavigationBar(
+                // backgroundColor: Colors.black,
+                type: BottomNavigationBarType.fixed,
+                currentIndex: state.page,
+                onTap: state.goTo,
+                items: const [alpha, a, b, c]),
+          ),
         ),
       ),
     );
   }
 }
 
-const alpha =
-
-    BottomNavigationBarItem(icon: Hero(tag: 'individual',child: Icon(Icons.person)), label: 'Invidivuales');
+const alpha = BottomNavigationBarItem(
+    icon: Hero(tag: 'individual', child: Icon(Icons.person)),
+    label: 'Invidivuales');
 
 const a = BottomNavigationBarItem(icon: Icon(Icons.euro), label: 'Gastos');
 const b = BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info');
