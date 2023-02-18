@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos/data/models/user.dart';
 import 'package:gastos/presentation/widgets/info/charts/month_expenses_chart_by_day.dart';
 import 'package:gastos/presentation/widgets/info/charts/week_expenses_chart_by_day.dart';
 import 'package:gastos/presentation/widgets/info/charts/year_expenses_chart_by_month.dart';
@@ -32,27 +33,7 @@ class InfoPage extends StatelessWidget {
             ),
 
             ///start usuarios de la app card
-            Padding(
-              padding: const EdgeInsets.all(3.0),
-              child: Card(
-                elevation: 6,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Wrap(
-                    children: [
-                      Text('Usuarios de la aplicación',
-                          style: titleStyle(25.2)),
-                      ...users
-                          .map((e) => _UserInfoContainer(
-                              userName: e.name,
-                              fecha: MyDateFormatter.toFormat(
-                                  'dd/MM/yyyy', DateTime.now())))
-                          .toList(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            _AppUsersInfo(users: users),
             //fin usuarios de la app card
             const SizedBox(height: 20),
             Padding(
@@ -64,13 +45,72 @@ class InfoPage extends StatelessWidget {
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   )),
             ),
+            const _CommonExpensesChartsRow(),
             const SizedBox(
-              height: 5,
-            ),
-            //card gastos semana actual
-            Card(
+              height: 50,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppUsersInfo extends StatelessWidget {
+  const _AppUsersInfo({
+    super.key,
+    required this.users,
+  });
+
+  final List<AppUser> users;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(3.0),
+      child: Card(
+        elevation: 6,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Wrap(
+            children: [
+              Text('Usuarios de la aplicación', style: titleStyle(25.2)),
+              ...users
+                  .map((e) => _UserInfoContainer(
+                      userName: e.name,
+                      fecha: MyDateFormatter.toFormat(
+                          'dd/MM/yyyy', DateTime.now())))
+                  .toList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CommonExpensesChartsRow extends StatelessWidget {
+  const _CommonExpensesChartsRow({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          // const SizedBox(
+          //   height: 5,
+          // ),
+          //card gastos semana actual
+          SizedBox(
+            width: width,
+            child: Card(
               elevation: 6,
-              child: Wrap(
+              child: Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -87,13 +127,16 @@ class InfoPage extends StatelessWidget {
                 ],
               ),
             ),
-            //fin card gasto semana actual
-            const SizedBox(
-              height: 7,
-            ),
-            Card(
+          ),
+          //fin card gasto semana actual
+          // const SizedBox(
+          //   height: 7,
+          // ),
+          SizedBox(
+            width: width,
+            child: Card(
               elevation: 6,
-              child: Wrap(
+              child: Column(
                 children: const [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -107,11 +150,14 @@ class InfoPage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 7,
-            ),
-            Card(
-              child: Wrap(
+          ),
+          // const SizedBox(
+          //   height: 7,
+          // ),
+          SizedBox(
+            width: width,
+            child: Card(
+              child: Column(
                 children: const [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -125,12 +171,9 @@ class InfoPage extends StatelessWidget {
                 ],
               ),
             ),
-            //fin card year
-            const SizedBox(
-              height: 50,
-            )
-          ],
-        ),
+          ),
+          //fin card year
+        ],
       ),
     );
   }
