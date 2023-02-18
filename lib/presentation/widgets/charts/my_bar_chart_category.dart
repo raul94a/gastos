@@ -45,16 +45,28 @@ class MyBarChartCategory extends StatelessWidget {
   Widget getTitles(double value, TitleMeta meta) {
     final style = xAxisTextStyle;
     int val = value.toInt();
-    print('categories expenses: $categoriesExpenses');
-    String text = categoriesExpenses
-        .firstWhere((element) => element.index == val)
-        .name!;
+
+    String text =
+        categoriesExpenses.firstWhere((element) => element.index == val).name!;
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 4,
-      child: Text(text, style: style),
+      child: Text(text.substring(0, getEndSubstringLength(text)), style: style),
     );
+  }
+
+  int getEndSubstringLength(String text) {
+    const nrLettersToShow = 8;
+    if (text.isEmpty) {
+      return 0;
+    }
+    int textLength = text.length;
+    bool goodLength = textLength >= nrLettersToShow;
+    if (goodLength) {
+      return nrLettersToShow;
+    }
+    return textLength - 1;
   }
 
   FlTitlesData get titlesData => FlTitlesData(
@@ -65,28 +77,6 @@ class MyBarChartCategory extends StatelessWidget {
             showTitles: true,
             reservedSize: 30,
             getTitlesWidget: getTitles,
-          ),
-        ),
-        leftTitles: AxisTitles(
-          axisNameWidget: yAxisWidgetLabel,
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-      );
-
-  FlTitlesData get _yearMonthsTitleData => FlTitlesData(
-        show: true,
-        bottomTitles: AxisTitles(
-          axisNameWidget: xAxisWidgetLabel,
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: getTitlesYearMonths,
           ),
         ),
         leftTitles: AxisTitles(

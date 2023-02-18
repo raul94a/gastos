@@ -75,29 +75,29 @@ class MyDateFormatter {
   static String monthThreeLetters(String month){
      switch (month) {
       case "01":
-        return 'Ene.';
+        return 'Ene';
       case "02":
-        return 'Feb.';
+        return 'Feb';
       case "03":
-        return 'Mar.';
+        return 'Mar';
       case "04":
-        return 'Abr.';
+        return 'Abr';
       case "05":
-        return 'May.';
+        return 'May';
       case "06":
-        return 'Jun.';
+        return 'Jun';
       case "07":
-        return 'Jul.';
+        return 'Jul';
       case "08":
-        return 'Ago.';
+        return 'Ago';
       case "09":
-        return 'Sep.';
+        return 'Sep';
       case "10":
-        return 'Oct.';
+        return 'Oct';
       case "11":
-        return 'Nov.';
+        return 'Nov';
       default:
-        return 'Dic.';
+        return 'Dic';
     }
   }
 

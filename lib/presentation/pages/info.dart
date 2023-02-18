@@ -22,6 +22,15 @@ class InfoPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Información',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge!
+                      .copyWith(fontSize: 32, fontWeight: FontWeight.bold)),
+            ),
+
             ///start usuarios de la app card
             Padding(
               padding: const EdgeInsets.all(3.0),
@@ -117,7 +126,9 @@ class InfoPage extends StatelessWidget {
               ),
             ),
             //fin card year
-            const SizedBox(height: 50,)
+            const SizedBox(
+              height: 50,
+            )
           ],
         ),
       ),
