@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/expense.dart';
-import 'package:gastos/presentation/pages/individual_expenses.dart';
 import 'package:gastos/presentation/widgets/dialogs/expense_options_dialog.dart';
 import 'package:gastos/presentation/widgets/dialogs/individual_expense_options_dialog.dart';
 import 'package:gastos/providers/categories_provider.dart';
@@ -108,10 +107,13 @@ class _ExpenseTileState extends State<ExpenseTile> {
           Container(
             height: 15,
             decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
+                gradient: LinearGradient(
+                  tileMode: TileMode.mirror,
+                  colors: [
               (color ?? Colors.white).withOpacity(0.35),
               color ?? Colors.white,
-            ], begin: Alignment.topLeft, end: Alignment.bottomCenter)),
+              (color ?? Colors.white).withOpacity(0.35),
+            ], begin: Alignment.topLeft, end: Alignment.bottomRight)),
           ),
           SizedBox(
             height: tileHeight,

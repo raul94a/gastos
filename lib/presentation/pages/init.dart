@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:gastos/presentation/pages/individual_expenses.dart';
 import 'package:gastos/presentation/pages/new_expenses_list.dart';
 import 'package:gastos/presentation/pages/new_individual_expense_list.dart';
 import 'package:gastos/presentation/pages/settings.dart';
 import 'package:gastos/presentation/pages/info.dart';
 import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
-import 'package:gastos/presentation/pages/expenses_list.dart';
 import 'package:gastos/presentation/widgets/dialogs/individual_expense_dialogs.dart';
 import 'package:gastos/presentation/widgets/main/should_abandon.dart';
 import 'package:gastos/providers/navigation_provider.dart';

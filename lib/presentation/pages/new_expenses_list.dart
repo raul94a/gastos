@@ -219,6 +219,8 @@ class _DateSelector extends StatelessWidget {
   static const fontSize = 18.5;
   @override
   Widget build(BuildContext context) {
+    const underlineInputBorder = UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black));
     return Row(
       children: [
         Consumer<SelectedDateProvider>(builder: (ctx, state, _) {
@@ -229,8 +231,9 @@ class _DateSelector extends StatelessWidget {
             style: GoogleFonts.raleway(fontSize: fontSize),
             controller: dateController,
             decoration: InputDecoration(
-                border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black))),
+                enabledBorder: underlineInputBorder,
+                disabledBorder: underlineInputBorder,
+                border: underlineInputBorder),
           ));
         }),
         SizedBox(
