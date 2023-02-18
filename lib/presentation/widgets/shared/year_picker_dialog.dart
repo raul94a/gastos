@@ -38,19 +38,47 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    
-    
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
     return Dialog(
-      child: YearPicker(
-          selectedDate: selectedDate,
-          firstDate: widget.firstDate,
-          lastDate: widget.lastDate,
-          onChanged: (dateTime) {
-            widget.onSelected(dateTime);
-            setState(() {
-              selectedDate = dateTime;
-            });
-          }),
+      insetPadding:
+          EdgeInsets.symmetric(horizontal: 40, vertical: size.height * 0.17),
+      child: Column(
+        children: [
+           Container(
+            height: 150,
+            width: width,
+            color: Theme.of(context).colorScheme.primary,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0).copyWith(left: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Elige un año'.toUpperCase(),
+                      style: Theme.of(context).textTheme.labelLarge),
+                      const SizedBox(height: 15,),
+                  Text(selectedDate.year.toString(),
+                      style: Theme.of(context).textTheme.labelLarge),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: YearPicker(
+              
+                selectedDate: selectedDate,
+                firstDate: DateTime.parse('2018-02-02'),
+                lastDate: widget.lastDate,
+                onChanged: (dateTime) {
+                  widget.onSelected(dateTime);
+                  setState(() {
+                    selectedDate = dateTime;
+                  });
+                }),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -77,7 +77,8 @@ class MyApp extends StatelessWidget {
                   )
               .copyWith(
                   textTheme: TextTheme(
-                      // titleLarge: GoogleFonts.raleway(fontSize:16.0,color: Colors.black),
+                      titleLarge: GoogleFonts.raleway(
+                          fontSize: 24.0, color: Colors.black),
                       //titlemedium control the formtext style
                       titleMedium: GoogleFonts.raleway(
                           fontSize: 16.0, color: Colors.black),
@@ -104,7 +105,8 @@ class MyApp extends StatelessWidget {
                           fontSize: 16.0, color: Colors.black),
                       bodyLarge: GoogleFonts.raleway(
                           fontSize: 16.0, color: Colors.black),
-                      labelLarge: TextStyle(color: Colors.white),
+                      labelLarge: GoogleFonts.raleway(
+                          fontSize: 16.0, color: Colors.white),
                       titleSmall: GoogleFonts.raleway(
                           fontSize: 16.0, color: Colors.black)),
                   cardColor: Colors.white,
@@ -136,10 +138,10 @@ class MyApp extends StatelessWidget {
                       labelColor: Color.fromARGB(255, 223, 228, 154)),
                   cardTheme: CardTheme(color: Colors.white),
                   colorScheme: ColorScheme.light(
-                      // onPrimary: Colors.black,
+                      // primary: Colors.white,
                       primary: Colors.indigo,
                       error: Colors.red,
-                      onSecondary: Colors.indigo,
+                      // onSecondary: Color.fromARGB(255, 3, 18, 30),
                       secondary: Color.fromARGB(255, 255, 237, 75))),
           routerConfig: router,
         );
