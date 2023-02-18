@@ -11,7 +11,7 @@ class ChartCard extends StatelessWidget {
         elevation: 10,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
-            side: const BorderSide(
+            side: true ? BorderSide.none : const BorderSide(
               strokeAlign: 0.0,
               width: 2,
               color: Color.fromARGB(235, 1, 1, 2),

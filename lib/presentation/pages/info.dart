@@ -22,14 +22,29 @@ class InfoPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Usuarios de la aplicación',
-                textAlign: TextAlign.center, style: titleStyle(28.2)),
-            ...users
-                .map((e) => _UserInfoContainer(
-                    userName: e.name,
-                    fecha:
-                        MyDateFormatter.toFormat('dd/MM/yyyy', DateTime.now())))
-                .toList(),
+            ///start usuarios de la app card
+            Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: Card(
+                elevation: 6,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Wrap(
+                    children: [
+                      Text('Usuarios de la aplicación',
+                          style: titleStyle(25.2)),
+                      ...users
+                          .map((e) => _UserInfoContainer(
+                              userName: e.name,
+                              fecha: MyDateFormatter.toFormat(
+                                  'dd/MM/yyyy', DateTime.now())))
+                          .toList(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            //fin usuarios de la app card
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -43,46 +58,66 @@ class InfoPage extends StatelessWidget {
             const SizedBox(
               height: 5,
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('Gastos de la semana actual',
-                  style: TextStyle(fontSize: 24)),
+            //card gastos semana actual
+            Card(
+              elevation: 6,
+              child: Wrap(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Gastos de la semana actual',
+                        style: TextStyle(fontSize: 24)),
+                  ),
+                  const SizedBox(
+                    height: 7,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: const CurrentWeekInfo(),
+                  ),
+                ],
+              ),
+            ),
+            //fin card gasto semana actual
+            const SizedBox(
+              height: 7,
+            ),
+            Card(
+              elevation: 6,
+              child: Wrap(
+                children: const [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Gastos del mes actual',
+                        style: TextStyle(fontSize: 24)),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  CurrentMonthInfo(),
+                ],
+              ),
             ),
             const SizedBox(
               height: 7,
             ),
             Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    side: BorderSide(color: Colors.black,width: 1.75)),
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: const CurrentWeekInfo(),
-                )),
-            const SizedBox(
-              height: 7,
+              child: Wrap(
+                children: const [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Gastos del año actual',
+                        style: TextStyle(fontSize: 24)),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  CurrentYearInfo()
+                ],
+              ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child:
-                  Text('Gastos del mes actual', style: TextStyle(fontSize: 24)),
-            ),
-            const SizedBox(
-              height: 7,
-            ),
-            const CurrentMonthInfo(),
-            const SizedBox(
-              height: 7,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child:
-                  Text('Gastos del año actual', style: TextStyle(fontSize: 24)),
-            ),
-            const SizedBox(
-              height: 7,
-            ),
-            const CurrentYearInfo()
+            //fin card year
+            const SizedBox(height: 50,)
           ],
         ),
       ),

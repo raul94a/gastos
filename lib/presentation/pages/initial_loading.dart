@@ -34,7 +34,7 @@ class _InitialLoadingState extends State<InitialLoading> {
   }
 
   void goToExpenseList(BuildContext context) {
-    context.go('/init');
+    context.pushReplacement('/init');
   }
 
 

@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:gastos/presentation/pages/individual_expenses.dart';
 import 'package:gastos/presentation/pages/new_expenses_list.dart';
+import 'package:gastos/presentation/pages/new_individual_expense_list.dart';
 import 'package:gastos/presentation/pages/settings.dart';
 import 'package:gastos/presentation/pages/info.dart';
 import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
@@ -94,9 +95,9 @@ SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(la
 
 const alpha = BottomNavigationBarItem(
     icon: Hero(tag: 'individual', child: Icon(Icons.person)),
-    label: 'Invidivuales');
+    label: 'Personal');
 
-const a = BottomNavigationBarItem(icon: Icon(Icons.euro), label: 'Gastos');
+const a = BottomNavigationBarItem(icon: Icon(Icons.euro), label: 'Comun');
 const b = BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info');
 const c = BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes');
 
@@ -107,7 +108,7 @@ class _PageSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (index == 0) return const IndividualExpensesPage();
+    if (index == 0) return const NewIndividualExpenseList();
     if (index == 1) return const NewExpenseList();
     if (index == 2) return const InfoPage();
 

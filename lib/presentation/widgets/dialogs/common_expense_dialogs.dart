@@ -14,10 +14,11 @@ import 'package:provider/provider.dart';
 class CommonExpenseDialog extends StatelessWidget
     with MaterialStatePropertyMixin {
   const CommonExpenseDialog(
-      {Key? key, this.expense, this.updateHandler, this.date})
+      {Key? key, this.expense, this.updateHandler, this.date, this.individual = false})
       : super(key: key);
   final Expense? expense;
   final String? date;
+  final bool individual;
   final Function(Expense)? updateHandler;
 
   @override
@@ -49,6 +50,7 @@ class CommonExpenseDialog extends StatelessWidget
                       }
 
                       return ExpenseHandlerContent(
+                        individual:individual,
                         expense: expense,
                         updateHandler: updateHandler,
                         date: date,
@@ -116,10 +118,11 @@ class SuccessDialog extends StatelessWidget with MaterialStatePropertyMixin {
 class ExpenseHandlerContent extends StatefulWidget
     with MaterialStatePropertyMixin {
   const ExpenseHandlerContent(
-      {super.key, this.expense, this.updateHandler, this.date});
+      {super.key, this.expense, this.updateHandler, this.date, this.individual = true});
   final Expense? expense;
   final Function(Expense)? updateHandler;
   final String? date;
+  final bool individual;
   @override
   State<ExpenseHandlerContent> createState() => _ExpenseHandlerContentState();
 }
@@ -174,20 +177,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // const Text('Nombre'),
-          // Padding(
-          //     padding: const EdgeInsets.all(8.0),
-          //     child: TextFormField(
-          //       keyboardType: TextInputType.name,
-          //       textInputAction: TextInputAction.next,
-          //       focusNode: nameNode,
-          //       decoration: basisFormDecoration(),
-          //       controller: nameController,
-          //       // onFieldSubmitted: (value) => nameNode.nextFocus(),
-          //     )),
-          // const SizedBox(
-          //   height: 20,
-          // ),
+          
           const Text('Descripción del gasto'),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -344,7 +334,7 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
     try {
       //We're not going to update the Expense with the provider.
       widget.updateHandler!(newExpense);
-      await state.update(expense: newExpense, individual: false);
+      await state.update(expense: newExpense, individual: widget.individual);
       Navigator.of(context).pop();
       context.read<SelectedDateProvider>().notify();
     } catch (err) {

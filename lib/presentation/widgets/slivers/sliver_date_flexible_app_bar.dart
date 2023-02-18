@@ -11,10 +11,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class SliverDateFlexibleAppBar extends StatefulWidget {
   const SliverDateFlexibleAppBar(
-      {Key? key, required this.child, required this.controller})
+      {Key? key,
+      required this.child,
+      required this.controller,
+      this.personalExpenses = false})
       : super(key: key);
   final Widget child;
   final ScrollController controller;
+  final bool personalExpenses;
 
   @override
   State<SliverDateFlexibleAppBar> createState() =>
@@ -26,7 +30,7 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
 
   static const _logoSize = 100.0;
 
-  static const _titleSize = 35.0;
+  static const _titleSize = 30.0;
   static const _textColor = Colors.black;
   static const _titleColor = Colors.white;
 
@@ -45,6 +49,19 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
   late SelectedDateProvider selectedDateProvider;
   late ExpenseProvider expenseProvider;
   late CategoriesProvider categoriesProvider;
+
+  int initialIndexByDateType(DateType dateType) {
+    switch (dateType) {
+      case DateType.day:
+        return 0;
+      case DateType.month:
+        return 2;
+      case DateType.year:
+        return 3;
+      case DateType.week:
+        return 1;
+    }
+  }
 
   @override
   void initState() {
@@ -65,8 +82,9 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
         categoriesProvider: categoriesProvider);
 
     final containerTextColor = Theme.of(context).textTheme.displayLarge!.color;
-
+    final dateType = expenseProvider.dateType;
     return DefaultTabController(
+      initialIndex: initialIndexByDateType(dateType),
       length: 4,
       child: CustomScrollView(
         controller: widget.controller,
@@ -93,18 +111,27 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Mis gastos',
+                              Text(
+                                  widget.personalExpenses
+                                      ? 'Gastos Personales'
+                                      : 'Gastos Comunes',
                                   style: GoogleFonts.robotoSerif(
                                       fontSize: _titleSize,
                                       color: _titleColor)),
                               const SizedBox(
                                 height: 5,
                               ),
-                              Text('Controla donde gastas tu dinero. Ahorra.',
+                              Text(
+                                  widget.personalExpenses
+                                      ? 'Controla donde gastas tu dinero. Ahorra.'
+                                      : 'Optimiza los gastos de tu grupo',
                                   maxLines: 2,
                                   style: GoogleFonts.robotoSerif(
                                       fontSize: _titleSize / 2.5,
                                       color: _titleColor)),
+                              const SizedBox(
+                                height: 10,
+                              )
                             ],
                           ),
                         ),

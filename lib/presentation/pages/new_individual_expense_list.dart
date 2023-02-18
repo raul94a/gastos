@@ -17,14 +17,17 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-class NewExpenseList extends StatefulWidget {
-  const NewExpenseList({super.key});
+class NewIndividualExpenseList extends StatefulWidget {
+  const NewIndividualExpenseList({super.key});
+ 
 
   @override
-  State<NewExpenseList> createState() => _NewExpenseListState();
+  State<NewIndividualExpenseList> createState() =>
+      _NewIndividualExpenseListState();
 }
 
-class _NewExpenseListState extends State<NewExpenseList> {
+class _NewIndividualExpenseListState extends State<NewIndividualExpenseList> {
+   static const bool personalExpenses = true;
   final scrollController = AutoScrollController();
   final dateController = TextEditingController();
   late ExpenseProvider expState;
@@ -83,6 +86,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
     dateController.text = selectedDate ?? toDDMMYYYY(DateTime.now());
     print('Build Main Page');
     return MainScrollNotification(
+      key: UniqueKey(),
         controller: scrollController,
         child: RefreshIndicator(
           triggerMode: RefreshIndicatorTriggerMode.anywhere,
@@ -93,6 +97,7 @@ class _NewExpenseListState extends State<NewExpenseList> {
                   .refreshData()
                   .then((value) => selectedDateState.notify()))),
           child: SliverDateFlexibleAppBar(
+            personalExpenses: personalExpenses,
             controller: scrollController,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -126,6 +131,7 @@ class _ExpensesList extends StatelessWidget {
   });
 
   final ExpenseProvider expState;
+
   static const fontSize = 18.0;
   static const logo = 'assets/sleep.svg';
   static const notFoundExpensesText =
@@ -137,7 +143,8 @@ class _ExpensesList extends StatelessWidget {
     final width = size.width;
     final logoWidth = width * 0.4;
     return Consumer<SelectedDateProvider>(builder: (ctx, state, _) {
-      final expensesOfDate = expState.expenses[state.selectedDateForExpenses];
+      final expensesOfDate =
+          expState.individualExpenses[state.selectedDateForExpenses];
       bool isExpensesOfDateNull = expensesOfDate == null;
       if (isExpensesOfDateNull) {
         return _NoExpensesFound(
@@ -152,9 +159,10 @@ class _ExpensesList extends StatelessWidget {
         itemCount: expensesOfDate.length,
         itemBuilder: (context, index) => ExpenseTile(
             key: UniqueKey(),
+            individualExpense: true,
             state: expState,
             date: state.selectedDateForExpenses,
-            expense: expState.expenses[state.selectedDateForExpenses]![index],
+            expense: expensesOfDate[index],
             position: index),
       );
     });
@@ -162,6 +170,8 @@ class _ExpensesList extends StatelessWidget {
 }
 
 class _NoExpensesFound extends StatelessWidget {
+  static const spaceHeight = 20.0;
+
   const _NoExpensesFound({
     super.key,
     required this.logo,
@@ -174,8 +184,6 @@ class _NoExpensesFound extends StatelessWidget {
   final double logoWidth;
   final double width;
   final String notFoundExpensesText;
-  static const spaceHeight = 20.0;
-
   @override
   Widget build(BuildContext context) {
     return Column(

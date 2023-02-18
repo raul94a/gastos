@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gastos/data/models/category.dart';
 import 'package:gastos/data/models/expense.dart';
+import 'package:gastos/presentation/pages/individual_expenses.dart';
 import 'package:gastos/presentation/widgets/dialogs/expense_options_dialog.dart';
+import 'package:gastos/presentation/widgets/dialogs/individual_expense_options_dialog.dart';
 import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +12,7 @@ import 'package:provider/provider.dart';
 class ExpenseTile extends StatefulWidget {
   const ExpenseTile(
       {Key? key,
+      this.individualExpense = false,
       required this.state,
       required this.date,
       required this.expense,
@@ -19,6 +22,7 @@ class ExpenseTile extends StatefulWidget {
   final String date;
   final Expense expense;
   final int position;
+  final bool individualExpense;
 
   @override
   State<ExpenseTile> createState() => _ExpenseTileState();
@@ -52,6 +56,15 @@ class _ExpenseTileState extends State<ExpenseTile> {
     showDialog(
         context: context,
         builder: (ctx) {
+          if (widget.individualExpense) {
+            return IndividualExpenseOptionsDialog(
+                updateHandler: updateExpense,
+                expense: expense,
+                
+                state: widget.state,
+                index: widget.position,
+                date: widget.date);
+          }
           return ExpenseOptionsDialog(
               updateHandler: updateExpense,
               expense: expense,
@@ -72,22 +85,21 @@ class _ExpenseTileState extends State<ExpenseTile> {
     try {
       cat = categories.firstWhere((element) => element.id == expense.category);
       color = Color.fromARGB(190, cat.r, cat.g, cat.b);
-    
     } catch (err) {
       print(err);
     }
     Color avatarColor = color ?? Colors.white;
     avatarColor = avatarColor.withOpacity(0.55).withAlpha(20);
     return Container(
-      
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(6.5)),
-        boxShadow:  [
+        boxShadow: [
           BoxShadow(
-              color: Color.fromARGB(181, 119, 118, 118), blurRadius: 5, offset: Offset(0.5, 1.25))
+              color: Color.fromARGB(181, 119, 118, 118),
+              blurRadius: 5,
+              offset: Offset(0.5, 1.25))
         ],
-       
       ),
       key: Key(widget.expense.id),
       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -105,8 +117,7 @@ class _ExpenseTileState extends State<ExpenseTile> {
             height: tileHeight,
             child: ListTile(
               isThreeLine: true,
-                          tileColor: Colors.white,
-
+              tileColor: Colors.white,
               onLongPress: showOptionDialog,
               contentPadding: const EdgeInsets.all(8),
               style: ListTileStyle.list,
