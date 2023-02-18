@@ -115,6 +115,8 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
             await currentWeekDataByCategory(context);
           },
         ),
+                    const SizedBox(height: 20,),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -125,16 +127,17 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
                 // width: width * 0.28,
                 height: size.height * 0.3,
                 decoration: BoxDecoration(
-                    color: const Color.fromARGB(235, 17, 22, 48),
+                    color: true ? Colors.white : const Color.fromARGB(235, 17, 22, 48),
                     borderRadius: BorderRadius.circular(10)),
                 child: Column(
                   children: [
                     Text('Resumen',
-                        style: TextStyle(color: Colors.white, fontSize: 22))
+                        style: TextStyle(color: true ? Colors.black : Colors.white, fontSize: 22))
                   ],
                 ),
               ),
             ),
+            const SizedBox(height: 20,),
             ChartCard(
               child: Container(
                   padding: const EdgeInsets.all(5),
@@ -147,34 +150,34 @@ class _CurrentWeekInfoState extends State<CurrentWeekInfo> {
                           data: myData,
                           maxY: maxY + 100,
                           xAxisTextStyle: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.bold),
                           yAxisTextStyle: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.bold),
                           xAxisWidgetLabel: Text('Semana actual',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                           yAxisWidgetLabel: Text('Euros (€)',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                         )
                       : MyBarChart(
                           barChartType: BarChartType.weekDay,
                           data: myData,
                           maxY: maxY + 100,
                           xAxisTextStyle: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.bold),
                           yAxisTextStyle: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 12,
                               fontWeight: FontWeight.bold),
                           xAxisWidgetLabel: Text('Semana actual',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                           yAxisWidgetLabel: Text('Euros (€)',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                         )),
             ),
           ],

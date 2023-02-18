@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 LinearGradient get barsGradient => const LinearGradient(
       colors: [
-        Color(0xFF2196F3),
-        Color(0xFF50E4FF),
+        const Color.fromARGB(235, 17, 22, 48),
+    
+        Colors.indigo,
       ],
       begin: Alignment.bottomCenter,
       end: Alignment.topCenter,

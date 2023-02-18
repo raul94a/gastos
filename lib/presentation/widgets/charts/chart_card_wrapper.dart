@@ -7,16 +7,19 @@ class ChartCard extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) {
-    return Card(
-        elevation: 10,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: true ? BorderSide.none : const BorderSide(
-              strokeAlign: 0.0,
-              width: 2,
-              color: Color.fromARGB(235, 1, 1, 2),
-            )),
-        color: const Color.fromARGB(235, 17, 22, 48),
-        child: child);
+    return child;
   }
 }
+
+
+///former code
+// Card(
+//         elevation: 10,
+//         shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(10),
+//             side: true ? BorderSide.none : const BorderSide(
+//               strokeAlign: 0.0,
+//               width: 2,
+//               color: Color.fromARGB(235, 1, 1, 2),
+//             )),
+//         color: const Color.fromARGB(235, 17, 22, 48),

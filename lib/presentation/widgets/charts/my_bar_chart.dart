@@ -125,8 +125,8 @@ class MyBarChart extends StatelessWidget {
         touchTooltipData: BarTouchTooltipData(
           tooltipBgColor: Colors.transparent,
           tooltipPadding: EdgeInsets.zero,
-          tooltipMargin: 20.0,
-          fitInsideVertically: true,
+          tooltipMargin: 2.0,
+          // fitInsideVertically: true,
           
           direction: TooltipDirection.top,
           getTooltipItem: (

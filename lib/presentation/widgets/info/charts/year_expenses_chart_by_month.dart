@@ -107,6 +107,9 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
                 await currentYearDataByCategory(context),
             leftText: 'Por días',
             rightText: 'Por categoría'),
+        const SizedBox(
+          height: 20,
+        ),
         if (!showByDay)
           ChartCard(
             child: Container(
@@ -119,17 +122,17 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
                 data: myData,
                 maxY: maxY + 100,
                 xAxisTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
                 yAxisTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
                 xAxisWidgetLabel:
-                    Text('Mes actual', style: TextStyle(color: Colors.white)),
+                    Text('Mes actual', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                 yAxisWidgetLabel:
-                    Text('Euros (€)', style: TextStyle(color: Colors.white)),
+                    Text('Euros (€)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
               ),
             ),
           )
@@ -145,17 +148,17 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
                 data: myData,
                 maxY: maxY + 100,
                 xAxisTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
                 yAxisTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
                 xAxisWidgetLabel:
-                    Text('Meses', style: TextStyle(color: Colors.white)),
+                    Text('Meses', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                 yAxisWidgetLabel:
-                    Text('Euros (€)', style: TextStyle(color: Colors.white)),
+                    Text('Euros (€)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
               ),
             ),
           ),

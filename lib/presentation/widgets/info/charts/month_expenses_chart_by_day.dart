@@ -103,6 +103,8 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
                 await currentMonthDataByCategory(context),
             leftText: 'Por días',
             rightText: 'Por categoría'),
+                        const SizedBox(height: 20,),
+
         if (!showByDay)
           ChartCard(
             child: Container(
@@ -115,17 +117,17 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
                 data: myData,
                 maxY: maxY + 100,
                 xAxisTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
                 yAxisTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
                 xAxisWidgetLabel:
-                    Text('Mes actual', style: TextStyle(color: Colors.white)),
+                    Text('Mes actual', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                 yAxisWidgetLabel:
-                    Text('Euros (€)', style: TextStyle(color: Colors.white)),
+                    Text('Euros (€)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
               ),
             ),
           )
@@ -140,17 +142,17 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
                   data: myData,
                   maxY: maxY + 50,
                   xAxisTextStyle: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 12,
                       fontWeight: FontWeight.bold),
                   yAxisTextStyle: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 12,
                       fontWeight: FontWeight.bold),
                   xAxisWidgetLabel:
-                      Text('Días', style: TextStyle(color: Colors.white)),
+                      Text('Días', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                   yAxisWidgetLabel:
-                      Text('Euros (€)', style: TextStyle(color: Colors.white)),
+                      Text('Euros (€)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                 )),
           ),
       ],
