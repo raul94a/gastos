@@ -10,7 +10,7 @@ class ChartInfoService {
   SqliteManager sqliteManager = SqliteManager.instance;
 
   ///Current week expenses by date
-  Future<List<Map<String, dynamic>>> getCurrentWeekExpensesByDate() async {
+  Future<List<Map<String, dynamic>>> getCurrentWeekExpensesByDate({bool individual = false}) async {
     final _db = sqliteManager.database;
     final now = DateTime.now();
     //i.e 4
@@ -34,11 +34,14 @@ class ChartInfoService {
     }
     final initialDate =
         DateTime(firstDate.year, firstDate.month, firstDate.day);
-    final endDate = DateTime(lastDate.year, lastDate.month, lastDate.day);
+        //we add one day here because the SQL query checks the createdDate to be less than the passed endDate
+        //example: the current week goes from day 7 to 13. The checked endDate should be less than 13 + 1 (14), so
+        //we take everything between [7,14) (14 is mathematically not included!)
+    final endDate = DateTime(lastDate.year, lastDate.month, lastDate.day).add(const Duration(days: 1));
 
     String sql = ChartInfoQueries.currentWeekExpensesGroupedByDay(
-        initialDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch);
-
+        initialDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch,individual);
+    print(sql);
     final result = [...await _db.rawQuery(sql)];
 
     //rellenamos los que no están
@@ -52,7 +55,7 @@ class ChartInfoService {
   }
 
   ///Current week expenses by category
-  Future<List<Map<String, dynamic>>> getCurrentMonthExpensesByDay() async {
+  Future<List<Map<String, dynamic>>> getCurrentMonthExpensesByDay({bool individual = false}) async {
     final _db = sqliteManager.database;
     final now = DateTime.now();
     //i.e 4
@@ -73,7 +76,7 @@ class ChartInfoService {
 
     final monthNumber = month < 10 ? '0$month' : month.toString();
     String sql =
-        ChartInfoQueries.currentMonthExpensesGroupedByDay(monthNumber, year);
+        ChartInfoQueries.currentMonthExpensesGroupedByDay(monthNumber, year,individual);
     List<Map<String, dynamic>> result = [];
 
     try {
@@ -93,13 +96,14 @@ class ChartInfoService {
   }
 
   Future<List<Map<String, dynamic>>>
-      getCurrentYearExpensesGroupedByMonth() async {
+      getCurrentYearExpensesGroupedByMonth({bool individual = false}) async {
     final db = sqliteManager.database;
     final now = DateTime.now();
     final year = now.year;
-    String sql = ChartInfoQueries.currentYearExpensesGroupedByMonth(year);
+    String sql = ChartInfoQueries.currentYearExpensesGroupedByMonth(year,individual);
     final results = [...await db.rawQuery(sql)];
     List<String> fullDates = [];
+    //we need to fill the dates with no data
     for (int i = 1; i <= 12; i++) {
       final date = '${i < 10 ? "0$i" : i}';
       fullDates.add(date);
@@ -120,7 +124,7 @@ class ChartInfoService {
   ///categories
   ///
 
-  Future<List<Map<String, dynamic>>> getCurrentWeekExpensesByCategory() async {
+  Future<List<Map<String, dynamic>>> getCurrentWeekExpensesByCategory({bool individual = false}) async {
     final db = sqliteManager.database;
     final now = DateTime.now();
     //i.e 4
@@ -140,16 +144,16 @@ class ChartInfoService {
 
     final initialDate =
         DateTime(firstDate.year, firstDate.month, firstDate.day);
-    final endDate = DateTime(lastDate.year, lastDate.month, lastDate.day);
+    final endDate = DateTime(lastDate.year, lastDate.month, lastDate.day).add(Duration(days: 1));
 
     String sql = ChartInfoQueries.currentWeekExpensesGroupedByCategory(
-        initialDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch);
+        initialDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch, individual);
     final List<Map<String, dynamic>> results = [...await db.rawQuery(sql)];
 
     return results;
   }
 
-  Future<List<Map<String, dynamic>>> getCurrentMonthExpensesByCategory() async {
+  Future<List<Map<String, dynamic>>> getCurrentMonthExpensesByCategory({bool individual = false}) async {
     final _db = sqliteManager.database;
     final now = DateTime.now();
     //i.e 4
@@ -160,7 +164,7 @@ class ChartInfoService {
 
     final monthNumber = month < 10 ? '0$month' : month.toString();
     String sql = ChartInfoQueries.currentMonthExpensesGroupedByCategory(
-        monthNumber, year);
+        monthNumber, year,individual);
     List<Map<String, dynamic>> result = [];
 
     try {
@@ -173,11 +177,11 @@ class ChartInfoService {
   }
 
   Future<List<Map<String, dynamic>>>
-      getCurrentYearExpensesGroupedByCategory() async {
+      getCurrentYearExpensesGroupedByCategory({bool individual = false}) async {
     final db = sqliteManager.database;
     final now = DateTime.now();
     final year = now.year;
-    String sql = ChartInfoQueries.currentYearExpensesGroupedByCategory(year);
+    String sql = ChartInfoQueries.currentYearExpensesGroupedByCategory(year,individual);
     final results = [...await db.rawQuery(sql)];
     return results;
   }

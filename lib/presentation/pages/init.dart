@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:gastos/presentation/pages/new_expenses_list.dart';
 import 'package:gastos/presentation/pages/new_individual_expense_list.dart';
@@ -14,20 +13,6 @@ import 'package:provider/provider.dart';
 class Init extends StatelessWidget {
   const Init({super.key});
 
-  showExpenseDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (ctx) => const CommonExpenseDialog());
-  }
-
-  showIndividualExpenseDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (ctx) => const IndividualExpenseDialog());
-  }
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -38,13 +23,13 @@ class Init extends StatelessWidget {
     //     systemStatusBarContrastEnforced: false,
     //     statusBarColor: Colors.transparent,
     //     systemNavigationBarColor: Colors.transparent));
-SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(label: 'Mis gastos',primaryColor: 100));
+    SystemChrome.setApplicationSwitcherDescription(
+        ApplicationSwitcherDescription(label: 'Mis gastos', primaryColor: 100));
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-          
           systemNavigationBarDividerColor: Colors.indigo,
           statusBarBrightness: Brightness.light,
           statusBarIconBrightness: Brightness.light,
@@ -54,27 +39,7 @@ SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(la
           systemNavigationBarColor: Colors.indigo),
       child: ShouldAbandonApp(
         child: Scaffold(
-          floatingActionButton:
-              Consumer<NavigationProvider>(builder: (ctx, state, _) {
-            return FloatingActionButton(
-              heroTag: 'hero-fab',
-              onPressed: () {
-                switch (state.pageName) {
-                  case PageName.individual:
-                    showIndividualExpenseDialog(context);
-                    break;
-                  case PageName.common:
-                    showExpenseDialog(context);
-                    break;
-                  case PageName.info:
-                    break;
-                  case PageName.settings:
-                    break;
-                }
-              },
-              child: const Icon(Icons.add_rounded),
-            );
-          }),
+          floatingActionButton: const _Fab(),
           body: Consumer<NavigationProvider>(
               builder: (ctx, state, _) => _PageSelector(index: state.page)),
           bottomNavigationBar: Consumer<NavigationProvider>(
@@ -111,5 +76,47 @@ class _PageSelector extends StatelessWidget {
     if (index == 2) return const InfoPage();
 
     return const Settings();
+  }
+}
+
+class _Fab extends StatelessWidget {
+  const _Fab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<NavigationProvider>(builder: (ctx, state, _) {
+      return FloatingActionButton(
+        heroTag: 'hero-fab',
+        onPressed: () {
+          switch (state.pageName) {
+            case PageName.individual:
+              showIndividualExpenseDialog(context);
+              break;
+            case PageName.common:
+              showExpenseDialog(context);
+              break;
+            case PageName.info:
+              break;
+            case PageName.settings:
+              break;
+          }
+        },
+        child: const Icon(Icons.add_rounded),
+      );
+    });
+  }
+
+  showExpenseDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (ctx) => const CommonExpenseDialog());
+  }
+
+  showIndividualExpenseDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (ctx) => const IndividualExpenseDialog());
   }
 }

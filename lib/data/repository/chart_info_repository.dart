@@ -6,27 +6,32 @@ import 'package:gastos/data/services/chart_info_service.dart';
 import 'package:gastos/data/models/chart_models/year_expenses.dart';
 
 class ChartInfoRepository {
-  ChartInfoRepository();
   final service = ChartInfoService();
+  final bool individual;
+  ChartInfoRepository({this.individual = false});
 
   Future<List<DateExpenses>> currentWeekExpensesGroupedByDate() async {
-    final results = await service.getCurrentWeekExpensesByDate();
+    final results =
+        await service.getCurrentWeekExpensesByDate(individual: individual);
     return results.map(DateExpenses.fromMap).toList();
   }
 
   Future<List<DateExpenses>> currentMonthExpensesGroupedByDate() async {
-    final results = await service.getCurrentMonthExpensesByDay();
+    final results =
+        await service.getCurrentMonthExpensesByDay(individual: individual);
     return results.map(DateExpenses.fromMap).toList();
   }
 
   Future<List<YearExpenses>> currentYearExpensesGroupedByMonth() async {
-    final results = await service.getCurrentYearExpensesGroupedByMonth();
+    final results = await service.getCurrentYearExpensesGroupedByMonth(
+        individual: individual);
     return results.map(YearExpenses.fromMap).toList();
   }
 
   //categories
   Future<List<CategoryExpenses>> currentWeekExpensesGroupedByCategory() async {
-    final results = await service.getCurrentWeekExpensesByCategory();
+    final results =
+        await service.getCurrentWeekExpensesByCategory(individual: individual);
     List<CategoryExpenses> list = <CategoryExpenses>[];
     for (int i = 0; i < results.length; i++) {
       final categoryExpense = CategoryExpenses.fromMap(results[i]);
@@ -34,14 +39,18 @@ class ChartInfoRepository {
       list.add(categoryExpense.copyWith(index: i));
     }
     print('WEEK CAT: $list');
-    if(list.isEmpty){
-      list = List.generate(5, (index) => CategoryExpenses(category: '', index: index, price: 0.0, name: ''));
+    if (list.isEmpty) {
+      list = List.generate(
+          5,
+          (index) => CategoryExpenses(
+              category: '', index: index, price: 0.0, name: ''));
     }
     return list;
   }
-   
+
   Future<List<CategoryExpenses>> currentMonthExpensesGroupedByCategory() async {
-    final results = await service.getCurrentMonthExpensesByCategory();
+    final results =
+        await service.getCurrentMonthExpensesByCategory(individual: individual);
     final list = <CategoryExpenses>[];
     for (int i = 0; i < results.length; i++) {
       final categoryExpense = CategoryExpenses.fromMap(results[i]);
@@ -50,8 +59,10 @@ class ChartInfoRepository {
     }
     return list;
   }
+
   Future<List<CategoryExpenses>> currentYearExpensesGroupedByCategory() async {
-    final results = await service.getCurrentYearExpensesGroupedByCategory();
+    final results = await service.getCurrentYearExpensesGroupedByCategory(
+        individual: individual);
     final list = <CategoryExpenses>[];
     for (int i = 0; i < results.length; i++) {
       final categoryExpense = CategoryExpenses.fromMap(results[i]);

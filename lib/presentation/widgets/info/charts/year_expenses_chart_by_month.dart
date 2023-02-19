@@ -12,7 +12,8 @@ import 'package:gastos/providers/categories_provider.dart';
 import 'package:provider/provider.dart';
 
 class CurrentYearInfo extends StatefulWidget {
-  const CurrentYearInfo({super.key});
+  const CurrentYearInfo({super.key,this.individual = false});
+  final bool individual;
 
   @override
   State<CurrentYearInfo> createState() => _CurrentYearInfoState();
@@ -31,7 +32,7 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
 
   void currentYearDataByDate() async {
     final data =
-        await ChartInfoRepository().currentYearExpensesGroupedByMonth();
+        await ChartInfoRepository(individual: widget.individual).currentYearExpensesGroupedByMonth();
     double mY = 0.0;
     List<BarChartGroupData> chartData = [];
     //first it needed to know the yMax for drawing the background of the chart bars
@@ -55,7 +56,7 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
   Future<void> currentYearDataByCategory(BuildContext context) async {
     final categories = context.read<CategoriesProvider>().categories;
     final data =
-        await ChartInfoRepository().currentYearExpensesGroupedByCategory();
+        await ChartInfoRepository(individual: widget.individual).currentYearExpensesGroupedByCategory();
     List<CategoryExpenses> mExpenses = [];
     List<BarChartGroupData> charData = [];
     double mY = 0.0;
@@ -113,9 +114,9 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
         if (!showByDay)
           ChartCard(
             child: Container(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(2),
               margin: const EdgeInsets.all(4),
-              height: size.height * 0.3,
+              height: size.height * 0.33,
               child: MyBarChartCategory(
                 barChartType: BarChartCategoryType.weekCategory,
                 categoriesExpenses: expenses,
@@ -130,7 +131,7 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
                 xAxisWidgetLabel:
-                    Text('Mes actual', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                    Text('Categorías', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
                 yAxisWidgetLabel:
                     Text('Euros (€)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
               ),
@@ -139,9 +140,9 @@ class _CurrentYearInfoState extends State<CurrentYearInfo> {
         else
           ChartCard(
             child: Container(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(2),
               //decoration: BoxDecoration( borderRadius: BorderRadius.circular(10), color: Colors.indigo),
-              height: size.height * 0.3,
+              height: size.height * 0.33,
               margin: const EdgeInsets.all(4),
               child: MyBarChart(
                 barChartType: BarChartType.yearMonth,
