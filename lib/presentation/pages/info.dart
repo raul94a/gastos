@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gastos/data/models/user.dart';
 import 'package:gastos/presentation/widgets/info/charts/month_expenses_chart_by_day.dart';
 import 'package:gastos/presentation/widgets/info/charts/week_expenses_chart_by_day.dart';
 import 'package:gastos/presentation/widgets/info/charts/year_expenses_chart_by_month.dart';
@@ -32,27 +33,7 @@ class InfoPage extends StatelessWidget {
             ),
 
             ///start usuarios de la app card
-            Padding(
-              padding: const EdgeInsets.all(3.0),
-              child: Card(
-                elevation: 6,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Wrap(
-                    children: [
-                      Text('Usuarios de la aplicación',
-                          style: titleStyle(25.2)),
-                      ...users
-                          .map((e) => _UserInfoContainer(
-                              userName: e.name,
-                              fecha: MyDateFormatter.toFormat(
-                                  'dd/MM/yyyy', DateTime.now())))
-                          .toList(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            _AppUsersInfo(users: users),
             //fin usuarios de la app card
             const SizedBox(height: 20),
             Padding(
@@ -64,36 +45,106 @@ class InfoPage extends StatelessWidget {
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   )),
             ),
-            const SizedBox(
-              height: 5,
+            const _CommonExpensesChartsRow(),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Title(
+                  color: Colors.white,
+                  child: Text(
+                    'Gastos personales ${DateTime.now().year}',
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  )),
             ),
-            //card gastos semana actual
-            Card(
+            const _PersonalExpensesChartsRow(),
+            const SizedBox(
+              height: 50,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppUsersInfo extends StatelessWidget {
+  const _AppUsersInfo({
+    super.key,
+    required this.users,
+  });
+
+  final List<AppUser> users;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(3.0),
+      child: Card(
+        elevation: 6,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Wrap(
+            children: [
+              Text('Usuarios de la aplicación', style: titleStyle(25.2)),
+              ...users
+                  .map((e) => _UserInfoContainer(
+                      userName: e.name,
+                      fecha: MyDateFormatter.toFormat(
+                          'dd/MM/yyyy', DateTime.now())))
+                  .toList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CommonExpensesChartsRow extends StatelessWidget {
+  const _CommonExpensesChartsRow({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          // const SizedBox(
+          //   height: 5,
+          // ),
+          //card gastos semana actual
+          SizedBox(
+            width: width,
+            child: Card(
               elevation: 6,
-              child: Wrap(
-                children: [
+              child: Column(
+                children: const [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: Text('Gastos de la semana actual',
                         style: TextStyle(fontSize: 24)),
                   ),
-                  const SizedBox(
+                  SizedBox(
                     height: 7,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: const CurrentWeekInfo(),
-                  ),
+                  CurrentWeekInfo(),
                 ],
               ),
             ),
-            //fin card gasto semana actual
-            const SizedBox(
-              height: 7,
-            ),
-            Card(
+          ),
+          //fin card gasto semana actual
+          // const SizedBox(
+          //   height: 7,
+          // ),
+          SizedBox(
+            width: width,
+            child: Card(
               elevation: 6,
-              child: Wrap(
+              child: Column(
                 children: const [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -107,11 +158,12 @@ class InfoPage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 7,
-            ),
-            Card(
-              child: Wrap(
+          ),
+
+          SizedBox(
+            width: width,
+            child: Card(
+              child: Column(
                 children: const [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -125,16 +177,100 @@ class InfoPage extends StatelessWidget {
                 ],
               ),
             ),
-            //fin card year
-            const SizedBox(
-              height: 50,
-            )
-          ],
-        ),
+          ),
+          //fin card year
+        ],
       ),
     );
   }
 }
+
+
+class _PersonalExpensesChartsRow extends StatelessWidget {
+  const _PersonalExpensesChartsRow({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          // const SizedBox(
+          //   height: 5,
+          // ),
+          //card gastos semana actual
+          SizedBox(
+            width: width,
+            child: Card(
+              elevation: 6,
+              child: Column(
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Gastos personales de la semana actual',
+                        style: TextStyle(fontSize: 24)),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  CurrentWeekInfo(individual: true),
+                ],
+              ),
+            ),
+          ),
+          //fin card gasto semana actual
+          // const SizedBox(
+          //   height: 7,
+          // ),
+          SizedBox(
+            width: width,
+            child: Card(
+              elevation: 6,
+              child: Column(
+                children: const [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Gastos personales del mes actual',
+                        style: TextStyle(fontSize: 24)),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  CurrentMonthInfo(individual: true),
+                ],
+              ),
+            ),
+          ),
+
+          SizedBox(
+            width: width,
+            child: Card(
+              child: Column(
+                children: const [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Gastos personales del año actual',
+                        style: TextStyle(fontSize: 24)),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  CurrentYearInfo(individual: true)
+                ],
+              ),
+            ),
+          ),
+          //fin card year
+        ],
+      ),
+    );
+  }
+}
+
 
 class _UserInfoContainer extends StatefulWidget {
   const _UserInfoContainer({required this.userName, required this.fecha});

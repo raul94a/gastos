@@ -43,8 +43,7 @@ class SqliteManager {
        
       //   f.createSync();
       //   f.writeAsStringSync(jsonEncode(res));
-      final res =  await db.rawQuery(ChartInfoQueries.currentYearExpensesGroupedByMonth(2023));
-      print('RESULT ON OPEN $res');
+      
             // final res = await db.rawQuery('select count(*) as "res" from expenses');
         // print(res);
         // final exps = ExpenseCreator.create();

@@ -52,6 +52,7 @@ class MyBarChart extends StatelessWidget {
   FlTitlesData get _yearMonthsTitleData => FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
+          axisNameSize: 30,
           axisNameWidget: xAxisWidgetLabel,
           sideTitles: SideTitles(
             showTitles: true,
@@ -86,6 +87,7 @@ class MyBarChart extends StatelessWidget {
   FlTitlesData get _monthDaysTitleData => FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
+          axisNameSize: 30,
           axisNameWidget: xAxisWidgetLabel,
           sideTitles: SideTitles(
             showTitles: true,
@@ -127,7 +129,7 @@ class MyBarChart extends StatelessWidget {
           tooltipPadding: EdgeInsets.zero,
           tooltipMargin: 2.0,
           // fitInsideVertically: true,
-          
+
           direction: TooltipDirection.top,
           getTooltipItem: (
             BarChartGroupData group,
@@ -176,6 +178,7 @@ class MyBarChart extends StatelessWidget {
   FlTitlesData get titlesData => FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
+          axisNameSize: 30,
           axisNameWidget: xAxisWidgetLabel,
           sideTitles: SideTitles(
             showTitles: true,
@@ -184,7 +187,6 @@ class MyBarChart extends StatelessWidget {
           ),
         ),
         leftTitles: AxisTitles(
-        
           axisNameWidget: yAxisWidgetLabel,
           sideTitles: SideTitles(showTitles: false),
         ),

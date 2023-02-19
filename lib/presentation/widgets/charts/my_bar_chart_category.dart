@@ -72,6 +72,7 @@ class MyBarChartCategory extends StatelessWidget {
   FlTitlesData get titlesData => FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
+          axisNameSize: 30,
           axisNameWidget: xAxisWidgetLabel,
           sideTitles: SideTitles(
             showTitles: true,

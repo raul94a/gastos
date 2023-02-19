@@ -12,8 +12,8 @@ import 'package:gastos/providers/categories_provider.dart';
 import 'package:provider/provider.dart';
 
 class CurrentMonthInfo extends StatefulWidget {
-  const CurrentMonthInfo({super.key});
-
+  const CurrentMonthInfo({super.key, this.individual = false});
+  final bool individual;
   @override
   State<CurrentMonthInfo> createState() => _CurrentMonthInfoState();
 }
@@ -31,7 +31,7 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
 
   void currentMonthDataByDate() async {
     final data =
-        await ChartInfoRepository().currentMonthExpensesGroupedByDate();
+        await ChartInfoRepository(individual: widget.individual).currentMonthExpensesGroupedByDate();
     double mY = 0.0;
     List<BarChartGroupData> chartData = [];
 
@@ -57,7 +57,7 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
   Future<void> currentMonthDataByCategory(BuildContext context) async {
     final categories = context.read<CategoriesProvider>().categories;
     final data =
-        await ChartInfoRepository().currentMonthExpensesGroupedByCategory();
+        await ChartInfoRepository(individual: widget.individual).currentMonthExpensesGroupedByCategory();
     List<CategoryExpenses> mExpenses = [];
     List<BarChartGroupData> charData = [];
     double mY = 0.0;
@@ -103,14 +103,15 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
                 await currentMonthDataByCategory(context),
             leftText: 'Por días',
             rightText: 'Por categoría'),
-                        const SizedBox(height: 20,),
-
+        const SizedBox(
+          height: 20,
+        ),
         if (!showByDay)
           ChartCard(
             child: Container(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(2),
               margin: const EdgeInsets.all(4),
-              height: size.height * 0.3,
+              height: size.height * 0.33,
               child: MyBarChartCategory(
                 barChartType: BarChartCategoryType.weekCategory,
                 categoriesExpenses: expenses,
@@ -124,23 +125,25 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
                     color: Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
-                xAxisWidgetLabel:
-                    Text('Mes actual', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
-                yAxisWidgetLabel:
-                    Text('Euros (€)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                xAxisWidgetLabel: Text('Categorías',
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold)),
+                yAxisWidgetLabel: Text('Euros (€)',
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold)),
               ),
             ),
           )
         else
           ChartCard(
             child: Container(
-                padding: const EdgeInsets.all(5),
+                padding: const EdgeInsets.all(2),
                 margin: const EdgeInsets.all(4),
-                height: size.height * 0.3,
+                height: size.height * 0.33,
                 child: MyBarChart(
                   barChartType: BarChartType.monthDay,
                   data: myData,
-                  maxY: maxY + 50,
+                  maxY: maxY + 100,
                   xAxisTextStyle: TextStyle(
                       color: Colors.black,
                       fontSize: 12,
@@ -149,10 +152,12 @@ class _CurrentMonthInfoState extends State<CurrentMonthInfo> {
                       color: Colors.black,
                       fontSize: 12,
                       fontWeight: FontWeight.bold),
-                  xAxisWidgetLabel:
-                      Text('Días', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
-                  yAxisWidgetLabel:
-                      Text('Euros (€)', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+                  xAxisWidgetLabel: Text('Días',
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold)),
+                  yAxisWidgetLabel: Text('Euros (€)',
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold)),
                 )),
           ),
       ],
