@@ -3,7 +3,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gastos/data/enums/date_type.dart';
+import 'package:gastos/data/shared_preferences_helper.dart';
 import 'package:gastos/logic/expenses_bloc.dart';
+import 'package:gastos/presentation/widgets/expenses/add_expense_to_date_btn.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
 import 'package:gastos/presentation/widgets/slivers/sliver_date_flexible_app_bar.dart';
@@ -12,6 +15,7 @@ import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
+import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -101,7 +105,9 @@ class _NewExpenseListState extends State<NewExpenseList> {
                   _DateSelector(
                       dateController: dateController,
                       selectedDateState: selectedDateState),
-
+                  //add a expense to a former date
+                  const SizedBox(height: 5,),
+                  AddExpenseToDateButton(selectedDateState: selectedDateState),
                   //Lista
                   _ExpensesList(expState: expState)
                 ],
@@ -219,8 +225,8 @@ class _DateSelector extends StatelessWidget {
   static const fontSize = 18.5;
   @override
   Widget build(BuildContext context) {
-    const underlineInputBorder = UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black));
+    const underlineInputBorder =
+        UnderlineInputBorder(borderSide: BorderSide(color: Colors.black));
     return Row(
       children: [
         Consumer<SelectedDateProvider>(builder: (ctx, state, _) {

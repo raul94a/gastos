@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gastos/logic/expenses_bloc.dart';
+import 'package:gastos/presentation/widgets/expenses/add_expense_to_date_btn.dart';
 import 'package:gastos/presentation/widgets/expenses/expense_tile.dart';
 import 'package:gastos/presentation/widgets/expenses/main_scroll_notification.dart';
 import 'package:gastos/presentation/widgets/slivers/sliver_date_flexible_app_bar.dart';
@@ -106,7 +107,9 @@ class _NewIndividualExpenseListState extends State<NewIndividualExpenseList> {
                   _DateSelector(
                       dateController: dateController,
                       selectedDateState: selectedDateState),
-
+                       //add a expense to a former date
+                  const SizedBox(height: 5,),
+                  AddExpenseToDateButton(selectedDateState: selectedDateState,individual: true,),
                   //Lista
                   _ExpensesList(expState: expState)
                 ],
