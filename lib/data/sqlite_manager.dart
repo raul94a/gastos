@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:gastos/data/firestore_manager.dart';
 import 'package:gastos/data/models/expense.dart';
 import 'package:gastos/data/queries/chart_info_queries.dart';
 import 'package:path_provider/path_provider.dart';
@@ -94,6 +95,14 @@ class SqliteManager {
         'INSERT INTO categories (id, name, r, g, b, createdDate, updatedDate, deleted) VALUES ("grisaceo", "Otros",153, 153, 102, $millis, $millis, 0)');
 
     await batch.commit();
+    final categoriesCollection = FirestoreManager.instance.firestore.collection('categories');
+    final categories = await categoriesCollection.get();
+    if(categories.docs.isEmpty) {
+      final categoriesDB = await db.query('categories');
+      for(final category in categoriesDB){
+        categoriesCollection.add(category);
+      }
+    }
   }
 }
 

@@ -133,7 +133,7 @@ class _ExpensesList extends StatelessWidget {
 
   final ExpenseProvider expState;
   static const fontSize = 18.0;
-  static const logo = 'assets/sleep.svg';
+  static const logo = 'assets/sleep.png';
   static const notFoundExpensesText =
       'Parece que no hay gastos para la fecha seleccionada';
 
@@ -191,7 +191,7 @@ class _NoExpensesFound extends StatelessWidget {
           height: spaceHeight,
         ),
         Center(
-          child: SvgPicture.asset(
+          child: Image.asset(
             logo,
             width: logoWidth,
             height: logoWidth,

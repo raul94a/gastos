@@ -27,9 +27,9 @@ void main() async {
 
 Future<void> _initDependencies() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SharedPreferencesHelper.instance;
   await SqliteManager.instance.open();
-  await Firebase.initializeApp();
 
   FirestoreManager.instance;
 }

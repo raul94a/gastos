@@ -5,7 +5,7 @@ description: A new Flutter project.
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 1.0.2+3
 
 environment:
   sdk: ">=2.17.2 <3.0.0"
@@ -14,6 +14,7 @@ dependencies:
   path_provider:
   flutter_date_pickers: ^0.4.1
   fl_chart:
+  flutter_launcher_icons: ^0.11.0
   month_year_picker:
     git:
       url: https://github.com/raul94a/month-year-picker
@@ -43,10 +44,15 @@ dev_dependencies:
   flutter_lints: ^1.0.0
 flutter:
   uses-material-design: true
-
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/launcher.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/
+    - assets/sleep.png
+    - assets/treasure.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

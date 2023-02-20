@@ -44,7 +44,7 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
 
   final _infoBorderRadius = BorderRadius.circular(9.0);
 
-  static const _logo = 'assets/treasure.svg';
+  static const _logo = 'assets/treasure.png';
 
   late SelectedDateProvider selectedDateProvider;
   late ExpenseProvider expenseProvider;
@@ -135,7 +135,7 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
                             ],
                           ),
                         ),
-                        SvgPicture.asset(
+                        Image.asset(
                           _logo,
                           height: _logoSize,
                           width: _logoSize,
