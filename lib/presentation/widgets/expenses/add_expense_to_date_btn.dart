@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gastos/data/enums/date_type.dart';
 import 'package:gastos/data/shared_preferences_helper.dart';
+import 'package:gastos/presentation/widgets/dialogs/common_expense_dialogs.dart';
+import 'package:gastos/presentation/widgets/dialogs/individual_expense_dialogs.dart';
+import 'package:gastos/presentation/widgets/dialogs/individual_expense_options_dialog.dart';
 import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:gastos/utils/date_formatter.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
-class AddExpenseToDateButton extends StatelessWidget
-    with MaterialStatePropertyMixin {
+class AddExpenseToDateButton extends StatelessWidget with MaterialStatePropertyMixin {
   const AddExpenseToDateButton({
     super.key,
     required this.selectedDateState,
@@ -26,15 +28,16 @@ class AddExpenseToDateButton extends StatelessWidget
         child: ElevatedButton.icon(
             style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
                 fixedSize: getProperty(Size(width, 45)),
-                shape: getProperty(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)))),
+                shape: getProperty(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))),
             onPressed: () {
-              if (individual) {
-                //personal expense
-                return;
-              }
-
-              //common
+            
+              showDialog(
+                  context: context,
+                  builder: (_) => individual
+                      ? IndividualExpenseDialog(date: state.selectedDateForExpenses)
+                      : CommonExpenseDialog(
+                          date: state.selectedDateForExpenses,
+                        ));
             },
             icon: Icon(Icons.add_box_outlined),
             label: Text(

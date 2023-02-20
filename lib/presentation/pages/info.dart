@@ -18,12 +18,14 @@ class InfoPage extends StatelessWidget {
     print('users $users');
     final size = MediaQuery.of(context).size;
     final width = size.width;
+   
+    final userNr = users.length;
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
-              height: size.height * 0.5 + 180,
+              height: size.height * 0.5 + 180 + (17.0 * userNr),
               child: Stack(
                 //  crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -32,17 +34,14 @@ class InfoPage extends StatelessWidget {
                   //fin usuarios de la app card
                   // const SizedBox(height: 20),
                   Positioned(
-                    top: 170,
+                    top: 100 + (17.0 * userNr),
                     child: Container(
                       height: size.height * 0.5,
                       width: width,
                       decoration: BoxDecoration(
-                          
                           color: Colors.indigo.shade100,
                           borderRadius: const BorderRadius.only(
-                             
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20))),
+                              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
                       padding: const EdgeInsets.all(10),
                       child: Wrap(
                         children: [
@@ -52,9 +51,7 @@ class InfoPage extends StatelessWidget {
                                 color: Colors.white,
                                 child: Text(
                                   'Gastos comunes ${DateTime.now().year}',
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                                 )),
                           ),
                           const _ExpensesChartsRow(),
@@ -67,17 +64,16 @@ class InfoPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0).copyWith(top: 0),
               child: Wrap(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0).copyWith(top: 0),
                     child: Title(
                         color: Colors.white,
                         child: Text(
                           'Gastos personales ${DateTime.now().year}',
-                          style: TextStyle(
-                              fontSize: 32, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                         )),
                   ),
                   const _ExpensesChartsRow(
@@ -110,33 +106,27 @@ class _AppUsersInfo extends StatelessWidget {
     final width = size.width;
     return Container(
         width: width,
-        height: 200,
-        padding: EdgeInsets.all(15),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(15).copyWith(bottom: 60),
+        decoration: const  BoxDecoration(
             color: Colors.indigo,
             borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(15),
-                bottomRight: Radius.circular(15))),
+                bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))),
         child: test());
   }
 
   Widget test() {
     final row = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Nombre',
-            style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
-        Text('Total Gastado',
-            style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
-        Text('Fecha',
-            style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
+        Text('Nombre', style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
+        Text('Total Gastado', style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
+        Text('Fecha', style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
       ],
     );
     ;
     return Wrap(
       children: [
-        Text('Usuarios de la aplicación',
-            style: titleStyle(25.2).copyWith(color: Colors.white)),
+        Text('Usuarios de la aplicación', style: titleStyle(25.2).copyWith(color: Colors.white)),
         Container(
           margin: EdgeInsets.only(top: 5),
           padding: EdgeInsets.all(6),
@@ -152,8 +142,7 @@ class _AppUsersInfo extends StatelessWidget {
               ...users
                   .map((e) => _UserInfoContainer(
                       userName: e.name,
-                      fecha: MyDateFormatter.toFormat(
-                          'dd/MM/yyyy', DateTime.now())))
+                      fecha: MyDateFormatter.toFormat('dd/MM/yyyy', DateTime.now())))
                   .toList(),
             ],
           ),
@@ -262,15 +251,16 @@ class _UserInfoContainerState extends State<_UserInfoContainer> {
       DataCell(Text(widget.fecha, style: textStyle(14.2)))
     ]);
 
-    final table  = TableRow(children: [
+    final table = TableRow(children: [
       Text(widget.userName, style: textStyle(14.2)),
-      loadingOrWidget(
-          expenseProvider.loading,
-          Text('${total == null ? "0.00" : total!.toStringAsFixed(2)} €',
-              style: textStyle(14.2))),
+      loadingOrWidget(expenseProvider.loading,
+          Text('${total == null ? "0.00" : total!.toStringAsFixed(2)} €', style: textStyle(14.2))),
       Text(widget.fecha, style: textStyle(14.2))
     ]);
-    final t = Table(children: [table], defaultColumnWidth: FixedColumnWidth(120),);
+    final t = Table(
+      children: [table],
+      defaultColumnWidth: FixedColumnWidth(width *0.35),
+    );
     return true
         ? t
         : Center(
@@ -286,8 +276,7 @@ class _UserInfoContainerState extends State<_UserInfoContainer> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Nombre',
-                                style: textStyle(14.2)
-                                    .copyWith(fontWeight: FontWeight.bold)),
+                                style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
                             const SizedBox(
                               height: 5,
                             ),
@@ -298,15 +287,13 @@ class _UserInfoContainerState extends State<_UserInfoContainer> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Total Gastado',
-                                style: textStyle(14.2)
-                                    .copyWith(fontWeight: FontWeight.bold)),
+                                style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
                             const SizedBox(
                               height: 5,
                             ),
                             loadingOrWidget(
                                 expenseProvider.loading,
-                                Text(
-                                    '${total == null ? "0.00" : total!.toStringAsFixed(2)} €',
+                                Text('${total == null ? "0.00" : total!.toStringAsFixed(2)} €',
                                     style: textStyle(14.2)))
                           ],
                         ),
@@ -314,8 +301,7 @@ class _UserInfoContainerState extends State<_UserInfoContainer> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Fecha',
-                                style: textStyle(14.2)
-                                    .copyWith(fontWeight: FontWeight.bold)),
+                                style: textStyle(14.2).copyWith(fontWeight: FontWeight.bold)),
                             const SizedBox(
                               height: 5,
                             ),

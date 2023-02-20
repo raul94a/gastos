@@ -8,6 +8,7 @@ import 'package:gastos/providers/categories_provider.dart';
 import 'package:gastos/providers/expense_provider.dart';
 import 'package:gastos/providers/selected_date_provider.dart';
 import 'package:gastos/providers/users_provider.dart';
+import 'package:gastos/utils/date_formatter.dart';
 import 'package:gastos/utils/material_state_property_mixin.dart';
 import 'package:provider/provider.dart';
 
@@ -291,8 +292,8 @@ class _ExpenseHandlerContentState extends State<ExpenseHandlerContent> {
 
     //if Date is not null, the creation is being triggered through the add button for past dates.
     //so, the only thing needed to be done is to fetch an expense from that date and borrow its createdDate
-    final createdDate = widget.date != null
-        ? state.expenses[widget.date!]!.first.createdDate
+     final createdDate = widget.date != null
+        ? MyDateFormatter.fromYYYYMMdd(widget.date!).toLocal()
         : DateTime.now().toLocal();
     final updatedDate = createdDate;
     final expense = Expense(

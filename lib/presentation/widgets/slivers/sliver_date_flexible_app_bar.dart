@@ -154,75 +154,77 @@ class _SliverDateFlexibleAppBarState extends State<SliverDateFlexibleAppBar> {
 
                       //color: Colors.greenAccent,
                       child: Consumer<SelectedDateProvider>(
-                        builder: (ctx, _, __) => Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Fecha',
+                        builder: (ctx, _, __) => SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Fecha',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor)),
+                                  Text(selectedDateProvider.selectedDate,
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor))
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Gastos',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor)),
+                                  Text(
+                                      '${controller.totalExpenseOfDatePrice().toStringAsFixed(2)} €',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor))
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Número de gastos',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor)),
+                                  Text(
+                                      '${controller.totalExpensesOfDateLength()}',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor))
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Mayor gasto en',
+                                      style: GoogleFonts.raleway(
+                                          fontSize: _fontSize,
+                                          color: containerTextColor)),
+                                  Text(
+                                    controller.categoryWithMoreExpenses(),
                                     style: GoogleFonts.raleway(
                                         fontSize: _fontSize,
-                                        color: containerTextColor)),
-                                Text(selectedDateProvider.selectedDate,
-                                    style: GoogleFonts.raleway(
-                                        fontSize: _fontSize,
-                                        color: containerTextColor))
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Gastos',
-                                    style: GoogleFonts.raleway(
-                                        fontSize: _fontSize,
-                                        color: containerTextColor)),
-                                Text(
-                                    '${controller.totalExpenseOfDatePrice().toStringAsFixed(2)} €',
-                                    style: GoogleFonts.raleway(
-                                        fontSize: _fontSize,
-                                        color: containerTextColor))
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Número de gastos',
-                                    style: GoogleFonts.raleway(
-                                        fontSize: _fontSize,
-                                        color: containerTextColor)),
-                                Text(
-                                    '${controller.totalExpensesOfDateLength()}',
-                                    style: GoogleFonts.raleway(
-                                        fontSize: _fontSize,
-                                        color: containerTextColor))
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Mayor gasto en',
-                                    style: GoogleFonts.raleway(
-                                        fontSize: _fontSize,
-                                        color: containerTextColor)),
-                                Text(
-                                  controller.categoryWithMoreExpenses(),
-                                  style: GoogleFonts.raleway(
-                                      fontSize: _fontSize,
-                                      color: containerTextColor),
-                                )
-                              ],
-                            ),
-                            Visibility(
-                                visible: false,
-                                child: ElevatedButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                        'Añadir gasto a ${selectedDateProvider.selectedDate}',
-                                        style: GoogleFonts.raleway(
-                                            fontSize: _fontSize,
-                                            color: containerTextColor))))
-                          ],
+                                        color: containerTextColor),
+                                  )
+                                ],
+                              ),
+                              Visibility(
+                                  visible: false,
+                                  child: ElevatedButton(
+                                      onPressed: () {},
+                                      child: Text(
+                                          'Añadir gasto a ${selectedDateProvider.selectedDate}',
+                                          style: GoogleFonts.raleway(
+                                              fontSize: _fontSize,
+                                              color: containerTextColor))))
+                            ],
+                          ),
                         ),
                       ),
                     ),

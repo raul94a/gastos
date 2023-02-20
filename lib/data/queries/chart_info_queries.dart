@@ -7,7 +7,7 @@ class ChartInfoQueries {
         'from expenses e '
         'where deleted = 0 '
         'AND isCommonExpense = $common '
-        'AND ( createdDate > $startTimeMillis '
+        'AND ( createdDate >= $startTimeMillis '
         'AND createdDate < $endTimeMillis ) '
         'GROUP BY date ';
     return sql;
@@ -53,7 +53,7 @@ class ChartInfoQueries {
         'from expenses e '
         'where deleted = 0 '
         'AND isCommonExpense = $common '
-        'AND ( createdDate > $startTimeMillis '
+        'AND ( createdDate >= $startTimeMillis '
         'AND createdDate < $endTimeMillis ) '
         'GROUP BY category '
         'ORDER BY price desc '
