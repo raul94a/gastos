@@ -33,7 +33,7 @@ class DateExpenses {
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: maxY,
-            color: const Color.fromARGB(66, 202, 202, 202),
+            color: Color.fromARGB(126, 130, 125, 125),
           ),
           toY: price.toDouble(),
           gradient: gradient,
@@ -54,7 +54,7 @@ class DateExpenses {
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: maxY,
-            color: const Color.fromARGB(66, 202, 202, 202),
+            color: Color.fromARGB(171, 130, 125, 125),
           ),
           // width: 5,
           toY: price.toDouble(),

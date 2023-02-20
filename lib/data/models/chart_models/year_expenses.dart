@@ -57,7 +57,7 @@ class YearExpenses {
             backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: maxY,
-            color: Color.fromARGB(74, 158, 155, 155),
+            color: Color.fromARGB(171, 130, 125, 125),
           ),
           toY: price.toDouble(),
           gradient: gradient,
